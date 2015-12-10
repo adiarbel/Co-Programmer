@@ -48,7 +48,7 @@ namespace Company.VSPackage1
 
     public sealed class VSPackage1Package : Package
     {
-
+        
         private DTE2 dte;
         private IWpfTextViewHost iwpf;
         TextDocumentKeyPressEvents tde;
@@ -123,7 +123,11 @@ namespace Company.VSPackage1
                 tde.BeforeKeyPress += new _dispTextDocumentKeyPressEvents_BeforeKeyPressEventHandler(CallBack);
                 te = ((Events2)DTE2.Events).TextEditorEvents;
                 te.LineChanged += new _dispTextEditorEvents_LineChangedEventHandler(CallBack2);
-                
+                IWpfTextViewHost h = GetCurrentViewHost();
+                ITextCaret c = h.TextView.Caret;
+                MyCallBack obj = new MyCallBack();
+                obj.callService(c.Position.ToString());
+
                 //ts.NewLine();
                 //ts.Insert("a");
             }
@@ -192,9 +196,6 @@ namespace Company.VSPackage1
             DTE2.ActiveDocument.Save();
             twice = false;
             */
-            IWpfTextViewHost h = GetCurrentViewHost();
-            ITextCaret c = h.TextView.Caret;
-            MessageBox.Show(c.Position.ToString());
         }
         private void CallBack2(TextPoint a, TextPoint b, int i)
         {
