@@ -15,10 +15,14 @@ namespace DuplexService
         void SendCaretPosition(string location);
         [OperationContract]
         void NormalFunction();
+        [OperationContract]
+        void GetChanges();
     }
     public interface IEditServiceCallBack
     {
         [OperationContract]
         void CallBackFunction(string str);
+        [OperationContract]
+        void CallBackChanges(string[] s);
     }
 }

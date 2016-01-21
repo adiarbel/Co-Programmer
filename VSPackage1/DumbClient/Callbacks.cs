@@ -3,13 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Company.VSPackage1.ServiceReference1;
+using DumbClient.ServiceReference1;
 using System.ServiceModel;
 
-namespace Company.VSPackage1
+namespace DumbClient
 {
-    [CallbackBehavior(UseSynchronizationContext = false)]
-    class MyCallBack : IEditServiceCallback, IDisposable
+    class Callbacks : IEditServiceCallback, IDisposable
     {
         EditServiceClient proxy;
         InstanceContext context;
@@ -17,25 +16,17 @@ namespace Company.VSPackage1
         NetTcpBinding mybinding;
         DuplexChannelFactory<IEditService> myChannelFactory;
         IEditService wcfclient;
-        public void CallBackFunction(string str)
-        {
-            System.Windows.Forms.MessageBox.Show(str);
-        }
-        public MyCallBack()
+        public Callbacks()
         {
             context = new InstanceContext(this);
             mybinding = new NetTcpBinding();
             myEndPoint = new EndpointAddress("net.tcp://localhost:8090/EditService");
             myChannelFactory = new DuplexChannelFactory<IEditService>(context, mybinding, myEndPoint);
-            wcfclient = myChannelFactory.CreateChannel();            
+            wcfclient = myChannelFactory.CreateChannel();
         }
-        public void callService(string str)
+        public void CallBackFunction(string str)
         {
-            wcfclient.SendCaretPosition(str);
-        }
-        public void getChange()
-        {
-            wcfclient.GetChanges();
+            Console.WriteLine(str);
         }
         public void CallBackChanges(string[] s)
         {
@@ -45,6 +36,14 @@ namespace Company.VSPackage1
                 st += s[i];
             }
             CallBackFunction(st);
+        }
+        public void getChange()
+        {
+            wcfclient.GetChanges();
+        }
+        public void callService(string str)
+        {
+            wcfclient.SendCaretPosition(str);
         }
         public void Dispose()
         {

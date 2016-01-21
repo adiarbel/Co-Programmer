@@ -55,6 +55,7 @@ namespace Company.VSPackage1
         TextEditorEvents te;
         char[] text = new char[50];
         int place = 0;
+        MyCallBack cb;
         private DTE2 DTE2
         {
             get { return dte ?? (dte = ServiceProvider.GlobalProvider.GetService(typeof(DTE)) as DTE2); }
@@ -122,11 +123,8 @@ namespace Company.VSPackage1
                 tde = ((Events2)DTE2.Events).TextDocumentKeyPressEvents;
                 tde.BeforeKeyPress += new _dispTextDocumentKeyPressEvents_BeforeKeyPressEventHandler(CallBack);
                 te = ((Events2)DTE2.Events).TextEditorEvents;
-                te.LineChanged += new _dispTextEditorEvents_LineChangedEventHandler(CallBack2);
-                IWpfTextViewHost h = GetCurrentViewHost();
-                ITextCaret c = h.TextView.Caret;
-                MyCallBack obj = new MyCallBack();
-                obj.callService(c.Position.ToString());
+                te.LineChanged += new _dispTextEditorEvents_LineChangedEventHandler(CallBack2);                
+                 cb = new MyCallBack();
 
                 //ts.NewLine();
                 //ts.Insert("a");
@@ -197,6 +195,7 @@ namespace Company.VSPackage1
             twice = false;
             */
         }
+        int countCalls = 0;
         private void CallBack2(TextPoint a, TextPoint b, int i)
         {
             //MessageBox.Show( Clipboard.GetText());   
@@ -204,14 +203,21 @@ namespace Company.VSPackage1
             //   EnvDTE.VirtualPoint vp = ts.ActivePoint;
             // System.Windows.Forms.MessageBox.Show(st);
             //DTE2.ActiveDocument.Save();
+            IWpfTextViewHost h = GetCurrentViewHost();
+            ITextCaret c = h.TextView.Caret;
             MessageBox.Show("a:" + a.Line + "," + a.LineCharOffset + "," + a.DTE.ActiveDocument.Name + "\n b:" + b.Line + "," + b.LineCharOffset + b.DTE.ActiveDocument.Name + "\n" + i);
             int line = ts.ActivePoint.Line;
             int charoff = ts.ActivePoint.LineCharOffset;
+            cb.callService(c.Position.ToString());
             TextSelection ts2 = null;
             ts2 = DTE2.ActiveWindow.Project.ProjectItems.Item("Class2.cs").Document.Selection as TextSelection;
             ts2.MoveToLineAndOffset(line, charoff, false);
             DTE2.ActiveDocument.Save();
-            
+            countCalls++;
+            if(countCalls%10==0)
+            {
+                cb.getChange();
+            }
         }
         IWpfTextViewHost GetCurrentViewHost()
         {

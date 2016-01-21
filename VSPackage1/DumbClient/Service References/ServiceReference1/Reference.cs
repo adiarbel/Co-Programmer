@@ -8,11 +8,11 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Company.VSPackage1.ServiceReference1 {
+namespace DumbClient.ServiceReference1 {
     
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
-    [System.ServiceModel.ServiceContractAttribute(ConfigurationName="ServiceReference1.IEditService", CallbackContract=typeof(Company.VSPackage1.ServiceReference1.IEditServiceCallback))]
+    [System.ServiceModel.ServiceContractAttribute(ConfigurationName="ServiceReference1.IEditService", CallbackContract=typeof(DumbClient.ServiceReference1.IEditServiceCallback))]
     public interface IEditService {
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IEditService/SendCaretPosition", ReplyAction="http://tempuri.org/IEditService/SendCaretPositionResponse")]
@@ -45,12 +45,12 @@ namespace Company.VSPackage1.ServiceReference1 {
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
-    public interface IEditServiceChannel : Company.VSPackage1.ServiceReference1.IEditService, System.ServiceModel.IClientChannel {
+    public interface IEditServiceChannel : DumbClient.ServiceReference1.IEditService, System.ServiceModel.IClientChannel {
     }
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
-    public partial class EditServiceClient : System.ServiceModel.DuplexClientBase<Company.VSPackage1.ServiceReference1.IEditService>, Company.VSPackage1.ServiceReference1.IEditService {
+    public partial class EditServiceClient : System.ServiceModel.DuplexClientBase<DumbClient.ServiceReference1.IEditService>, DumbClient.ServiceReference1.IEditService {
         
         public EditServiceClient(System.ServiceModel.InstanceContext callbackInstance) : 
                 base(callbackInstance) {
