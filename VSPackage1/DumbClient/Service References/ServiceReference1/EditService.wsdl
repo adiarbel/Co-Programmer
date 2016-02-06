@@ -54,6 +54,12 @@
   <wsdl:message name="IEditService_GetChanges_OutputMessage">
     <wsdl:part name="parameters" element="tns:GetChangesResponse" />
   </wsdl:message>
+  <wsdl:message name="IEditService_printIds_InputMessage">
+    <wsdl:part name="parameters" element="tns:printIds" />
+  </wsdl:message>
+  <wsdl:message name="IEditService_printIds_OutputMessage">
+    <wsdl:part name="parameters" element="tns:printIdsResponse" />
+  </wsdl:message>
   <wsdl:message name="IEditService_CallBackFunction_OutputCallbackMessage">
     <wsdl:part name="parameters" element="tns:CallBackFunction" />
   </wsdl:message>
@@ -78,6 +84,10 @@
     <wsdl:operation name="GetChanges">
       <wsdl:input wsaw:Action="http://tempuri.org/IEditService/GetChanges" message="tns:IEditService_GetChanges_InputMessage" />
       <wsdl:output wsaw:Action="http://tempuri.org/IEditService/GetChangesResponse" message="tns:IEditService_GetChanges_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="printIds">
+      <wsdl:input wsaw:Action="http://tempuri.org/IEditService/printIds" message="tns:IEditService_printIds_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IEditService/printIdsResponse" message="tns:IEditService_printIds_OutputMessage" />
     </wsdl:operation>
     <wsdl:operation name="CallBackFunction">
       <wsdl:output wsaw:Action="http://tempuri.org/IEditService/CallBackFunction" message="tns:IEditService_CallBackFunction_OutputCallbackMessage" />
@@ -111,6 +121,15 @@
     </wsdl:operation>
     <wsdl:operation name="GetChanges">
       <soap12:operation soapAction="http://tempuri.org/IEditService/GetChanges" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="printIds">
+      <soap12:operation soapAction="http://tempuri.org/IEditService/printIds" style="document" />
       <wsdl:input>
         <soap12:body use="literal" />
       </wsdl:input>

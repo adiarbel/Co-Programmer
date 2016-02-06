@@ -45,7 +45,8 @@ namespace DumbClient
         {
             wcfclient.SendCaretPosition(str);
         }
-        public void Dispose()
+
+        void IDisposable.Dispose()
         {
             proxy.Close();
         }

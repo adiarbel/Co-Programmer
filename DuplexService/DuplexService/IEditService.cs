@@ -17,6 +17,8 @@ namespace DuplexService
         void NormalFunction();
         [OperationContract]
         void GetChanges();
+        [OperationContract]
+        void printIds();
     }
     public interface IEditServiceCallBack
     {

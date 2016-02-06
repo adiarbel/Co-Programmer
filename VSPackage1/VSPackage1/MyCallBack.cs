@@ -8,6 +8,9 @@ using System.ServiceModel;
 
 namespace Company.VSPackage1
 {
+    //TODO: define delegate
+    //TODO: define event for that delegate
+    //TODO: define the above for each event that might come from the server's callbacks
     [CallbackBehavior(UseSynchronizationContext = false)]
     class MyCallBack : IEditServiceCallback, IDisposable
     {
@@ -46,7 +49,12 @@ namespace Company.VSPackage1
             }
             CallBackFunction(st);
         }
-        public void Dispose()
+        public void PrintIds()
+        {
+            wcfclient.printIds();
+        }
+
+        void IDisposable.Dispose()
         {
             proxy.Close();
         }

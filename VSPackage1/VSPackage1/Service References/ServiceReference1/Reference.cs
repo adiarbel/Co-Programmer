@@ -32,6 +32,12 @@ namespace Company.VSPackage1.ServiceReference1 {
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IEditService/GetChanges", ReplyAction="http://tempuri.org/IEditService/GetChangesResponse")]
         System.Threading.Tasks.Task GetChangesAsync();
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IEditService/printIds", ReplyAction="http://tempuri.org/IEditService/printIdsResponse")]
+        void printIds();
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IEditService/printIds", ReplyAction="http://tempuri.org/IEditService/printIdsResponse")]
+        System.Threading.Tasks.Task printIdsAsync();
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
@@ -94,6 +100,14 @@ namespace Company.VSPackage1.ServiceReference1 {
         
         public System.Threading.Tasks.Task GetChangesAsync() {
             return base.Channel.GetChangesAsync();
+        }
+        
+        public void printIds() {
+            base.Channel.printIds();
+        }
+        
+        public System.Threading.Tasks.Task printIdsAsync() {
+            return base.Channel.printIdsAsync();
         }
     }
 }

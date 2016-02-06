@@ -126,6 +126,10 @@ namespace Company.VSPackage1
                 te.LineChanged += new _dispTextEditorEvents_LineChangedEventHandler(CallBack2);                
                  cb = new MyCallBack();
 
+                //TODO: register to cb's events
+                //TODO: add a different handler function for each of the events
+                // examples: http://www.codeproject.com/Articles/20550/C-Event-Implementation-Fundamentals-Best-Practices
+
                 //ts.NewLine();
                 //ts.Insert("a");
             }
@@ -208,6 +212,7 @@ namespace Company.VSPackage1
             MessageBox.Show("a:" + a.Line + "," + a.LineCharOffset + "," + a.DTE.ActiveDocument.Name + "\n b:" + b.Line + "," + b.LineCharOffset + b.DTE.ActiveDocument.Name + "\n" + i);
             int line = ts.ActivePoint.Line;
             int charoff = ts.ActivePoint.LineCharOffset;
+            cb.PrintIds();
             cb.callService(c.Position.ToString());
             TextSelection ts2 = null;
             ts2 = DTE2.ActiveWindow.Project.ProjectItems.Item("Class2.cs").Document.Selection as TextSelection;

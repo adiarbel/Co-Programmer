@@ -7,11 +7,18 @@ using System.Text;
 
 namespace DuplexService
 {
-    [ServiceBehavior(ConcurrencyMode=ConcurrencyMode.Reentrant)]
-    public class EditService : IEditService
+    [ServiceBehavior(InstanceContextMode = InstanceContextMode.PerSession, ConcurrencyMode = ConcurrencyMode.Reentrant)]
+    public class EditService : IEditService,IDisposable
     {
-       string[] currChanges = new string[10];
-       int place = 0;
+        string[] currChanges = new string[10];
+        static List<string> ids = new List<string>();
+        string id;
+        int place = 0;
+        public EditService()
+        {
+            ids.Add(OperationContext.Current.SessionId);
+            id = OperationContext.Current.SessionId;
+        }
         public void NormalFunction()
         {
             IEditServiceCallBack callback = OperationContext.Current.GetCallbackChannel<IEditServiceCallBack>();
@@ -21,8 +28,8 @@ namespace DuplexService
         {
             IEditServiceCallBack callback = OperationContext.Current.GetCallbackChannel<IEditServiceCallBack>();
             currChanges[place++] = location;
-            callback.CallBackFunction(location+" From Service");
-            
+            callback.CallBackFunction(location + " From Service");
+
         }
         public void GetChanges()
         {
@@ -31,6 +38,18 @@ namespace DuplexService
             currChanges = new string[10];
             place = 0;
         }
+        public void printIds()
+        {
+            for (int i = 0; i < ids.Count; i++)
+            {
+                Console.WriteLine(ids[i]);
+            }
+        }
+        void IDisposable.Dispose()
+        {
+            ids.Remove(id);
+        }
 
     }
+    
 }
