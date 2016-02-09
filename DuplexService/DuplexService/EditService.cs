@@ -28,7 +28,7 @@ namespace DuplexService
         {
             IEditServiceCallBack callback = OperationContext.Current.GetCallbackChannel<IEditServiceCallBack>();
             currChanges[place++] = location;
-            callback.CallBackFunction(location + " From Service");
+            callback.CallBackFunction(location + ",From Service");
 
         }
         public void GetChanges()

@@ -14,15 +14,13 @@ namespace DumbClient
         InstanceContext context;
         EndpointAddress myEndPoint;
         NetTcpBinding mybinding;
-        DuplexChannelFactory<IEditService> myChannelFactory;
         IEditService wcfclient;
         public Callbacks()
         {
             context = new InstanceContext(this);
             mybinding = new NetTcpBinding();
             myEndPoint = new EndpointAddress("net.tcp://localhost:8090/EditService");
-            myChannelFactory = new DuplexChannelFactory<IEditService>(context, mybinding, myEndPoint);
-            wcfclient = myChannelFactory.CreateChannel();
+            wcfclient = new EditServiceClient(context,mybinding,myEndPoint);
         }
         public void CallBackFunction(string str)
         {

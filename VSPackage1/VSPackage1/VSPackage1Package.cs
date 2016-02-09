@@ -125,7 +125,7 @@ namespace Company.VSPackage1
                 te = ((Events2)DTE2.Events).TextEditorEvents;
                 te.LineChanged += new _dispTextEditorEvents_LineChangedEventHandler(CallBack2);                
                  cb = new MyCallBack();
-
+                 cb.ChangeCaret += new ChangeCaretEventHandler(my_CaretChange);
                 //TODO: register to cb's events
                 //TODO: add a different handler function for each of the events
                 // examples: http://www.codeproject.com/Articles/20550/C-Event-Implementation-Fundamentals-Best-Practices
@@ -134,6 +134,15 @@ namespace Company.VSPackage1
                 //ts.Insert("a");
             }
 
+        }
+        private void my_CaretChange(object sender, ChangeCaretEventArgs e)
+        {
+           
+            
+            TextSelection ts2 = null;
+            ts2 = DTE2.ActiveWindow.Project.ProjectItems.Item("Class2.cs").Document.Selection as TextSelection;
+            ts2.MoveToLineAndOffset(int.Parse(e.Location.Split(',')[3])+5, int.Parse(e.Location.Split(',')[4]));
+            ts2.Insert("oved");
         }
         bool twice = false;
         private void CallBack(string st, TextSelection ts, bool b, ref bool br)
@@ -213,7 +222,7 @@ namespace Company.VSPackage1
             int line = ts.ActivePoint.Line;
             int charoff = ts.ActivePoint.LineCharOffset;
             cb.PrintIds();
-            cb.callService(c.Position.ToString());
+            cb.callService(a.Line + "," + a.LineCharOffset + "," + a.DTE.ActiveDocument.Name + "," + b.Line + "," + b.LineCharOffset +","+ b.DTE.ActiveDocument.Name);
             TextSelection ts2 = null;
             ts2 = DTE2.ActiveWindow.Project.ProjectItems.Item("Class2.cs").Document.Selection as TextSelection;
             ts2.MoveToLineAndOffset(line, charoff, false);

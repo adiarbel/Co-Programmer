@@ -8,29 +8,31 @@ using System.ServiceModel;
 
 namespace Company.VSPackage1
 {
-    //TODO: define delegate
-    //TODO: define event for that delegate
-    //TODO: define the above for each event that might come from the server's callbacks
+    /*TODO: define delegate*/
+    public delegate void ChangeCaretEventHandler(object sender, ChangeCaretEventArgs e);
+    /*TODO: define event for that delegate*/
+    
+    /*TODO: define the above for each event that might come from the server's callbacks*/
     [CallbackBehavior(UseSynchronizationContext = false)]
     class MyCallBack : IEditServiceCallback, IDisposable
     {
+        public event ChangeCaretEventHandler ChangeCaret;
         EditServiceClient proxy;
         InstanceContext context;
         EndpointAddress myEndPoint;
         NetTcpBinding mybinding;
-        DuplexChannelFactory<IEditService> myChannelFactory;
-        IEditService wcfclient;
+        ServiceReference1.EditServiceClient wcfclient;
         public void CallBackFunction(string str)
         {
             System.Windows.Forms.MessageBox.Show(str);
+            OnCaretChanged(str);
         }
         public MyCallBack()
         {
             context = new InstanceContext(this);
             mybinding = new NetTcpBinding();
             myEndPoint = new EndpointAddress("net.tcp://localhost:8090/EditService");
-            myChannelFactory = new DuplexChannelFactory<IEditService>(context, mybinding, myEndPoint);
-            wcfclient = myChannelFactory.CreateChannel();            
+            wcfclient = new ServiceReference1.EditServiceClient(context,mybinding,myEndPoint);         
         }
         public void callService(string str)
         {
@@ -58,5 +60,30 @@ namespace Company.VSPackage1
         {
             proxy.Close();
         }
+        private void OnCaretChanged(string str)
+        {
+            if (ChangeCaret!=null)
+            {
+                ChangeCaret(this, new ChangeCaretEventArgs(str));
+            }
+        }
+    }
+    public class ChangeCaretEventArgs : EventArgs
+    {
+        // Fields
+        private string m_location = string.Empty;
+
+        // Constructor
+        public ChangeCaretEventArgs(string location)
+        {
+            m_location = location;
+        }
+        // Properties (read-only)
+        public string Location
+        {
+            get { return m_location; }
+        }
+
+
     }
 }
