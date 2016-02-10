@@ -17,11 +17,10 @@ namespace Company.VSPackage1
     class MyCallBack : IEditServiceCallback, IDisposable
     {
         public event ChangeCaretEventHandler ChangeCaret;
-        EditServiceClient proxy;
         InstanceContext context;
         EndpointAddress myEndPoint;
         NetTcpBinding mybinding;
-        ServiceReference1.EditServiceClient wcfclient;
+        EditServiceClient wcfclient;
         public void CallBackFunction(string str)
         {
             System.Windows.Forms.MessageBox.Show(str);
@@ -58,7 +57,7 @@ namespace Company.VSPackage1
 
         void IDisposable.Dispose()
         {
-            proxy.Close();
+            wcfclient.Close();
         }
         private void OnCaretChanged(string str)
         {

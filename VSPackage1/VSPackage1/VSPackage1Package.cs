@@ -48,7 +48,7 @@ namespace Company.VSPackage1
 
     public sealed class VSPackage1Package : Package
     {
-        
+
         private DTE2 dte;
         private IWpfTextViewHost iwpf;
         TextDocumentKeyPressEvents tde;
@@ -78,7 +78,29 @@ namespace Company.VSPackage1
             Debug.WriteLine(string.Format(CultureInfo.CurrentCulture, "Entering constructor for: {0}", this.ToString()));
 
         }
-
+        IWpfTextViewHost GetCurrentViewHost()
+        {
+            // code to get access to the editor's currently selected text cribbed from
+            // http://msdn.microsoft.com/en-us/library/dd884850.aspx
+            IVsTextManager txtMgr = (IVsTextManager)GetService(typeof(SVsTextManager));
+            IVsTextView vTextView = null;
+            int mustHaveFocus = 1;
+            txtMgr.GetActiveView(mustHaveFocus, null, out vTextView);
+            IVsUserData userData = vTextView as IVsUserData;
+            if (userData == null)
+            {
+                return null;
+            }
+            else
+            {
+                IWpfTextViewHost viewHost;
+                object holder;
+                Guid guidViewHost = DefGuidList.guidIWpfTextViewHost;
+                userData.GetData(ref guidViewHost, out holder);
+                viewHost = (IWpfTextViewHost)holder;
+                return viewHost;
+            }
+        }
 
 
         /////////////////////////////////////////////////////////////////////////////
@@ -116,148 +138,12 @@ namespace Company.VSPackage1
         {
             //CoProWindow c = new CoProWindow(DTE);
             // c.Show();      
-            if (DTE2.ActiveWindow != null)
-            {
-
-                
-                tde = ((Events2)DTE2.Events).TextDocumentKeyPressEvents;
-                tde.BeforeKeyPress += new _dispTextDocumentKeyPressEvents_BeforeKeyPressEventHandler(CallBack);
-                te = ((Events2)DTE2.Events).TextEditorEvents;
-                te.LineChanged += new _dispTextEditorEvents_LineChangedEventHandler(CallBack2);                
-                 cb = new MyCallBack();
-                 cb.ChangeCaret += new ChangeCaretEventHandler(my_CaretChange);
-                //TODO: register to cb's events
-                //TODO: add a different handler function for each of the events
-                // examples: http://www.codeproject.com/Articles/20550/C-Event-Implementation-Fundamentals-Best-Practices
-
-                //ts.NewLine();
-                //ts.Insert("a");
-            }
-
+            Carets cs = new Carets(GetCurrentViewHost());
         }
-        private void my_CaretChange(object sender, ChangeCaretEventArgs e)
-        {
-           
-            
-            TextSelection ts2 = null;
-            ts2 = DTE2.ActiveWindow.Project.ProjectItems.Item("Class2.cs").Document.Selection as TextSelection;
-            ts2.MoveToLineAndOffset(int.Parse(e.Location.Split(',')[3])+5, int.Parse(e.Location.Split(',')[4]));
-            ts2.Insert("oved");
-        }
-        bool twice = false;
-        private void CallBack(string st, TextSelection ts, bool b, ref bool br)
-        {
-            /*
-            int line = ts.ActivePoint.Line;
-            int charoff = ts.ActivePoint.LineCharOffset;
-            int stn = (int)st[0];
-            TextSelection ts2 = null;
-            
-            /* Projects ps = DTE2.Solution.Projects;
-             ProjectItem pi=null;
-             foreach(Project p in ps)
-             {
-                 try
-                 {
-
-                     pi= p.ProjectItems.Item("Class2.cs");
-                     pi.Open();
-                     pi.Document.Activate();
-                     ts2 = pi.Document.Selection as TextSelection;
-                 }
-                 catch
-                 {
-                    
-                 }
-             }*/
-            /*
-            ts2 = DTE2.ActiveWindow.Project.ProjectItems.Item("Class2.cs").Document.Selection as TextSelection;
-            ts2.MoveToLineAndOffset(line, charoff, false);
-
-            if (twice == false)
-            {
-                if (st[0] == '\b')
-                {
-                    twice = true;
-                    ts2.DeleteLeft();
-                }
-
-                else if (st[0] == '\r')
-                {
-                    twice = true;
-                    ts2.NewLine();
-                }
-                else if (st[0] == '\t')
-                {
-                    twice = true;
-                    ts2.Indent(1);
-                }
-                else if (st[0] == 127)
-                {
-                    twice = true;
-                    ts2.Delete();
-                }
-                else
-                {
-                    ts2.Insert(st);
-                }
-                // pi.Save();
-                //  pi.Document.Close();
-            }
-            DTE2.ActiveDocument.Save();
-            twice = false;
-            */
-        }
-        int countCalls = 0;
-        private void CallBack2(TextPoint a, TextPoint b, int i)
-        {
-            //MessageBox.Show( Clipboard.GetText());   
-            EnvDTE.TextSelection ts = dte.ActiveDocument.Selection as EnvDTE.TextSelection;
-            //   EnvDTE.VirtualPoint vp = ts.ActivePoint;
-            // System.Windows.Forms.MessageBox.Show(st);
-            //DTE2.ActiveDocument.Save();
-            IWpfTextViewHost h = GetCurrentViewHost();
-            ITextCaret c = h.TextView.Caret;
-            MessageBox.Show("a:" + a.Line + "," + a.LineCharOffset + "," + a.DTE.ActiveDocument.Name + "\n b:" + b.Line + "," + b.LineCharOffset + b.DTE.ActiveDocument.Name + "\n" + i);
-            int line = ts.ActivePoint.Line;
-            int charoff = ts.ActivePoint.LineCharOffset;
-            cb.PrintIds();
-            cb.callService(a.Line + "," + a.LineCharOffset + "," + a.DTE.ActiveDocument.Name + "," + b.Line + "," + b.LineCharOffset +","+ b.DTE.ActiveDocument.Name);
-            TextSelection ts2 = null;
-            ts2 = DTE2.ActiveWindow.Project.ProjectItems.Item("Class2.cs").Document.Selection as TextSelection;
-            ts2.MoveToLineAndOffset(line, charoff, false);
-            DTE2.ActiveDocument.Save();
-            countCalls++;
-            if(countCalls%10==0)
-            {
-                cb.getChange();
-            }
-        }
-        IWpfTextViewHost GetCurrentViewHost()
-        {
-            // code to get access to the editor's currently selected text cribbed from
-            // http://msdn.microsoft.com/en-us/library/dd884850.aspx
-            IVsTextManager txtMgr = (IVsTextManager)GetService(typeof(SVsTextManager));
-            IVsTextView vTextView = null;
-            int mustHaveFocus = 1;
-            txtMgr.GetActiveView(mustHaveFocus, null, out vTextView);
-            IVsUserData userData = vTextView as IVsUserData;
-            if (userData == null)
-            {
-                return null;
-            }
-            else
-            {
-                IWpfTextViewHost viewHost;
-                object holder;
-                Guid guidViewHost = DefGuidList.guidIWpfTextViewHost;
-                userData.GetData(ref guidViewHost, out holder);
-                viewHost = (IWpfTextViewHost)holder;
-                return viewHost;
-            }
-        }
+        
+        
 
 
-       
+
     }
 }

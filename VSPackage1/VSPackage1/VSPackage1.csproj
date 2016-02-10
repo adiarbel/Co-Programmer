@@ -131,6 +131,7 @@
     </COMReference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Carets.cs" />
     <Compile Include="CoProWindow.xaml.cs">
       <DependentUpon>CoProWindow.xaml</DependentUpon>
     </Compile>
