@@ -10,7 +10,7 @@ namespace Company.VSPackage1
 {
     /*TODO: define delegate*/
     public delegate void ChangeCaretEventHandler(object sender, ChangeCaretEventArgs e);
-    /*TODO: define event for that delegate*/
+    /*TODO: define event for that delegate*/ 
     
     /*TODO: define the above for each event that might come from the server's callbacks*/
     [CallbackBehavior(UseSynchronizationContext = false)]
