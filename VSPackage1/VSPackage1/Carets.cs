@@ -47,16 +47,16 @@ namespace Company.VSPackage1
             {
                 iwpf = h;
                 tde = ((Events2)DTE2.Events).TextDocumentKeyPressEvents;
-                tde.BeforeKeyPress += new _dispTextDocumentKeyPressEvents_BeforeKeyPressEventHandler(CallBack);
+                tde.BeforeKeyPress += new _dispTextDocumentKeyPressEvents_BeforeKeyPressEventHandler(KeyPress_EventHandler);
                 te = ((Events2)DTE2.Events).TextEditorEvents;
-                te.LineChanged += new _dispTextEditorEvents_LineChangedEventHandler(CallBack2);
-                cb = new MyCallBack();
-                cb.ChangeCaret += new ChangeCaretEventHandler(my_CaretChange);
+                te.LineChanged += new _dispTextEditorEvents_LineChangedEventHandler(LineChanged_EventHandler);
+               // cb = new MyCallBack();
+                //cb.ChangeCaret += new ChangeCaretEventHandler(my_CaretChange);
                 twice = false;
                 //TODO: register to cb's events
                 //TODO: add a different handler function for each of the events
                 // examples: http://www.codeproject.com/Articles/20550/C-Event-Implementation-Fundamentals-Best-Practices
-
+                
                 //ts.NewLine();
                 //ts.Insert("a");
             }
@@ -66,20 +66,22 @@ namespace Company.VSPackage1
 
             if (twice == false)
             {
+                twice = true;
                 TextSelection ts2 = null;
                 ts2 = DTE2.ActiveWindow.Project.ProjectItems.Item("Class2.cs").Document.Selection as TextSelection;
                 string s = e.Location.Split(',')[3];
                 ts2.MoveToLineAndOffset(int.Parse(e.Location.Split(',')[3]), int.Parse(e.Location.Split(',')[4]));
-                ts2.Insert("oved");
-                twice = true;
+                ts2.Insert("oved");//TODO: Check event calling by insert and not by pressing
+                
             }
             else
             {
                 twice = false;
             }
         }
-        private void CallBack(string st, TextSelection ts, bool b, ref bool br)
+        private void KeyPress_EventHandler(string st, TextSelection ts, bool b, ref bool br)
         {
+            int i = 1;
             /*
             int line = ts.ActivePoint.Line;
             int charoff = ts.ActivePoint.LineCharOffset;
@@ -140,21 +142,27 @@ namespace Company.VSPackage1
             DTE2.ActiveDocument.Save();
             twice = false;
             */
+            //countCalls++;
+            //if (countCalls % 10 == 0)
+            //{
+            //    cb.getChange();
+            //}
         }
         int countCalls = 0;
-        private void CallBack2(TextPoint a, TextPoint b, int i)
+        private void LineChanged_EventHandler(TextPoint a, TextPoint b, int i)
         {
             //MessageBox.Show( Clipboard.GetText());   
             EnvDTE.TextSelection ts = dte.ActiveDocument.Selection as EnvDTE.TextSelection;
             //   EnvDTE.VirtualPoint vp = ts.ActivePoint;
             // System.Windows.Forms.MessageBox.Show(st);
             //DTE2.ActiveDocument.Save();
+            string s = ts.Text;
             ITextCaret c = iwpf.TextView.Caret;
             MessageBox.Show("a:" + a.Line + "," + a.LineCharOffset + "," + a.DTE.ActiveDocument.Name + "\n b:" + b.Line + "," + b.LineCharOffset + b.DTE.ActiveDocument.Name + "\n" + i);
             int line = ts.ActivePoint.Line;
             int charoff = ts.ActivePoint.LineCharOffset;
-            cb.PrintIds();
-            cb.callService(a.Line + "," + a.LineCharOffset + "," + a.DTE.ActiveDocument.Name + "," + b.Line + "," + b.LineCharOffset + "," + b.DTE.ActiveDocument.Name);
+            //cb.PrintIds();
+            //cb.callService(a.Line + "," + a.LineCharOffset + "," + a.DTE.ActiveDocument.Name + "," + b.Line + "," + b.LineCharOffset + "," + b.DTE.ActiveDocument.Name);
             TextSelection ts2 = null;
             ts2 = DTE2.ActiveWindow.Project.ProjectItems.Item("Class2.cs").Document.Selection as TextSelection;
             ts2.MoveToLineAndOffset(line, charoff, false);

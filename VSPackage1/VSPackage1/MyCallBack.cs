@@ -23,7 +23,7 @@ namespace Company.VSPackage1
         EditServiceClient wcfclient;
         public void CallBackFunction(string str)
         {
-            System.Windows.Forms.MessageBox.Show(str);
+          //  System.Windows.Forms.MessageBox.Show(str);
             OnCaretChanged(str);
         }
         public MyCallBack()
@@ -31,7 +31,8 @@ namespace Company.VSPackage1
             context = new InstanceContext(this);
             mybinding = new NetTcpBinding();
             myEndPoint = new EndpointAddress("net.tcp://localhost:8090/EditService");
-            wcfclient = new ServiceReference1.EditServiceClient(context,mybinding,myEndPoint);         
+            wcfclient = new ServiceReference1.EditServiceClient(context,mybinding,myEndPoint);
+            PrintIds();
         }
         public void callService(string str)
         {

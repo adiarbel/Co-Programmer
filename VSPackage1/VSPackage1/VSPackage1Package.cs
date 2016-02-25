@@ -139,6 +139,8 @@ namespace Company.VSPackage1
             //CoProWindow c = new CoProWindow(DTE);
             // c.Show();      
             Carets cs = new Carets(GetCurrentViewHost());
+            MultiEditFilterProvider m = new MultiEditFilterProvider();
+           
         }
         
         

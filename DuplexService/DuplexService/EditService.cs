@@ -11,12 +11,12 @@ namespace DuplexService
     public class EditService : IEditService,IDisposable
     {
         string[] currChanges = new string[10];
-        static List<string> ids = new List<string>();
+        static List<OperationContext> ids = new List<OperationContext>();
         string id;
         int place = 0;
         public EditService()
         {
-            ids.Add(OperationContext.Current.SessionId);
+            ids.Add(OperationContext.Current);
             id = OperationContext.Current.SessionId;
         }
         public void NormalFunction()
@@ -26,9 +26,23 @@ namespace DuplexService
         }
         public void SendCaretPosition(string location)
         {
-            IEditServiceCallBack callback = OperationContext.Current.GetCallbackChannel<IEditServiceCallBack>();
+            IEditServiceCallBack callback;
             currChanges[place++] = location;
-            callback.CallBackFunction(location + ",From Service");
+            for (int i = 0; i < ids.Count; i++)
+            {
+                if(ids[i].SessionId!=id)
+                {
+                    try
+                    {
+                        callback = ids[i].GetCallbackChannel<IEditServiceCallBack>();
+                        callback.CallBackFunction(location + ",From Service");
+                    }
+                    catch
+                    {
+                        ids.Remove(ids[i]);
+                    }
+                }
+            }
 
         }
         public void GetChanges()
@@ -42,12 +56,12 @@ namespace DuplexService
         {
             for (int i = 0; i < ids.Count; i++)
             {
-                Console.WriteLine(ids[i]);
+                Console.WriteLine(ids[i].SessionId);
             }
         }
         void IDisposable.Dispose()
         {
-            ids.Remove(id);
+            ids.Remove(OperationContext.Current);
         }
 
     }

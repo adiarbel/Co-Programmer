@@ -13,7 +13,8 @@ namespace DumbClient
             Callbacks c = new Callbacks();
             for (int i = 0; i < 10; i++)
             {
-                c.callService("Hello");
+                int line = 12+i;
+                c.callService("12,53,Class2.cs,"+(line)+",54,Class2.cs");
                 System.Threading.Thread.Sleep(1000);
             }
             c.getChange();

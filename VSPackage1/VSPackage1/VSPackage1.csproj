@@ -63,6 +63,7 @@
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data" />
     <Reference Include="System.Design" />
@@ -136,6 +137,8 @@
       <DependentUpon>CoProWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Guids.cs" />
+    <Compile Include="MultiEditCommandFilter.cs" />
+    <Compile Include="MultiEditFilterProvider.cs" />
     <Compile Include="MyCallBack.cs" />
     <Compile Include="Resources.Designer.cs">
       <AutoGen>True</AutoGen>
