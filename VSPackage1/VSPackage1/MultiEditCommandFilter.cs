@@ -19,7 +19,7 @@ namespace Company.VSPackage1
         internal bool m_added;
         private IAdornmentLayer m_adornmentLayer;//Our adornment layer to work on
         private bool requiresHandling = false;
-
+        List<ITrackingPoint> trackList = new List<ITrackingPoint>();
         public MultiEditCommandFilter(IWpfTextView textView)
         {
             m_textView = textView;
@@ -36,10 +36,16 @@ namespace Company.VSPackage1
                 requiresHandling = true;
 
             }
-            if (pguidCmdGroup == VSConstants.VSStd2K && nCmdID == (uint)VSConstants.VSStd2KCmdID.TYPECHAR)
+            if (requiresHandling == true)
             {
-                var typedChar = (char)(ushort)Marshal.GetObjectForNativeVariant(pvaIn);
-                int i = 1;
+                // Capture Alt Left Click, only when the Box Selection mode hasn't been used (After Drag-selecting)
+                if (pguidCmdGroup == VSConstants.VSStd2K && nCmdID == (uint)VSConstants.VSStd2KCmdID.ECMD_LEFTCLICK &&
+                                                            Keyboard.Modifiers == ModifierKeys.Alt)
+                {
+                    // Add a Edit point, show it Visually 
+                    AddSyncPoint();
+                    RedrawScreen();
+                }
             }
             return m_nextTarget.Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
         }
@@ -47,6 +53,18 @@ namespace Company.VSPackage1
         public int QueryStatus(ref Guid pguidCmdGroup, uint cCmds, OLECMD[] prgCmds, IntPtr pCmdText)
         {
             return m_nextTarget.QueryStatus(ref pguidCmdGroup, cCmds, prgCmds, pCmdText);
+        }
+
+        private void RedrawScreen()
+        {
+        }
+
+        private void AddSyncPoint()
+        {
+            CaretPosition curPosition = m_textView.Caret.Position;
+            var curTrackPoint = m_textView.TextSnapshot.CreateTrackingPoint(curPosition.BufferPosition.Position,
+            PointTrackingMode.Positive);
+            trackList.Add(curTrackPoint);
         }
     }
 }

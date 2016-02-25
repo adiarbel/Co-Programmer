@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
   <Metadata>
-    <Identity Id="0d8b7db9-221f-4434-9594-2c8caefc7625" Version="1.0" Language="en-US" Publisher="Company" />
+    <Identity Id="0d8b7db9-221f-4434-9594-2c8caefc7625" Version="1.01" Language="en-US" Publisher="Company" />
     <DisplayName>VSPackage1</DisplayName>
     <Description>Information about my package</Description>
   </Metadata>
@@ -14,5 +14,6 @@
   </Dependencies>
   <Assets>
     <Asset Type="Microsoft.VisualStudio.VsPackage" d:Source="Project" d:ProjectName="%CurrentProject%" Path="|%CurrentProject%;PkgdefProjectOutputGroup|" />
+    <Asset Type="Microsoft.VisualStudio.MefComponent" d:Source="Project" d:ProjectName="%CurrentProject%" Path="|%CurrentProject%|" />
   </Assets>
 </PackageManifest>

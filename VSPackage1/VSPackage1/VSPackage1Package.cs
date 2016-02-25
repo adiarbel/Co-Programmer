@@ -43,7 +43,7 @@ namespace Company.VSPackage1
     // This attribute is needed to let the shell know that this package exposes some menus.
     [ProvideMenuResource("Menus.ctmenu", 1)]
     [Guid(GuidList.guidVSPackage1PkgString)]
-
+    [ProvideAutoLoad("ADFC4E64-0397-11D1-9F4E-00A0C911004F")]
 
 
     public sealed class VSPackage1Package : Package
@@ -76,7 +76,7 @@ namespace Company.VSPackage1
         public VSPackage1Package()
         {
             Debug.WriteLine(string.Format(CultureInfo.CurrentCulture, "Entering constructor for: {0}", this.ToString()));
-
+            MultiEditFilterProvider m = new MultiEditFilterProvider();
         }
         IWpfTextViewHost GetCurrentViewHost()
         {
@@ -139,7 +139,7 @@ namespace Company.VSPackage1
             //CoProWindow c = new CoProWindow(DTE);
             // c.Show();      
             Carets cs = new Carets(GetCurrentViewHost());
-            MultiEditFilterProvider m = new MultiEditFilterProvider();
+            
            
         }
         

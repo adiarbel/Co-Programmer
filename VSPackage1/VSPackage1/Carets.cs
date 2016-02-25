@@ -50,8 +50,8 @@ namespace Company.VSPackage1
                 tde.BeforeKeyPress += new _dispTextDocumentKeyPressEvents_BeforeKeyPressEventHandler(KeyPress_EventHandler);
                 te = ((Events2)DTE2.Events).TextEditorEvents;
                 te.LineChanged += new _dispTextEditorEvents_LineChangedEventHandler(LineChanged_EventHandler);
-               // cb = new MyCallBack();
-                //cb.ChangeCaret += new ChangeCaretEventHandler(my_CaretChange);
+                cb = new MyCallBack();
+                cb.ChangeCaret += new ChangeCaretEventHandler(my_CaretChange);
                 twice = false;
                 //TODO: register to cb's events
                 //TODO: add a different handler function for each of the events
@@ -167,11 +167,6 @@ namespace Company.VSPackage1
             ts2 = DTE2.ActiveWindow.Project.ProjectItems.Item("Class2.cs").Document.Selection as TextSelection;
             ts2.MoveToLineAndOffset(line, charoff, false);
             DTE2.ActiveDocument.Save();
-            countCalls++;
-            if (countCalls % 10 == 0)
-            {
-                cb.getChange();
-            }
         }
         IWpfTextViewHost GetTextViewHost()
         {
