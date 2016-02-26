@@ -20,30 +20,68 @@ namespace Company.VSPackage1
         private IAdornmentLayer m_adornmentLayer;//Our adornment layer to work on
         private bool requiresHandling = false;
         List<ITrackingPoint> trackList = new List<ITrackingPoint>();
+        private static MyCallBack cb = new MyCallBack();
         public MultiEditCommandFilter(IWpfTextView textView)
         {
             m_textView = textView;
             m_adornmentLayer = m_textView.GetAdornmentLayer("MultiEditLayer");
-        }
+            m_added = false;
+            m_textView.LayoutChanged += m_textView_LayoutChanged;
 
+            cb.ChangeCaret += new ChangeCaretEventHandler(my_CaretChange);//how to send by parameter the NetworkClass ref
+        }
+        private void my_CaretChange(object sender, ChangeCaretEventArgs e)
+        {
+            ITextDocument textDoc;
+            var rc = m_textView.TextBuffer.Properties.TryGetProperty<ITextDocument>(
+              typeof(ITextDocument), out textDoc);
+            if (rc == true)
+                System.Windows.Forms.MessageBox.Show(textDoc.FilePath);//helps me to find which file the caret is in
+           
+        }
         public int Exec(ref Guid pguidCmdGroup, uint nCmdID, uint nCmdexecopt, IntPtr pvaIn, IntPtr pvaOut)
         {
             requiresHandling = false;
             // When Alt Clicking, we need to add Edit points.
-            Debug.WriteLine("=====" + nCmdID + " " + pguidCmdGroup.ToString() + nCmdexecopt + " " + pvaIn.ToString() + " " + pvaOut.ToString(), "adi");
-            if (pguidCmdGroup == VSConstants.VSStd2K && nCmdID == (uint)VSConstants.VSStd2KCmdID.ECMD_LEFTCLICK && Keyboard.Modifiers == ModifierKeys.Alt)
+            //Debug.WriteLine("=====" + nCmdID + " " + pguidCmdGroup.ToString() + nCmdexecopt + " " + pvaIn.ToString() + " " + pvaOut.ToString(), "adi");
+            if (pguidCmdGroup == VSConstants.VSStd2K && nCmdID == (uint)VSConstants.VSStd2KCmdID.ECMD_LEFTCLICK)
             {
                 requiresHandling = true;
 
             }
+            else if (pguidCmdGroup == VSConstants.VSStd2K && trackList.Count > 0 && (nCmdID == (uint)VSConstants.VSStd2KCmdID.TYPECHAR ||
+                    nCmdID == (uint)VSConstants.VSStd2KCmdID.BACKSPACE ||
+                    nCmdID == (uint)VSConstants.VSStd2KCmdID.TAB ||
+                    nCmdID == (uint)VSConstants.VSStd2KCmdID.UP ||
+                    nCmdID == (uint)VSConstants.VSStd2KCmdID.DOWN ||
+                    nCmdID == (uint)VSConstants.VSStd2KCmdID.LEFT ||
+                    nCmdID == (uint)VSConstants.VSStd2KCmdID.RIGHT
+            ))
+                requiresHandling = true;
             if (requiresHandling == true)
             {
-                // Capture Alt Left Click, only when the Box Selection mode hasn't been used (After Drag-selecting)
-                if (pguidCmdGroup == VSConstants.VSStd2K && nCmdID == (uint)VSConstants.VSStd2KCmdID.ECMD_LEFTCLICK &&
-                                                            Keyboard.Modifiers == ModifierKeys.Alt)
+                if (pguidCmdGroup == VSConstants.VSStd2K && nCmdID == (uint)VSConstants.VSStd2KCmdID.ECMD_LEFTCLICK)
                 {
-                    // Add a Edit point, show it Visually 
-                    AddSyncPoint();
+                    // Switch back to normal, clear out Edit points
+                    ClearSyncPoints();
+                    RedrawScreen();
+                }
+                else if (pguidCmdGroup == VSConstants.VSStd2K && nCmdID == (uint)VSConstants.VSStd2KCmdID.TYPECHAR)
+                {
+                    var typedChar = (char)(ushort)Marshal.GetObjectForNativeVariant(pvaIn);
+                    //InsertSyncedChar(typedChar.ToString());
+                    RedrawScreen();
+                }
+                else if (pguidCmdGroup == VSConstants.VSStd2K && nCmdID == (uint)VSConstants.VSStd2KCmdID.BACKSPACE)
+                {
+                    var typedChar = (char)(ushort)Marshal.GetObjectForNativeVariant(pvaIn);
+                   // SyncedBackSpace();
+                    RedrawScreen();
+                }
+                else if (pguidCmdGroup == VSConstants.VSStd2K && nCmdID == (uint)VSConstants.VSStd2KCmdID.DELETE)
+                {
+                    var typedChar = (char)(ushort)Marshal.GetObjectForNativeVariant(pvaIn);
+                   // SyncedDelete();
                     RedrawScreen();
                 }
             }
@@ -57,6 +95,12 @@ namespace Company.VSPackage1
 
         private void RedrawScreen()
         {
+            m_adornmentLayer.RemoveAllAdornments();
+            for (int i = 0; i < trackList.Count; i++)
+            {
+                var curTrackPoint = trackList[i];
+                DrawSingleSyncPoint(curTrackPoint);
+            }
         }
 
         private void AddSyncPoint()
@@ -65,6 +109,35 @@ namespace Company.VSPackage1
             var curTrackPoint = m_textView.TextSnapshot.CreateTrackingPoint(curPosition.BufferPosition.Position,
             PointTrackingMode.Positive);
             trackList.Add(curTrackPoint);
+        }
+        private void DrawSingleSyncPoint(ITrackingPoint curTrackPoint)
+        {
+            SnapshotSpan span;
+            span = new SnapshotSpan(curTrackPoint.GetPoint(m_textView.TextSnapshot), 1);
+            var brush = new SolidColorBrush(Colors.Plum);
+            var g = m_textView.TextViewLines.GetLineMarkerGeometry(span);
+            GeometryDrawing drawing = new GeometryDrawing(brush, null, g);
+            if (drawing.Bounds.IsEmpty)
+                return;
+
+            System.Windows.Shapes.Rectangle r = new System.Windows.Shapes.Rectangle()
+            {
+                Fill = brush,
+                Width = drawing.Bounds.Width / 2,
+                Height = drawing.Bounds.Height
+            };
+            Canvas.SetLeft(r, g.Bounds.Left);
+            Canvas.SetTop(r, g.Bounds.Top);
+            m_adornmentLayer.AddAdornment(AdornmentPositioningBehavior.TextRelative, span, "MultiEditLayer", r, null);
+        }
+        private void m_textView_LayoutChanged(object sender, TextViewLayoutChangedEventArgs e)
+        {
+            RedrawScreen();
+        }
+        private void ClearSyncPoints()
+        {
+            trackList.Clear();
+            m_adornmentLayer.RemoveAllAdornments();
         }
     }
 }

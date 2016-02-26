@@ -76,7 +76,6 @@ namespace Company.VSPackage1
         public VSPackage1Package()
         {
             Debug.WriteLine(string.Format(CultureInfo.CurrentCulture, "Entering constructor for: {0}", this.ToString()));
-            MultiEditFilterProvider m = new MultiEditFilterProvider();
         }
         IWpfTextViewHost GetCurrentViewHost()
         {
@@ -138,7 +137,7 @@ namespace Company.VSPackage1
         {
             //CoProWindow c = new CoProWindow(DTE);
             // c.Show();      
-            Carets cs = new Carets(GetCurrentViewHost());
+            //Carets cs = new Carets(GetCurrentViewHost());
             
            
         }
