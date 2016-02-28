@@ -37,47 +37,44 @@ namespace Company.VSPackage1
         TextEditorEvents te;
         MyCallBack cb;
         bool twice;
-        private DTE2 DTE2
+        public DTE2 DTE2
         {
             get { return dte ?? (dte = ServiceProvider.GlobalProvider.GetService(typeof(DTE)) as DTE2); }
         }
-        public Carets(IWpfTextViewHost h)
+        public Carets(IWpfTextViewHost h, MyCallBack cb)
         {
             if (DTE2.ActiveWindow != null)
             {
                 iwpf = h;
-                tde = ((Events2)DTE2.Events).TextDocumentKeyPressEvents;
-                tde.BeforeKeyPress += new _dispTextDocumentKeyPressEvents_BeforeKeyPressEventHandler(KeyPress_EventHandler);
-                te = ((Events2)DTE2.Events).TextEditorEvents;
-                te.LineChanged += new _dispTextEditorEvents_LineChangedEventHandler(LineChanged_EventHandler);
-                cb = new MyCallBack();
-                cb.ChangeCaret += new ChangeCaretEventHandler(my_CaretChange);
+                //tde = ((Events2)DTE2.Events).TextDocumentKeyPressEvents;
+                //tde.BeforeKeyPress += new _dispTextDocumentKeyPressEvents_BeforeKeyPressEventHandler(KeyPress_EventHandler);
+                //te = ((Events2)DTE2.Events).TextEditorEvents;
+                //te.LineChanged += new _dispTextEditorEvents_LineChangedEventHandler(LineChanged_EventHandler);
+                this.cb = cb;
+                //cb = new MyCallBack();
+                //cb.ChangeCaret += new ChangeCaretEventHandler(my_CaretChange);
                 twice = false;
                 //TODO: register to cb's events
                 //TODO: add a different handler function for each of the events
                 // examples: http://www.codeproject.com/Articles/20550/C-Event-Implementation-Fundamentals-Best-Practices
-                
+
                 //ts.NewLine();
                 //ts.Insert("a");
             }
         }
-        private void my_CaretChange(object sender, ChangeCaretEventArgs e)
+        public void my_CaretChange(object sender, ChangeCaretEventArgs e)
         {
 
-            if (twice == false)
-            {
-                twice = true;
-                TextSelection ts2 = null;
-                ts2 = DTE2.ActiveWindow.Project.ProjectItems.Item("Class2.cs").Document.Selection as TextSelection;
-                string s = e.Location.Split(',')[3];
-                ts2.MoveToLineAndOffset(int.Parse(e.Location.Split(',')[3]), int.Parse(e.Location.Split(',')[4]));
-                ts2.Insert("oved");//TODO: Check event calling by insert and not by pressing
-                
-            }
-            else
-            {
-                twice = false;
-            }
+            TextSelection ts2 = null;
+            ts2 = DTE2.ActiveWindow.Project.ProjectItems.Item("Class2.cs").Document.Selection as TextSelection;
+            string s = e.Location.Split(',')[3];
+            int line = ts2.ActivePoint.Line;
+            int offs = ts2.ActivePoint.LineCharOffset;
+            ts2.MoveToLineAndOffset(int.Parse(e.Location.Split(',')[3]), int.Parse(e.Location.Split(',')[4]));
+            ts2.Insert("oved");//TODO: Check event calling by insert and not by pressing
+            ts2.MoveToLineAndOffset(line, offs);
+
+
         }
         private void KeyPress_EventHandler(string st, TextSelection ts, bool b, ref bool br)
         {

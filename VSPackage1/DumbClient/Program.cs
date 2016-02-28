@@ -14,7 +14,7 @@ namespace DumbClient
             for (int i = 0; i < 10; i++)
             {
                 int line = 12+i;
-                c.callService("12,53,Class2.cs,"+(line)+",54,Class2.cs");
+                c.callService("12,53,Class2.cs," + (line) + ",54,Class2.cs", "Class2.cs","TYPECHAR:123");
                 System.Threading.Thread.Sleep(1000);
             }
             c.getChange();

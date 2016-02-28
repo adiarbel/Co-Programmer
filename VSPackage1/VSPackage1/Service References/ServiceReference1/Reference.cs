@@ -16,10 +16,10 @@ namespace Company.VSPackage1.ServiceReference1 {
     public interface IEditService {
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IEditService/SendCaretPosition", ReplyAction="http://tempuri.org/IEditService/SendCaretPositionResponse")]
-        void SendCaretPosition(string location);
+        void SendCaretPosition(string location, string file, string content);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IEditService/SendCaretPosition", ReplyAction="http://tempuri.org/IEditService/SendCaretPositionResponse")]
-        System.Threading.Tasks.Task SendCaretPositionAsync(string location);
+        System.Threading.Tasks.Task SendCaretPositionAsync(string location, string file, string content);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IEditService/NormalFunction", ReplyAction="http://tempuri.org/IEditService/NormalFunctionResponse")]
         void NormalFunction();
@@ -44,7 +44,7 @@ namespace Company.VSPackage1.ServiceReference1 {
     public interface IEditServiceCallback {
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IEditService/CallBackFunction", ReplyAction="http://tempuri.org/IEditService/CallBackFunctionResponse")]
-        void CallBackFunction(string str);
+        void CallBackFunction(string str, string file, string content);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IEditService/CallBackChanges", ReplyAction="http://tempuri.org/IEditService/CallBackChangesResponse")]
         void CallBackChanges(string[] s);
@@ -78,12 +78,12 @@ namespace Company.VSPackage1.ServiceReference1 {
                 base(callbackInstance, binding, remoteAddress) {
         }
         
-        public void SendCaretPosition(string location) {
-            base.Channel.SendCaretPosition(location);
+        public void SendCaretPosition(string location, string file, string content) {
+            base.Channel.SendCaretPosition(location, file, content);
         }
         
-        public System.Threading.Tasks.Task SendCaretPositionAsync(string location) {
-            return base.Channel.SendCaretPositionAsync(location);
+        public System.Threading.Tasks.Task SendCaretPositionAsync(string location, string file, string content) {
+            return base.Channel.SendCaretPositionAsync(location, file, content);
         }
         
         public void NormalFunction() {

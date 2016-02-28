@@ -20,14 +20,16 @@ namespace Company.VSPackage1
         private IAdornmentLayer m_adornmentLayer;//Our adornment layer to work on
         private bool requiresHandling = false;
         List<ITrackingPoint> trackList = new List<ITrackingPoint>();
-        private static MyCallBack cb = new MyCallBack();
-        public MultiEditCommandFilter(IWpfTextView textView)
+        private MyCallBack cb;
+        private Carets crts;
+        public MultiEditCommandFilter(IWpfTextView textView, MyCallBack mcb,Carets cs)
         {
             m_textView = textView;
             m_adornmentLayer = m_textView.GetAdornmentLayer("MultiEditLayer");
             m_added = false;
             m_textView.LayoutChanged += m_textView_LayoutChanged;
-
+            cb = mcb;
+            crts = cs;
             cb.ChangeCaret += new ChangeCaretEventHandler(my_CaretChange);//how to send by parameter the NetworkClass ref
         }
         private void my_CaretChange(object sender, ChangeCaretEventArgs e)
@@ -35,9 +37,11 @@ namespace Company.VSPackage1
             ITextDocument textDoc;
             var rc = m_textView.TextBuffer.Properties.TryGetProperty<ITextDocument>(
               typeof(ITextDocument), out textDoc);
+            string s = textDoc.FilePath.Substring(textDoc.FilePath.LastIndexOf('\\'));//gets the file only
             if (rc == true)
-                System.Windows.Forms.MessageBox.Show(textDoc.FilePath);//helps me to find which file the caret is in
-           
+                if (e.File == textDoc.FilePath.Substring(textDoc.FilePath.LastIndexOf('\\')+1))
+                    crts.my_CaretChange(sender,e);//helps me to find which file the caret is in
+
         }
         public int Exec(ref Guid pguidCmdGroup, uint nCmdID, uint nCmdexecopt, IntPtr pvaIn, IntPtr pvaOut)
         {
@@ -75,13 +79,13 @@ namespace Company.VSPackage1
                 else if (pguidCmdGroup == VSConstants.VSStd2K && nCmdID == (uint)VSConstants.VSStd2KCmdID.BACKSPACE)
                 {
                     var typedChar = (char)(ushort)Marshal.GetObjectForNativeVariant(pvaIn);
-                   // SyncedBackSpace();
+                    // SyncedBackSpace();
                     RedrawScreen();
                 }
                 else if (pguidCmdGroup == VSConstants.VSStd2K && nCmdID == (uint)VSConstants.VSStd2KCmdID.DELETE)
                 {
                     var typedChar = (char)(ushort)Marshal.GetObjectForNativeVariant(pvaIn);
-                   // SyncedDelete();
+                    // SyncedDelete();
                     RedrawScreen();
                 }
             }
@@ -138,6 +142,19 @@ namespace Company.VSPackage1
         {
             trackList.Clear();
             m_adornmentLayer.RemoveAllAdornments();
+        }
+        private void InsertSyncedChar(string inputString)
+        {
+            // Avoiding inserting the character for the last edit point, as the Caret is there and
+            // the default IDE behavior will insert the text as expected.
+            ITextEdit edit = m_textView.TextBuffer.CreateEdit();
+            for (int i = 0; i < trackList.Count - 1; i++)
+            {
+                var curTrackPoint = trackList[i];
+                edit.Insert(curTrackPoint.GetPosition(m_textView.TextSnapshot), inputString);
+            }
+            edit.Apply();
+            edit.Dispose();
         }
     }
 }

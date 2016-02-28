@@ -22,9 +22,9 @@ namespace DumbClient
             myEndPoint = new EndpointAddress("net.tcp://localhost:8090/EditService");
             wcfclient = new EditServiceClient(context,mybinding,myEndPoint);
         }
-        public void CallBackFunction(string str)
+        public void CallBackFunction(string str,string file,string content)
         {
-            Console.WriteLine(str);
+            Console.WriteLine(str + " " + file + " " + content);
         }
         public void CallBackChanges(string[] s)
         {
@@ -33,15 +33,15 @@ namespace DumbClient
             {
                 st += s[i];
             }
-            CallBackFunction(st);
+            CallBackFunction(st,"","");
         }
         public void getChange()
         {
             wcfclient.GetChanges();
         }
-        public void callService(string str)
+        public void callService(string str,string file,string content)
         {
-            wcfclient.SendCaretPosition(str);
+            wcfclient.SendCaretPosition(str,file,content);
         }
 
         void IDisposable.Dispose()

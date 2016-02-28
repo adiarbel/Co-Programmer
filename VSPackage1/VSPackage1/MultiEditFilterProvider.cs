@@ -21,13 +21,32 @@ namespace Company.VSPackage1
         internal AdornmentLayerDefinition m_multieditAdornmentLayer = null;
         [Import(typeof(IVsEditorAdaptersFactoryService))]
         internal IVsEditorAdaptersFactoryService editorFactory = null;
+        MyCallBack cb = new MyCallBack();
+        Carets cs;
         public void VsTextViewCreated(IVsTextView textViewAdapter)
         {
             IWpfTextView textView = editorFactory.GetWpfTextView(textViewAdapter);//gets the text view
+            cs = new Carets(GetCurrentViewHost(textViewAdapter),cb);
             if (textView == null)
                 return;
-
-            AddCommandFilter(textViewAdapter, new MultiEditCommandFilter(textView));//adds an instance of our command filter to the text view
+            AddCommandFilter(textViewAdapter, new MultiEditCommandFilter(textView,cb,cs));//adds an instance of our command filter to the text view
+        }
+        IWpfTextViewHost GetCurrentViewHost(IVsTextView vTextView)
+        {
+            IVsUserData userData = vTextView as IVsUserData;
+            if (userData == null)
+            {
+                return null;
+            }
+            else
+            {
+                IWpfTextViewHost viewHost;
+                object holder;
+                Guid guidViewHost = DefGuidList.guidIWpfTextViewHost;
+                userData.GetData(ref guidViewHost, out holder);
+                viewHost = (IWpfTextViewHost)holder;
+                return viewHost;
+            }
         }
         void AddCommandFilter(IVsTextView viewAdapter, MultiEditCommandFilter commandFilter)
         {
@@ -46,5 +65,6 @@ namespace Company.VSPackage1
                 }
             }
         }
+
     }
 }

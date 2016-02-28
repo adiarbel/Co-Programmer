@@ -22,9 +22,9 @@ namespace DuplexService
         public void NormalFunction()
         {
             IEditServiceCallBack callback = OperationContext.Current.GetCallbackChannel<IEditServiceCallBack>();
-            callback.CallBackFunction("Got it!");
+            callback.CallBackFunction("Got it!","","");
         }
-        public void SendCaretPosition(string location)
+        public void SendCaretPosition(string location,string file,string content)
         {
             IEditServiceCallBack callback;
             currChanges[place++] = location;
@@ -35,7 +35,7 @@ namespace DuplexService
                     try
                     {
                         callback = ids[i].GetCallbackChannel<IEditServiceCallBack>();
-                        callback.CallBackFunction(location + ",From Service");
+                        callback.CallBackFunction(location + ",From Service",file,content);
                     }
                     catch
                     {

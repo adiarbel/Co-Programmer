@@ -21,10 +21,10 @@ namespace Company.VSPackage1
         EndpointAddress myEndPoint;
         NetTcpBinding mybinding;
         EditServiceClient wcfclient;
-        public void CallBackFunction(string str)
+        public void CallBackFunction(string str,string file,string content)
         {
           //  System.Windows.Forms.MessageBox.Show(str);
-            OnCaretChanged(str);
+            OnCaretChanged(str,file,content);
         }
         public MyCallBack()
         {
@@ -34,9 +34,9 @@ namespace Company.VSPackage1
             wcfclient = new ServiceReference1.EditServiceClient(context,mybinding,myEndPoint);
             PrintIds();
         }
-        public void callService(string str)
+        public void callService(string str, string file, string content)
         {
-            wcfclient.SendCaretPosition(str);
+            wcfclient.SendCaretPosition(str, file,content);
         }
         public void getChange()
         {
@@ -49,7 +49,7 @@ namespace Company.VSPackage1
             {
                 st += s[i];
             }
-            CallBackFunction(st);
+            CallBackFunction(st,"","");
         }
         public void PrintIds()
         {
@@ -60,30 +60,42 @@ namespace Company.VSPackage1
         {
             wcfclient.Close();
         }
-        private void OnCaretChanged(string str)
+        private void OnCaretChanged(string str,string file,string command)
         {
             if (ChangeCaret!=null)
             {
-                ChangeCaret(this, new ChangeCaretEventArgs(str));
+                ChangeCaret(this, new ChangeCaretEventArgs(str,file,command));
             }
         }
+
     }
     public class ChangeCaretEventArgs : EventArgs
     {
         // Fields
         private string m_location = string.Empty;
+        private string m_file = string.Empty;
+        private string m_command = string.Empty;
 
         // Constructor
-        public ChangeCaretEventArgs(string location)
+        public ChangeCaretEventArgs(string location, string file,string command)
         {
             m_location = location;
+            m_file = file;
+            m_command = command;
         }
         // Properties (read-only)
         public string Location
         {
             get { return m_location; }
         }
-
+        public string File
+        {
+            get { return m_file; }
+        }
+        public string Command
+        {
+            get { return m_command; }
+        }
 
     }
 }
