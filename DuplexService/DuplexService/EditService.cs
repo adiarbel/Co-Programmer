@@ -8,56 +8,57 @@ using Microsoft.VisualStudio.Text;
 
 namespace DuplexService
 {
-    [Serializable]
-    public class EditorCaret : ISerializable
-    {
-        
-    }
+
     [ServiceBehavior(InstanceContextMode = InstanceContextMode.PerSession, ConcurrencyMode = ConcurrencyMode.Reentrant)]
     public class EditService : IEditService, IDisposable
     {
         string[] currChanges = new string[10];
         static List<OperationContext> ids = new List<OperationContext>();
+        static Dictionary<string,string> carets = new Dictionary<string,string>();
         string id;
         int place = 0;
-        //public EditService() { }
         public EditService()
         {
-            ITrackingPoint itp2 = null;
-            ids.Add(OperationContext.Current);
             id = OperationContext.Current.SessionId;
-
+            ids.Add(OperationContext.Current);
         }
-        private void UpdateLists(ITrackingPoint itp)
+
+        public void IntializePosition(string file, int line, int char_off)
         {
             IEditServiceCallBack callback;
-            for (int i = 0; i < ids.Count; i++)
+            carets[id] = "" + file + " " + line + " " + char_off;
+            
+            for (int i = 0; i < ids.Count;i++ )
             {
                 if (ids[i].SessionId != id)
                 {
                     try
                     {
                         callback = ids[i].GetCallbackChannel<IEditServiceCallBack>();
-                        callback.AddNewEditor(itp);
+                        callback.AddNewEditor(file, line, char_off);
                     }
                     catch
                     {
                         ids.Remove(ids[i]);
+
                     }
                 }
+
             }
+
         }
-        public void SendCaretPosition(ITrackingPoint itp)
+        public void SendCaretPosition(string file, int line, int char_off, string content)
         {
             IEditServiceCallBack callback;
-            currChanges[place++] = itp.ToString();
+            carets[id] = "" + file + " " + line + " " + char_off;
+            currChanges[place++] = file.ToString();
             for (int i = 0; i < ids.Count; i++)
             {
 
                 try
                 {
                     callback = ids[i].GetCallbackChannel<IEditServiceCallBack>();
-                    callback.CallBackFunction(itp, "ge");
+                    callback.AddNewEditor(file, line, char_off);
                 }
                 catch
                 {
@@ -86,6 +87,7 @@ namespace DuplexService
         {
             ids.Remove(OperationContext.Current);
         }
+
 
 
     }

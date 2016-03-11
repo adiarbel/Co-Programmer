@@ -13,7 +13,8 @@ namespace DuplexService
     {
 
         [OperationContract]
-        void SendCaretPosition(ITrackingPoint itp);
+        void IntializePosition(string file, int line, int char_off);
+        void SendCaretPosition(string file,int line,int char_off,string content);
         //[OperationContract]
        // void NormalFunction();
         [OperationContract]
@@ -24,9 +25,9 @@ namespace DuplexService
     public interface IEditServiceCallBack
     {
         [OperationContract]
-        void CallBackFunction(ITrackingPoint itp, string content);
+        void CallBackFunction(string file, int line, int char_off);
         [OperationContract]
-        void AddNewEditor(ITrackingPoint itp);
+        void AddNewEditor(string file, int line, int char_off);
         [OperationContract]
         void CallBackChanges(string[] s);
     }

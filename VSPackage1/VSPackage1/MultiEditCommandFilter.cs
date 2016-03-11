@@ -9,6 +9,7 @@ using Microsoft.VisualStudio.Text;
 using System.Windows.Media;
 using System.Windows.Controls;
 using System.Diagnostics;
+using System.IO;
 
 namespace Company.VSPackage1
 {
@@ -22,7 +23,7 @@ namespace Company.VSPackage1
         List<ITrackingPoint> trackList = new List<ITrackingPoint>();
         private MyCallBack cb;
         private Carets crts;
-        public MultiEditCommandFilter(IWpfTextView textView, MyCallBack mcb,Carets cs)
+        public MultiEditCommandFilter(IWpfTextView textView, MyCallBack mcb, Carets cs)
         {
             m_textView = textView;
             m_adornmentLayer = m_textView.GetAdornmentLayer("MultiEditLayer");
@@ -39,12 +40,21 @@ namespace Company.VSPackage1
               typeof(ITextDocument), out textDoc);
             string s = textDoc.FilePath.Substring(textDoc.FilePath.LastIndexOf('\\'));//gets the file only
             if (rc == true)
-                if (e.File == textDoc.FilePath.Substring(textDoc.FilePath.LastIndexOf('\\')+1))
-                    crts.my_CaretChange(sender,e);//helps me to find which file the caret is in
+                if (e.File == textDoc.FilePath.Substring(textDoc.FilePath.LastIndexOf('\\') + 1))
+                    crts.my_CaretChange(sender, e);//helps me to find which file the caret is in
 
         }
         public int Exec(ref Guid pguidCmdGroup, uint nCmdID, uint nCmdexecopt, IntPtr pvaIn, IntPtr pvaOut)
         {
+
+            ITextDocument textDoc;
+            var rc = m_textView.TextBuffer.Properties.TryGetProperty<ITextDocument>(
+              typeof(ITextDocument), out textDoc);
+            string st = crts.DTE2.Solution.FullName;
+            st = st.Substring(st.LastIndexOf('\\') + 1);
+            st = st.Split('.')[0];
+            st = textDoc.FilePath.Substring(textDoc.FilePath.IndexOf(st));
+            cb.callService(st, m_textView.Caret.Position.BufferPosition.Position, 0);
             requiresHandling = false;
             // When Alt Clicking, we need to add Edit points.
             //Debug.WriteLine("=====" + nCmdID + " " + pguidCmdGroup.ToString() + nCmdexecopt + " " + pvaIn.ToString() + " " + pvaOut.ToString(), "adi");

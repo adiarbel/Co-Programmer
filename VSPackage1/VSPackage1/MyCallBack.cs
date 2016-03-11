@@ -11,8 +11,8 @@ namespace Company.VSPackage1
 {
     /*TODO: define delegate*/
     public delegate void ChangeCaretEventHandler(object sender, ChangeCaretEventArgs e);
-    /*TODO: define event for that delegate*/ 
-    
+    /*TODO: define event for that delegate*/
+
     /*TODO: define the above for each event that might come from the server's callbacks*/
     [CallbackBehavior(UseSynchronizationContext = false)]
     class MyCallBack : IEditServiceCallback, IDisposable
@@ -22,21 +22,21 @@ namespace Company.VSPackage1
         EndpointAddress myEndPoint;
         NetTcpBinding mybinding;
         EditServiceClient wcfclient;
-        public void CallBackFunction(object itp, string content)
+        public void CallBackFunction(string file, int line, int char_off)
         {
-            OnCaretChanged((ITrackingPoint)itp, content);
+            OnCaretChanged(file,line,char_off);
         }
         public MyCallBack()
         {
             context = new InstanceContext(this);
             mybinding = new NetTcpBinding();
             myEndPoint = new EndpointAddress("net.tcp://localhost:8090/EditService");
-            wcfclient = new ServiceReference1.EditServiceClient(context,mybinding,myEndPoint);
+            wcfclient = new ServiceReference1.EditServiceClient(context, mybinding, myEndPoint);
             PrintIds();
         }
-        public void callService(ITrackingPoint itp)
+        public void callService(string file, int line, int char_off)
         {
-            wcfclient.SendCaretPosition(itp);
+            wcfclient.IntializePosition(file,line,char_off);
         }
         public void getChange()
         {
@@ -49,7 +49,6 @@ namespace Company.VSPackage1
             {
                 st += s[i];
             }
-            CallBackFunction(null,"");
         }
         public void PrintIds()
         {
@@ -60,18 +59,17 @@ namespace Company.VSPackage1
         {
             wcfclient.Close();
         }
-        private void OnCaretChanged(ITrackingPoint itp,string command)
+        private void OnCaretChanged(string file, int line, int char_off)
         {
-            if (ChangeCaret!=null)
+            if (ChangeCaret != null)
             {
-                ChangeCaret(this, new ChangeCaretEventArgs(itp.ToString(),itp.ToString(),command));
+                ChangeCaret(this, new ChangeCaretEventArgs(line.ToString(),file,char_off.ToString()));
             }
         }
 
 
-        public void AddNewEditor(object itp)
+        public void AddNewEditor(string file, int line, int char_off)
         {
-            throw new NotImplementedException();
         }
     }
     public class ChangeCaretEventArgs : EventArgs
@@ -82,7 +80,7 @@ namespace Company.VSPackage1
         private string m_command = string.Empty;
 
         // Constructor
-        public ChangeCaretEventArgs(string location, string file,string command)
+        public ChangeCaretEventArgs(string location, string file, string command)
         {
             m_location = location;
             m_file = file;
