@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Company.VSPackage1.ServiceReference1;
 using System.ServiceModel;
+using Microsoft.VisualStudio.Text;
 
 namespace Company.VSPackage1
 {
@@ -21,10 +22,9 @@ namespace Company.VSPackage1
         EndpointAddress myEndPoint;
         NetTcpBinding mybinding;
         EditServiceClient wcfclient;
-        public void CallBackFunction(string str,string file,string content)
+        public void CallBackFunction(object itp, string content)
         {
-          //  System.Windows.Forms.MessageBox.Show(str);
-            OnCaretChanged(str,file,content);
+            OnCaretChanged((ITrackingPoint)itp, content);
         }
         public MyCallBack()
         {
@@ -34,9 +34,9 @@ namespace Company.VSPackage1
             wcfclient = new ServiceReference1.EditServiceClient(context,mybinding,myEndPoint);
             PrintIds();
         }
-        public void callService(string str, string file, string content)
+        public void callService(ITrackingPoint itp)
         {
-            wcfclient.SendCaretPosition(str, file,content);
+            wcfclient.SendCaretPosition(itp);
         }
         public void getChange()
         {
@@ -49,7 +49,7 @@ namespace Company.VSPackage1
             {
                 st += s[i];
             }
-            CallBackFunction(st,"","");
+            CallBackFunction(null,"");
         }
         public void PrintIds()
         {
@@ -60,14 +60,19 @@ namespace Company.VSPackage1
         {
             wcfclient.Close();
         }
-        private void OnCaretChanged(string str,string file,string command)
+        private void OnCaretChanged(ITrackingPoint itp,string command)
         {
             if (ChangeCaret!=null)
             {
-                ChangeCaret(this, new ChangeCaretEventArgs(str,file,command));
+                ChangeCaret(this, new ChangeCaretEventArgs(itp.ToString(),itp.ToString(),command));
             }
         }
 
+
+        public void AddNewEditor(object itp)
+        {
+            throw new NotImplementedException();
+        }
     }
     public class ChangeCaretEventArgs : EventArgs
     {

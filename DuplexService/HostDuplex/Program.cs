@@ -4,19 +4,19 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.ServiceModel;
-
+using Microsoft.VisualStudio.Text;
 namespace HostDuplex
 {
     class Program
     {
         static void Main(string[] args)
         {
-            using(ServiceHost host = new ServiceHost(typeof(DuplexService.EditService)))
-            {
-                host.Open();
-                Console.WriteLine("Host started @" + DateTime.Now.ToString());
-                Console.ReadLine();
-            }
+            
+            ServiceHost host = new ServiceHost(typeof(DuplexService.EditService));
+            host.Open();
+            Console.WriteLine("Host started @" + DateTime.Now.ToString());
+            Console.ReadLine();
         }
     }
+    
 }

@@ -4,7 +4,8 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.ServiceModel;
 using System.Text;
-
+using Microsoft.VisualStudio.Text;
+using Microsoft.VisualStudio.Uml.Classes;
 namespace DuplexService
 {
     [ServiceContract(CallbackContract = typeof(IEditServiceCallBack))]
@@ -12,9 +13,9 @@ namespace DuplexService
     {
 
         [OperationContract]
-        void SendCaretPosition(string location, string file, string content);
-        [OperationContract]
-        void NormalFunction();
+        void SendCaretPosition(ITrackingPoint itp);
+        //[OperationContract]
+       // void NormalFunction();
         [OperationContract]
         void GetChanges();
         [OperationContract]
@@ -23,8 +24,11 @@ namespace DuplexService
     public interface IEditServiceCallBack
     {
         [OperationContract]
-        void CallBackFunction(string str, string file,string content);
+        void CallBackFunction(ITrackingPoint itp, string content);
+        [OperationContract]
+        void AddNewEditor(ITrackingPoint itp);
         [OperationContract]
         void CallBackChanges(string[] s);
     }
+    
 }

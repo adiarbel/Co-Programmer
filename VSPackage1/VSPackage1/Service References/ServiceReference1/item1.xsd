@@ -4,23 +4,11 @@
   <xs:element name="SendCaretPosition">
     <xs:complexType>
       <xs:sequence>
-        <xs:element minOccurs="0" name="location" nillable="true" type="xs:string" />
-        <xs:element minOccurs="0" name="file" nillable="true" type="xs:string" />
-        <xs:element minOccurs="0" name="content" nillable="true" type="xs:string" />
+        <xs:element minOccurs="0" name="itp" nillable="true" type="xs:anyType" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
   <xs:element name="SendCaretPositionResponse">
-    <xs:complexType>
-      <xs:sequence />
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="NormalFunction">
-    <xs:complexType>
-      <xs:sequence />
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="NormalFunctionResponse">
     <xs:complexType>
       <xs:sequence />
     </xs:complexType>
@@ -48,13 +36,24 @@
   <xs:element name="CallBackFunction">
     <xs:complexType>
       <xs:sequence>
-        <xs:element minOccurs="0" name="str" nillable="true" type="xs:string" />
-        <xs:element minOccurs="0" name="file" nillable="true" type="xs:string" />
+        <xs:element minOccurs="0" name="itp" nillable="true" type="xs:anyType" />
         <xs:element minOccurs="0" name="content" nillable="true" type="xs:string" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
   <xs:element name="CallBackFunctionResponse">
+    <xs:complexType>
+      <xs:sequence />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="AddNewEditor">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="itp" nillable="true" type="xs:anyType" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="AddNewEditorResponse">
     <xs:complexType>
       <xs:sequence />
     </xs:complexType>

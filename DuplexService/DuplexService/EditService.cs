@@ -4,44 +4,67 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.ServiceModel;
 using System.Text;
+using Microsoft.VisualStudio.Text;
 
 namespace DuplexService
 {
+    [Serializable]
+    public class EditorCaret : ISerializable
+    {
+        
+    }
     [ServiceBehavior(InstanceContextMode = InstanceContextMode.PerSession, ConcurrencyMode = ConcurrencyMode.Reentrant)]
-    public class EditService : IEditService,IDisposable
+    public class EditService : IEditService, IDisposable
     {
         string[] currChanges = new string[10];
         static List<OperationContext> ids = new List<OperationContext>();
         string id;
         int place = 0;
+        //public EditService() { }
         public EditService()
         {
+            ITrackingPoint itp2 = null;
             ids.Add(OperationContext.Current);
             id = OperationContext.Current.SessionId;
+
         }
-        public void NormalFunction()
-        {
-            IEditServiceCallBack callback = OperationContext.Current.GetCallbackChannel<IEditServiceCallBack>();
-            callback.CallBackFunction("Got it!","","");
-        }
-        public void SendCaretPosition(string location,string file,string content)
+        private void UpdateLists(ITrackingPoint itp)
         {
             IEditServiceCallBack callback;
-            currChanges[place++] = location;
             for (int i = 0; i < ids.Count; i++)
             {
-                if(ids[i].SessionId!=id)
+                if (ids[i].SessionId != id)
                 {
                     try
                     {
                         callback = ids[i].GetCallbackChannel<IEditServiceCallBack>();
-                        callback.CallBackFunction(location + ",From Service",file,content);
+                        callback.AddNewEditor(itp);
                     }
                     catch
                     {
                         ids.Remove(ids[i]);
                     }
                 }
+            }
+        }
+        public void SendCaretPosition(ITrackingPoint itp)
+        {
+            IEditServiceCallBack callback;
+            currChanges[place++] = itp.ToString();
+            for (int i = 0; i < ids.Count; i++)
+            {
+
+                try
+                {
+                    callback = ids[i].GetCallbackChannel<IEditServiceCallBack>();
+                    callback.CallBackFunction(itp, "ge");
+                }
+                catch
+                {
+                    ids.Remove(ids[i]);
+
+                }
+
             }
 
         }
@@ -64,6 +87,7 @@ namespace DuplexService
             ids.Remove(OperationContext.Current);
         }
 
+
     }
-    
+
 }
