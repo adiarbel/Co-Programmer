@@ -26,25 +26,33 @@ namespace DuplexService
         public void IntializePosition(string file, int line, int char_off)
         {
             IEditServiceCallBack callback;
-            carets[id] = "" + file + " " + line + " " + char_off;
-            
-            for (int i = 0; i < ids.Count;i++ )
+            if(carets.ContainsKey(id))
             {
-                if (ids[i].SessionId != id)
-                {
-                    try
-                    {
-                        callback = ids[i].GetCallbackChannel<IEditServiceCallBack>();
-                        callback.AddNewEditor(file, line, char_off);
-                    }
-                    catch
-                    {
-                        ids.Remove(ids[i]);
-
-                    }
-                }
-
+                SendCaretPosition(file, line, char_off, "");
             }
+            else
+            {
+                carets[id] = "" + file + " " + line + " " + char_off;
+
+                for (int i = 0; i < ids.Count; i++)
+                {
+                    if (ids[i].SessionId != id)
+                    {
+                        try
+                        {
+                            callback = ids[i].GetCallbackChannel<IEditServiceCallBack>();
+                            callback.AddNewEditor(file, line, char_off,id);
+                        }
+                        catch
+                        {
+                            ids.Remove(ids[i]);
+
+                        }
+                    }
+
+                }
+            }
+            
 
         }
         public void SendCaretPosition(string file, int line, int char_off, string content)
@@ -58,7 +66,7 @@ namespace DuplexService
                 try
                 {
                     callback = ids[i].GetCallbackChannel<IEditServiceCallBack>();
-                    callback.AddNewEditor(file, line, char_off);
+                    callback.AddNewEditor(file, line, char_off,id);
                 }
                 catch
                 {

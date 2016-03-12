@@ -25,9 +25,9 @@ namespace DuplexService
     public interface IEditServiceCallBack
     {
         [OperationContract]
-        void CallBackFunction(string file, int line, int char_off);
+        void CallBackFunction(string file, int line, int char_off, string sender);
         [OperationContract]
-        void AddNewEditor(string file, int line, int char_off);
+        void AddNewEditor(string file, int line, int char_off,string sender);
         [OperationContract]
         void CallBackChanges(string[] s);
     }

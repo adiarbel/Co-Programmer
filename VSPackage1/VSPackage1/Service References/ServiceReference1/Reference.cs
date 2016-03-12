@@ -41,7 +41,7 @@ namespace Company.VSPackage1.ServiceReference1 {
         void CallBackFunction(string file, int line, int char_off);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IEditService/AddNewEditor", ReplyAction="http://tempuri.org/IEditService/AddNewEditorResponse")]
-        void AddNewEditor(string file, int line, int char_off);
+        void AddNewEditor(string file, int line, int char_off, string sender);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IEditService/CallBackChanges", ReplyAction="http://tempuri.org/IEditService/CallBackChangesResponse")]
         void CallBackChanges(string[] s);

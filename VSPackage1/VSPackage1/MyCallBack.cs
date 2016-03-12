@@ -24,7 +24,7 @@ namespace Company.VSPackage1
         EditServiceClient wcfclient;
         public void CallBackFunction(string file, int line, int char_off)
         {
-            OnCaretChanged(file,line,char_off);
+
         }
         public MyCallBack()
         {
@@ -36,7 +36,7 @@ namespace Company.VSPackage1
         }
         public void callService(string file, int line, int char_off)
         {
-            wcfclient.IntializePosition(file,line,char_off);
+            wcfclient.IntializePosition(file, line, char_off);
         }
         public void getChange()
         {
@@ -59,34 +59,43 @@ namespace Company.VSPackage1
         {
             wcfclient.Close();
         }
-        private void OnCaretChanged(string file, int line, int char_off)
+        private void OnCaretChanged(string file, int line, int char_off,string sender)
         {
             if (ChangeCaret != null)
             {
-                ChangeCaret(this, new ChangeCaretEventArgs(line.ToString(),file,char_off.ToString()));
+                ChangeCaret(this, new ChangeCaretEventArgs( sender,line.ToString(),file, char_off.ToString()));
             }
         }
 
 
-        public void AddNewEditor(string file, int line, int char_off)
+
+
+        public void AddNewEditor(string file, int line, int char_off, string sender)
         {
+            OnCaretChanged(file, line, char_off, sender);
         }
     }
     public class ChangeCaretEventArgs : EventArgs
     {
         // Fields
+        private string m_sender = string.Empty;
         private string m_location = string.Empty;
         private string m_file = string.Empty;
         private string m_command = string.Empty;
 
         // Constructor
-        public ChangeCaretEventArgs(string location, string file, string command)
+        public ChangeCaretEventArgs(string sender, string location, string file, string command)
         {
+            m_sender = sender;
             m_location = location;
             m_file = file;
             m_command = command;
         }
         // Properties (read-only)
+        public string Sender
+        {
+            get { return m_sender; }
+        }
         public string Location
         {
             get { return m_location; }

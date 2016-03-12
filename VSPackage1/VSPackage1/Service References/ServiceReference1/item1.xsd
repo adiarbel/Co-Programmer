@@ -55,6 +55,7 @@
         <xs:element minOccurs="0" name="file" nillable="true" type="xs:string" />
         <xs:element minOccurs="0" name="line" type="xs:int" />
         <xs:element minOccurs="0" name="char_off" type="xs:int" />
+        <xs:element minOccurs="0" name="sender" nillable="true" type="xs:string" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
