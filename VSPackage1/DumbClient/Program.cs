@@ -14,7 +14,7 @@ namespace DumbClient
             for (int i = 0; i < 10; i++)
             {
                 int line = 12+i;
-                c.callService("sdfsd",300-i*30,0);
+                c.callService("sdfsd",300-i*30);
                 System.Threading.Thread.Sleep(1000);
             }
             c.getChange();
