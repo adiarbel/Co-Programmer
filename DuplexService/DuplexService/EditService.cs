@@ -59,7 +59,6 @@ namespace DuplexService
         {
             IEditServiceCallBack callback;
             carets[id] = "" + file + " " + line + " " + char_off;
-            currChanges[place++] = file.ToString();
             for (int i = 0; i < ids.Count; i++)
             {
 

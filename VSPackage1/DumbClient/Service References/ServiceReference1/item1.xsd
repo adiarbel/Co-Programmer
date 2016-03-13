@@ -1,26 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <xs:schema xmlns:tns="http://tempuri.org/" elementFormDefault="qualified" targetNamespace="http://tempuri.org/" xmlns:xs="http://www.w3.org/2001/XMLSchema">
   <xs:import schemaLocation="http://localhost:8080/?xsd=xsd2" namespace="http://schemas.microsoft.com/2003/10/Serialization/Arrays" />
-  <xs:element name="SendCaretPosition">
+  <xs:element name="IntializePosition">
     <xs:complexType>
       <xs:sequence>
-        <xs:element minOccurs="0" name="location" nillable="true" type="xs:string" />
         <xs:element minOccurs="0" name="file" nillable="true" type="xs:string" />
-        <xs:element minOccurs="0" name="content" nillable="true" type="xs:string" />
+        <xs:element minOccurs="0" name="line" type="xs:int" />
+        <xs:element minOccurs="0" name="char_off" type="xs:int" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
-  <xs:element name="SendCaretPositionResponse">
-    <xs:complexType>
-      <xs:sequence />
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="NormalFunction">
-    <xs:complexType>
-      <xs:sequence />
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="NormalFunctionResponse">
+  <xs:element name="IntializePositionResponse">
     <xs:complexType>
       <xs:sequence />
     </xs:complexType>
@@ -48,13 +38,29 @@
   <xs:element name="CallBackFunction">
     <xs:complexType>
       <xs:sequence>
-        <xs:element minOccurs="0" name="str" nillable="true" type="xs:string" />
         <xs:element minOccurs="0" name="file" nillable="true" type="xs:string" />
-        <xs:element minOccurs="0" name="content" nillable="true" type="xs:string" />
+        <xs:element minOccurs="0" name="line" type="xs:int" />
+        <xs:element minOccurs="0" name="char_off" type="xs:int" />
+        <xs:element minOccurs="0" name="sender" nillable="true" type="xs:string" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
   <xs:element name="CallBackFunctionResponse">
+    <xs:complexType>
+      <xs:sequence />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="AddNewEditor">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="file" nillable="true" type="xs:string" />
+        <xs:element minOccurs="0" name="line" type="xs:int" />
+        <xs:element minOccurs="0" name="char_off" type="xs:int" />
+        <xs:element minOccurs="0" name="sender" nillable="true" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="AddNewEditorResponse">
     <xs:complexType>
       <xs:sequence />
     </xs:complexType>

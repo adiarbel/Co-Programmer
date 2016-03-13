@@ -15,17 +15,11 @@ namespace DumbClient.ServiceReference1 {
     [System.ServiceModel.ServiceContractAttribute(ConfigurationName="ServiceReference1.IEditService", CallbackContract=typeof(DumbClient.ServiceReference1.IEditServiceCallback))]
     public interface IEditService {
         
-        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IEditService/SendCaretPosition", ReplyAction="http://tempuri.org/IEditService/SendCaretPositionResponse")]
-        void SendCaretPosition(string location, string file, string content);
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IEditService/IntializePosition", ReplyAction="http://tempuri.org/IEditService/IntializePositionResponse")]
+        void IntializePosition(string file, int line, int char_off);
         
-        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IEditService/SendCaretPosition", ReplyAction="http://tempuri.org/IEditService/SendCaretPositionResponse")]
-        System.Threading.Tasks.Task SendCaretPositionAsync(string location, string file, string content);
-        
-        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IEditService/NormalFunction", ReplyAction="http://tempuri.org/IEditService/NormalFunctionResponse")]
-        void NormalFunction();
-        
-        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IEditService/NormalFunction", ReplyAction="http://tempuri.org/IEditService/NormalFunctionResponse")]
-        System.Threading.Tasks.Task NormalFunctionAsync();
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IEditService/IntializePosition", ReplyAction="http://tempuri.org/IEditService/IntializePositionResponse")]
+        System.Threading.Tasks.Task IntializePositionAsync(string file, int line, int char_off);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IEditService/GetChanges", ReplyAction="http://tempuri.org/IEditService/GetChangesResponse")]
         void GetChanges();
@@ -44,7 +38,10 @@ namespace DumbClient.ServiceReference1 {
     public interface IEditServiceCallback {
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IEditService/CallBackFunction", ReplyAction="http://tempuri.org/IEditService/CallBackFunctionResponse")]
-        void CallBackFunction(string str, string file, string content);
+        void CallBackFunction(string file, int line, int char_off, string sender);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IEditService/AddNewEditor", ReplyAction="http://tempuri.org/IEditService/AddNewEditorResponse")]
+        void AddNewEditor(string file, int line, int char_off, string sender);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IEditService/CallBackChanges", ReplyAction="http://tempuri.org/IEditService/CallBackChangesResponse")]
         void CallBackChanges(string[] s);
@@ -78,20 +75,12 @@ namespace DumbClient.ServiceReference1 {
                 base(callbackInstance, binding, remoteAddress) {
         }
         
-        public void SendCaretPosition(string location, string file, string content) {
-            base.Channel.SendCaretPosition(location, file, content);
+        public void IntializePosition(string file, int line, int char_off) {
+            base.Channel.IntializePosition(file, line, char_off);
         }
         
-        public System.Threading.Tasks.Task SendCaretPositionAsync(string location, string file, string content) {
-            return base.Channel.SendCaretPositionAsync(location, file, content);
-        }
-        
-        public void NormalFunction() {
-            base.Channel.NormalFunction();
-        }
-        
-        public System.Threading.Tasks.Task NormalFunctionAsync() {
-            return base.Channel.NormalFunctionAsync();
+        public System.Threading.Tasks.Task IntializePositionAsync(string file, int line, int char_off) {
+            return base.Channel.IntializePositionAsync(file, line, char_off);
         }
         
         public void GetChanges() {

@@ -36,17 +36,11 @@
       <xsd:import schemaLocation="http://localhost:8080/?xsd=xsd2" namespace="http://schemas.microsoft.com/2003/10/Serialization/Arrays" />
     </xsd:schema>
   </wsdl:types>
-  <wsdl:message name="IEditService_SendCaretPosition_InputMessage">
-    <wsdl:part name="parameters" element="tns:SendCaretPosition" />
+  <wsdl:message name="IEditService_IntializePosition_InputMessage">
+    <wsdl:part name="parameters" element="tns:IntializePosition" />
   </wsdl:message>
-  <wsdl:message name="IEditService_SendCaretPosition_OutputMessage">
-    <wsdl:part name="parameters" element="tns:SendCaretPositionResponse" />
-  </wsdl:message>
-  <wsdl:message name="IEditService_NormalFunction_InputMessage">
-    <wsdl:part name="parameters" element="tns:NormalFunction" />
-  </wsdl:message>
-  <wsdl:message name="IEditService_NormalFunction_OutputMessage">
-    <wsdl:part name="parameters" element="tns:NormalFunctionResponse" />
+  <wsdl:message name="IEditService_IntializePosition_OutputMessage">
+    <wsdl:part name="parameters" element="tns:IntializePositionResponse" />
   </wsdl:message>
   <wsdl:message name="IEditService_GetChanges_InputMessage">
     <wsdl:part name="parameters" element="tns:GetChanges" />
@@ -66,6 +60,12 @@
   <wsdl:message name="IEditService_CallBackFunction_InputCallbackMessage">
     <wsdl:part name="parameters" element="tns:CallBackFunctionResponse" />
   </wsdl:message>
+  <wsdl:message name="IEditService_AddNewEditor_OutputCallbackMessage">
+    <wsdl:part name="parameters" element="tns:AddNewEditor" />
+  </wsdl:message>
+  <wsdl:message name="IEditService_AddNewEditor_InputCallbackMessage">
+    <wsdl:part name="parameters" element="tns:AddNewEditorResponse" />
+  </wsdl:message>
   <wsdl:message name="IEditService_CallBackChanges_OutputCallbackMessage">
     <wsdl:part name="parameters" element="tns:CallBackChanges" />
   </wsdl:message>
@@ -73,13 +73,9 @@
     <wsdl:part name="parameters" element="tns:CallBackChangesResponse" />
   </wsdl:message>
   <wsdl:portType name="IEditService">
-    <wsdl:operation name="SendCaretPosition">
-      <wsdl:input wsaw:Action="http://tempuri.org/IEditService/SendCaretPosition" message="tns:IEditService_SendCaretPosition_InputMessage" />
-      <wsdl:output wsaw:Action="http://tempuri.org/IEditService/SendCaretPositionResponse" message="tns:IEditService_SendCaretPosition_OutputMessage" />
-    </wsdl:operation>
-    <wsdl:operation name="NormalFunction">
-      <wsdl:input wsaw:Action="http://tempuri.org/IEditService/NormalFunction" message="tns:IEditService_NormalFunction_InputMessage" />
-      <wsdl:output wsaw:Action="http://tempuri.org/IEditService/NormalFunctionResponse" message="tns:IEditService_NormalFunction_OutputMessage" />
+    <wsdl:operation name="IntializePosition">
+      <wsdl:input wsaw:Action="http://tempuri.org/IEditService/IntializePosition" message="tns:IEditService_IntializePosition_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IEditService/IntializePositionResponse" message="tns:IEditService_IntializePosition_OutputMessage" />
     </wsdl:operation>
     <wsdl:operation name="GetChanges">
       <wsdl:input wsaw:Action="http://tempuri.org/IEditService/GetChanges" message="tns:IEditService_GetChanges_InputMessage" />
@@ -93,6 +89,10 @@
       <wsdl:output wsaw:Action="http://tempuri.org/IEditService/CallBackFunction" message="tns:IEditService_CallBackFunction_OutputCallbackMessage" />
       <wsdl:input wsaw:Action="http://tempuri.org/IEditService/CallBackFunctionResponse" message="tns:IEditService_CallBackFunction_InputCallbackMessage" />
     </wsdl:operation>
+    <wsdl:operation name="AddNewEditor">
+      <wsdl:output wsaw:Action="http://tempuri.org/IEditService/AddNewEditor" message="tns:IEditService_AddNewEditor_OutputCallbackMessage" />
+      <wsdl:input wsaw:Action="http://tempuri.org/IEditService/AddNewEditorResponse" message="tns:IEditService_AddNewEditor_InputCallbackMessage" />
+    </wsdl:operation>
     <wsdl:operation name="CallBackChanges">
       <wsdl:output wsaw:Action="http://tempuri.org/IEditService/CallBackChanges" message="tns:IEditService_CallBackChanges_OutputCallbackMessage" />
       <wsdl:input wsaw:Action="http://tempuri.org/IEditService/CallBackChangesResponse" message="tns:IEditService_CallBackChanges_InputCallbackMessage" />
@@ -101,17 +101,8 @@
   <wsdl:binding name="NetTcpBinding_IEditService" type="tns:IEditService">
     <wsp:PolicyReference URI="#NetTcpBinding_IEditService_policy" />
     <soap12:binding transport="http://schemas.microsoft.com/soap/tcp" />
-    <wsdl:operation name="SendCaretPosition">
-      <soap12:operation soapAction="http://tempuri.org/IEditService/SendCaretPosition" style="document" />
-      <wsdl:input>
-        <soap12:body use="literal" />
-      </wsdl:input>
-      <wsdl:output>
-        <soap12:body use="literal" />
-      </wsdl:output>
-    </wsdl:operation>
-    <wsdl:operation name="NormalFunction">
-      <soap12:operation soapAction="http://tempuri.org/IEditService/NormalFunction" style="document" />
+    <wsdl:operation name="IntializePosition">
+      <soap12:operation soapAction="http://tempuri.org/IEditService/IntializePosition" style="document" />
       <wsdl:input>
         <soap12:body use="literal" />
       </wsdl:input>
@@ -139,6 +130,15 @@
     </wsdl:operation>
     <wsdl:operation name="CallBackFunction">
       <soap12:operation soapAction="http://tempuri.org/IEditService/CallBackFunction" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="AddNewEditor">
+      <soap12:operation soapAction="http://tempuri.org/IEditService/AddNewEditor" style="document" />
       <wsdl:input>
         <soap12:body use="literal" />
       </wsdl:input>

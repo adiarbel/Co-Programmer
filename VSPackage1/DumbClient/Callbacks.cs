@@ -39,14 +39,24 @@ namespace DumbClient
         {
             wcfclient.GetChanges();
         }
-        public void callService(string str,string file,string content)
+        public void callService(string file, int line, int char_off)
         {
-            wcfclient.SendCaretPosition(str,file,content);
+            wcfclient.IntializePosition(file, line, char_off);
         }
 
         void IDisposable.Dispose()
         {
             proxy.Close();
+        }
+
+        public void CallBackFunction(string file, int line, int char_off, string sender)
+        {
+            
+        }
+
+        public void AddNewEditor(string file, int line, int char_off, string sender)
+        {
+            
         }
     }
 }

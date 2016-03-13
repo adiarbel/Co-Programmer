@@ -10,7 +10,7 @@ using System.Windows.Media;
 using System.Windows.Controls;
 using System.Diagnostics;
 using System.IO;
-
+using System.Windows.Threading;
 namespace Company.VSPackage1
 {
     class MultiEditCommandFilter : IOleCommandTarget///helps to get IO of clicked buttons 
@@ -23,6 +23,7 @@ namespace Company.VSPackage1
         List<ITrackingPoint> trackList = new List<ITrackingPoint>();
         private MyCallBack cb;
         private Carets crts;
+        static Dispatcher uiDisp;
         public MultiEditCommandFilter(IWpfTextView textView, MyCallBack mcb, Carets cs)
         {
             m_textView = textView;
@@ -36,10 +37,12 @@ namespace Company.VSPackage1
             var rc = m_textView.TextBuffer.Properties.TryGetProperty<ITextDocument>(
               typeof(ITextDocument), out textDoc);
             string st = crts.DTE2.Solution.FullName;
+            uiDisp = Dispatcher.CurrentDispatcher;
             st = st.Substring(st.LastIndexOf('\\') + 1);
             st = st.Split('.')[0];
             st = textDoc.FilePath.Substring(textDoc.FilePath.IndexOf(st));
             cb.callService(st, m_textView.Caret.Position.BufferPosition.Position, 0);
+            InsertSyncedChar("NewEditorIsHere");
         }
         private void my_CaretChange(object sender, ChangeCaretEventArgs e)
         {
@@ -53,16 +56,17 @@ namespace Company.VSPackage1
             var curTrackPoint = m_textView.TextSnapshot.CreateTrackingPoint(int.Parse(e.Location),
             PointTrackingMode.Positive);
             trackList.Add(curTrackPoint);
-
         }
         public int Exec(ref Guid pguidCmdGroup, uint nCmdID, uint nCmdexecopt, IntPtr pvaIn, IntPtr pvaOut)
         {
+            RedrawScreen();
             requiresHandling = false;
             // When Alt Clicking, we need to add Edit points.
             //Debug.WriteLine("=====" + nCmdID + " " + pguidCmdGroup.ToString() + nCmdexecopt + " " + pvaIn.ToString() + " " + pvaOut.ToString(), "adi");
             if (pguidCmdGroup == VSConstants.VSStd2K && nCmdID == (uint)VSConstants.VSStd2KCmdID.ECMD_LEFTCLICK)
             {
                 requiresHandling = true;
+                RedrawScreen();
 
             }
             else if (pguidCmdGroup == VSConstants.VSStd2K && trackList.Count > 0 && (nCmdID == (uint)VSConstants.VSStd2KCmdID.TYPECHAR ||
@@ -76,13 +80,8 @@ namespace Company.VSPackage1
                 requiresHandling = true;
             if (requiresHandling == true)
             {
-                if (pguidCmdGroup == VSConstants.VSStd2K && nCmdID == (uint)VSConstants.VSStd2KCmdID.ECMD_LEFTCLICK)
-                {
-                    // Switch back to normal, clear out Edit points
-                    ClearSyncPoints();
-                    RedrawScreen();
-                }
-                else if (pguidCmdGroup == VSConstants.VSStd2K && nCmdID == (uint)VSConstants.VSStd2KCmdID.TYPECHAR)
+
+                if (pguidCmdGroup == VSConstants.VSStd2K && nCmdID == (uint)VSConstants.VSStd2KCmdID.TYPECHAR)
                 {
                     var typedChar = (char)(ushort)Marshal.GetObjectForNativeVariant(pvaIn);
                     //InsertSyncedChar(typedChar.ToString());
@@ -159,14 +158,17 @@ namespace Company.VSPackage1
         {
             // Avoiding inserting the character for the last edit point, as the Caret is there and
             // the default IDE behavior will insert the text as expected.
-            ITextEdit edit = m_textView.TextBuffer.CreateEdit();
-            for (int i = 0; i < trackList.Count - 1; i++)
-            {
-                var curTrackPoint = trackList[i];
-                edit.Insert(curTrackPoint.GetPosition(m_textView.TextSnapshot), inputString);
-            }
-            edit.Apply();
-            edit.Dispose();
+            uiDisp.Invoke(new Action(() =>
+                {
+                    ITextEdit edit = m_textView.TextBuffer.CreateEdit();
+                    for (int i = 0; i < trackList.Count - 1; i++)
+                    {
+                        var curTrackPoint = trackList[i];
+                        edit.Insert(curTrackPoint.GetPosition(m_textView.TextSnapshot), inputString);
+                    }
+                    edit.Apply();
+                    edit.Dispose();
+                }));
         }
     }
 }
