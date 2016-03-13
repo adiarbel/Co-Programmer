@@ -42,6 +42,12 @@
   <wsdl:message name="IEditService_IntializePosition_OutputMessage">
     <wsdl:part name="parameters" element="tns:IntializePositionResponse" />
   </wsdl:message>
+  <wsdl:message name="IEditService_SendCaretPosition_InputMessage">
+    <wsdl:part name="parameters" element="tns:SendCaretPosition" />
+  </wsdl:message>
+  <wsdl:message name="IEditService_SendCaretPosition_OutputMessage">
+    <wsdl:part name="parameters" element="tns:SendCaretPositionResponse" />
+  </wsdl:message>
   <wsdl:message name="IEditService_GetChanges_InputMessage">
     <wsdl:part name="parameters" element="tns:GetChanges" />
   </wsdl:message>
@@ -77,6 +83,10 @@
       <wsdl:input wsaw:Action="http://tempuri.org/IEditService/IntializePosition" message="tns:IEditService_IntializePosition_InputMessage" />
       <wsdl:output wsaw:Action="http://tempuri.org/IEditService/IntializePositionResponse" message="tns:IEditService_IntializePosition_OutputMessage" />
     </wsdl:operation>
+    <wsdl:operation name="SendCaretPosition">
+      <wsdl:input wsaw:Action="http://tempuri.org/IEditService/SendCaretPosition" message="tns:IEditService_SendCaretPosition_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IEditService/SendCaretPositionResponse" message="tns:IEditService_SendCaretPosition_OutputMessage" />
+    </wsdl:operation>
     <wsdl:operation name="GetChanges">
       <wsdl:input wsaw:Action="http://tempuri.org/IEditService/GetChanges" message="tns:IEditService_GetChanges_InputMessage" />
       <wsdl:output wsaw:Action="http://tempuri.org/IEditService/GetChangesResponse" message="tns:IEditService_GetChanges_OutputMessage" />
@@ -103,6 +113,15 @@
     <soap12:binding transport="http://schemas.microsoft.com/soap/tcp" />
     <wsdl:operation name="IntializePosition">
       <soap12:operation soapAction="http://tempuri.org/IEditService/IntializePosition" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="SendCaretPosition">
+      <soap12:operation soapAction="http://tempuri.org/IEditService/SendCaretPosition" style="document" />
       <wsdl:input>
         <soap12:body use="literal" />
       </wsdl:input>

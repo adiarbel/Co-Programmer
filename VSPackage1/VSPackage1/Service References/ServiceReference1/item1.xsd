@@ -5,12 +5,25 @@
     <xs:complexType>
       <xs:sequence>
         <xs:element minOccurs="0" name="file" nillable="true" type="xs:string" />
-        <xs:element minOccurs="0" name="line" type="xs:int" />
-        <xs:element minOccurs="0" name="char_off" type="xs:int" />
+        <xs:element minOccurs="0" name="position" type="xs:int" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
   <xs:element name="IntializePositionResponse">
+    <xs:complexType>
+      <xs:sequence />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="SendCaretPosition">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="file" nillable="true" type="xs:string" />
+        <xs:element minOccurs="0" name="position" type="xs:int" />
+        <xs:element minOccurs="0" name="content" nillable="true" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="SendCaretPositionResponse">
     <xs:complexType>
       <xs:sequence />
     </xs:complexType>
@@ -39,8 +52,8 @@
     <xs:complexType>
       <xs:sequence>
         <xs:element minOccurs="0" name="file" nillable="true" type="xs:string" />
-        <xs:element minOccurs="0" name="line" type="xs:int" />
-        <xs:element minOccurs="0" name="char_off" type="xs:int" />
+        <xs:element minOccurs="0" name="position" type="xs:int" />
+        <xs:element minOccurs="0" name="sender" nillable="true" type="xs:string" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -53,8 +66,7 @@
     <xs:complexType>
       <xs:sequence>
         <xs:element minOccurs="0" name="file" nillable="true" type="xs:string" />
-        <xs:element minOccurs="0" name="line" type="xs:int" />
-        <xs:element minOccurs="0" name="char_off" type="xs:int" />
+        <xs:element minOccurs="0" name="position" type="xs:int" />
         <xs:element minOccurs="0" name="sender" nillable="true" type="xs:string" />
       </xs:sequence>
     </xs:complexType>

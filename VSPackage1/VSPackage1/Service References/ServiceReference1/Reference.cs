@@ -16,10 +16,16 @@ namespace Company.VSPackage1.ServiceReference1 {
     public interface IEditService {
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IEditService/IntializePosition", ReplyAction="http://tempuri.org/IEditService/IntializePositionResponse")]
-        void IntializePosition(string file, int line, int char_off);
+        void IntializePosition(string file, int position);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IEditService/IntializePosition", ReplyAction="http://tempuri.org/IEditService/IntializePositionResponse")]
-        System.Threading.Tasks.Task IntializePositionAsync(string file, int line, int char_off);
+        System.Threading.Tasks.Task IntializePositionAsync(string file, int position);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IEditService/SendCaretPosition", ReplyAction="http://tempuri.org/IEditService/SendCaretPositionResponse")]
+        void SendCaretPosition(string file, int position, string content);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IEditService/SendCaretPosition", ReplyAction="http://tempuri.org/IEditService/SendCaretPositionResponse")]
+        System.Threading.Tasks.Task SendCaretPositionAsync(string file, int position, string content);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IEditService/GetChanges", ReplyAction="http://tempuri.org/IEditService/GetChangesResponse")]
         void GetChanges();
@@ -38,10 +44,10 @@ namespace Company.VSPackage1.ServiceReference1 {
     public interface IEditServiceCallback {
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IEditService/CallBackFunction", ReplyAction="http://tempuri.org/IEditService/CallBackFunctionResponse")]
-        void CallBackFunction(string file, int line, int char_off);
+        void CallBackFunction(string file, int position, string sender);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IEditService/AddNewEditor", ReplyAction="http://tempuri.org/IEditService/AddNewEditorResponse")]
-        void AddNewEditor(string file, int line, int char_off, string sender);
+        void AddNewEditor(string file, int position, string sender);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IEditService/CallBackChanges", ReplyAction="http://tempuri.org/IEditService/CallBackChangesResponse")]
         void CallBackChanges(string[] s);
@@ -75,12 +81,20 @@ namespace Company.VSPackage1.ServiceReference1 {
                 base(callbackInstance, binding, remoteAddress) {
         }
         
-        public void IntializePosition(string file, int line, int char_off) {
-            base.Channel.IntializePosition(file, line, char_off);
+        public void IntializePosition(string file, int position) {
+            base.Channel.IntializePosition(file, position);
         }
         
-        public System.Threading.Tasks.Task IntializePositionAsync(string file, int line, int char_off) {
-            return base.Channel.IntializePositionAsync(file, line, char_off);
+        public System.Threading.Tasks.Task IntializePositionAsync(string file, int position) {
+            return base.Channel.IntializePositionAsync(file, position);
+        }
+        
+        public void SendCaretPosition(string file, int position, string content) {
+            base.Channel.SendCaretPosition(file, position, content);
+        }
+        
+        public System.Threading.Tasks.Task SendCaretPositionAsync(string file, int position, string content) {
+            return base.Channel.SendCaretPositionAsync(file, position, content);
         }
         
         public void GetChanges() {

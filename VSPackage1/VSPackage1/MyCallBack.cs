@@ -22,7 +22,7 @@ namespace Company.VSPackage1
         EndpointAddress myEndPoint;
         NetTcpBinding mybinding;
         EditServiceClient wcfclient;
-        public void CallBackFunction(string file, int line, int char_off)
+        public void CallBackFunction(string file, int position, string sender)
         {
 
         }
@@ -34,9 +34,9 @@ namespace Company.VSPackage1
             wcfclient = new ServiceReference1.EditServiceClient(context, mybinding, myEndPoint);
             PrintIds();
         }
-        public void callService(string file, int line, int char_off)
+        public void callService(string file, int position)
         {
-            wcfclient.IntializePosition(file, line, char_off);
+            wcfclient.IntializePosition(file, position);
         }
         public void getChange()
         {
@@ -59,21 +59,21 @@ namespace Company.VSPackage1
         {
             wcfclient.Close();
         }
-        private void OnCaretChanged(string file, int line, int char_off,string sender)
+        private void OnCaretChanged(string file, int position,string sender)
         {
             if (ChangeCaret != null)
             {
-                ChangeCaret(this, new ChangeCaretEventArgs( sender,line.ToString(),file, char_off.ToString()));
+                ChangeCaret(this, new ChangeCaretEventArgs(sender, position.ToString(), file," "));
             }
         }
 
-
-
-
-        public void AddNewEditor(string file, int line, int char_off, string sender)
+        public void AddNewEditor(string file, int position, string sender)
         {
-            OnCaretChanged(file, line, char_off, sender);
+            OnCaretChanged(file, position, sender);
         }
+
+
+
     }
     public class ChangeCaretEventArgs : EventArgs
     {

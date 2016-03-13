@@ -23,16 +23,16 @@ namespace DuplexService
             ids.Add(OperationContext.Current);
         }
 
-        public void IntializePosition(string file, int line, int char_off)
+        public void IntializePosition(string file, int position)
         {
             IEditServiceCallBack callback;
             if(carets.ContainsKey(id))
             {
-                SendCaretPosition(file, line, char_off, "");
+                SendCaretPosition(file, position, "");
             }
             else
             {
-                carets[id] = "" + file + " " + line + " " + char_off;
+                carets[id] = "" + file + " " + position;
 
                 for (int i = 0; i < ids.Count; i++)
                 {
@@ -41,7 +41,7 @@ namespace DuplexService
                         try
                         {
                             callback = ids[i].GetCallbackChannel<IEditServiceCallBack>();
-                            callback.AddNewEditor(file, line, char_off,id);
+                            callback.AddNewEditor(file, position,id);
                         }
                         catch
                         {
@@ -55,17 +55,17 @@ namespace DuplexService
             
 
         }
-        public void SendCaretPosition(string file, int line, int char_off, string content)
+        public void SendCaretPosition(string file, int position, string content)
         {
             IEditServiceCallBack callback;
-            carets[id] = "" + file + " " + line + " " + char_off;
+            carets[id] = "" + file + " " + position;
             for (int i = 0; i < ids.Count; i++)
             {
 
                 try
                 {
                     callback = ids[i].GetCallbackChannel<IEditServiceCallBack>();
-                    callback.AddNewEditor(file, line, char_off,id);
+                    callback.AddNewEditor(file, position,id);
                 }
                 catch
                 {

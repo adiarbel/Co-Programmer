@@ -41,7 +41,7 @@ namespace Company.VSPackage1
             st = st.Substring(st.LastIndexOf('\\') + 1);
             st = st.Split('.')[0];
             st = textDoc.FilePath.Substring(textDoc.FilePath.IndexOf(st));
-            cb.callService(st, m_textView.Caret.Position.BufferPosition.Position, 0);
+            cb.callService(st, m_textView.Caret.Position.BufferPosition.Position);
             InsertSyncedChar("NewEditorIsHere");
         }
         private void my_CaretChange(object sender, ChangeCaretEventArgs e)
