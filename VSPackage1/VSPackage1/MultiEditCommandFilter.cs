@@ -32,19 +32,19 @@ namespace Company.VSPackage1
             m_textView.LayoutChanged += m_textView_LayoutChanged;
             cb = mcb;
             crts = cs;
-            cb.ChangeCaret += new ChangeCaretEventHandler(my_CaretChange);//how to send by parameter the NetworkClass ref
+            cb.NewCaret += new NewCaretEventHandler(my_NewCaret);//how to send by parameter the NetworkClass ref
+            cb.ChangeCaret += new ChangeCaretEventHandler(my_ChangedCaret);//how to send by parameter the NetworkClass ref
+            uiDisp = Dispatcher.CurrentDispatcher;
             ITextDocument textDoc;
             var rc = m_textView.TextBuffer.Properties.TryGetProperty<ITextDocument>(
               typeof(ITextDocument), out textDoc);
             string st = crts.DTE2.Solution.FullName;
-            uiDisp = Dispatcher.CurrentDispatcher;
             st = st.Substring(st.LastIndexOf('\\') + 1);
             st = st.Split('.')[0];
             st = textDoc.FilePath.Substring(textDoc.FilePath.IndexOf(st));
             cb.callService(st, m_textView.Caret.Position.BufferPosition.Position);
-            InsertSyncedChar("NewEditorIsHere");
         }
-        private void my_CaretChange(object sender, ChangeCaretEventArgs e)
+        private void my_NewCaret(object sender, ChangeCaretEventArgs e)
         {
             //ITextDocument textDoc;
             //var rc = m_textView.TextBuffer.Properties.TryGetProperty<ITextDocument>(
@@ -57,6 +57,19 @@ namespace Company.VSPackage1
             PointTrackingMode.Positive);
             trackList.Add(curTrackPoint);
         }
+        private void my_ChangedCaret(object sender, ChangeCaretEventArgs e)
+        {
+            //ITextDocument textDoc;
+            //var rc = m_textView.TextBuffer.Properties.TryGetProperty<ITextDocument>(
+            //  typeof(ITextDocument), out textDoc);
+            //string s = textDoc.FilePath.Substring(textDoc.FilePath.LastIndexOf('\\'));//gets the file only
+            //if (rc == true)
+            //    if (e.File == textDoc.FilePath.Substring(textDoc.FilePath.LastIndexOf('\\') + 1))
+            //        crts.my_CaretChange(sender, e);//helps me to find which file the caret is in
+            if(trackList.Count>0)
+            trackList[0] = m_textView.TextSnapshot.CreateTrackingPoint(int.Parse(e.Location),
+            PointTrackingMode.Positive);
+        }
         public int Exec(ref Guid pguidCmdGroup, uint nCmdID, uint nCmdexecopt, IntPtr pvaIn, IntPtr pvaOut)
         {
             RedrawScreen();
@@ -67,6 +80,14 @@ namespace Company.VSPackage1
             {
                 requiresHandling = true;
                 RedrawScreen();
+                ITextDocument textDoc;
+                var rc = m_textView.TextBuffer.Properties.TryGetProperty<ITextDocument>(
+                  typeof(ITextDocument), out textDoc);
+                string st = crts.DTE2.Solution.FullName;
+                st = st.Substring(st.LastIndexOf('\\') + 1);
+                st = st.Split('.')[0];
+                st = textDoc.FilePath.Substring(textDoc.FilePath.IndexOf(st));
+                cb.SendCurrPos(st, m_textView.Caret.Position.BufferPosition.Position);
 
             }
             else if (pguidCmdGroup == VSConstants.VSStd2K && trackList.Count > 0 && (nCmdID == (uint)VSConstants.VSStd2KCmdID.TYPECHAR ||

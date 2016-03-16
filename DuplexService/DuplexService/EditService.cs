@@ -14,7 +14,7 @@ namespace DuplexService
     {
         string[] currChanges = new string[10];
         static List<OperationContext> ids = new List<OperationContext>();
-        static Dictionary<string,string> carets = new Dictionary<string,string>();
+        static Dictionary<string, string> carets = new Dictionary<string, string>();
         string id;
         int place = 0;
         public EditService()
@@ -22,11 +22,11 @@ namespace DuplexService
             id = OperationContext.Current.SessionId;
             ids.Add(OperationContext.Current);
         }
-
         public void IntializePosition(string file, int position)
         {
+            string[] assa = carets.Keys.ToArray<string>();
             IEditServiceCallBack callback;
-            if(carets.ContainsKey(id))
+            if (carets.ContainsKey(id))
             {
                 SendCaretPosition(file, position, "");
             }
@@ -41,7 +41,7 @@ namespace DuplexService
                         try
                         {
                             callback = ids[i].GetCallbackChannel<IEditServiceCallBack>();
-                            callback.AddNewEditor(file, position,id);
+                            callback.AddNewEditor(file, position, id);
                         }
                         catch
                         {
@@ -52,7 +52,7 @@ namespace DuplexService
 
                 }
             }
-            
+
 
         }
         public void SendCaretPosition(string file, int position, string content)
@@ -61,16 +61,18 @@ namespace DuplexService
             carets[id] = "" + file + " " + position;
             for (int i = 0; i < ids.Count; i++)
             {
-
-                try
+                if (ids[i].SessionId != id)
                 {
-                    callback = ids[i].GetCallbackChannel<IEditServiceCallBack>();
-                    callback.AddNewEditor(file, position,id);
-                }
-                catch
-                {
-                    ids.Remove(ids[i]);
+                    try
+                    {
+                        callback = ids[i].GetCallbackChannel<IEditServiceCallBack>();
+                        callback.CallBackFunction(file, position, id);
+                    }
+                    catch
+                    {
+                        ids.Remove(ids[i]);
 
+                    }
                 }
 
             }

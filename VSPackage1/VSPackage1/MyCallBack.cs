@@ -10,6 +10,7 @@ using Microsoft.VisualStudio.Text;
 namespace Company.VSPackage1
 {
     /*TODO: define delegate*/
+    public delegate void NewCaretEventHandler(object sender, ChangeCaretEventArgs e);
     public delegate void ChangeCaretEventHandler(object sender, ChangeCaretEventArgs e);
     /*TODO: define event for that delegate*/
 
@@ -17,6 +18,7 @@ namespace Company.VSPackage1
     [CallbackBehavior(UseSynchronizationContext = false)]
     class MyCallBack : IEditServiceCallback, IDisposable
     {
+        public event NewCaretEventHandler NewCaret;
         public event ChangeCaretEventHandler ChangeCaret;
         InstanceContext context;
         EndpointAddress myEndPoint;
@@ -25,6 +27,7 @@ namespace Company.VSPackage1
         public void CallBackFunction(string file, int position, string sender)
         {
 
+            OnCaretChanged(file, position, sender);
         }
         public MyCallBack()
         {
@@ -37,6 +40,10 @@ namespace Company.VSPackage1
         public void callService(string file, int position)
         {
             wcfclient.IntializePosition(file, position);
+        }
+        public void SendCurrPos(string file,int position)
+        {
+            wcfclient.SendCaretPosition(file, position, "click");
         }
         public void getChange()
         {
@@ -63,13 +70,19 @@ namespace Company.VSPackage1
         {
             if (ChangeCaret != null)
             {
-                ChangeCaret(this, new ChangeCaretEventArgs(sender, position.ToString(), file," "));
+                ChangeCaret(this, new ChangeCaretEventArgs(sender, position.ToString(), file, " "));
             }
         }
-
+        private void OnNewCaret(string file, int position, string sender)
+        {
+            if (NewCaret != null)
+            {
+                NewCaret(this, new ChangeCaretEventArgs(sender, position.ToString(), file, " "));
+            }
+        }
         public void AddNewEditor(string file, int position, string sender)
         {
-            OnCaretChanged(file, position, sender);
+            OnNewCaret(file, position, sender);
         }
 
 

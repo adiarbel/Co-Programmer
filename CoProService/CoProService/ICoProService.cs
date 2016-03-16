@@ -12,13 +12,23 @@ namespace CoProService
     interface ICoProService
     {
         [OperationContract]
-        void IntializePosition(string file, int position);
+        bool IntializePosition(string file, int position);
         
     }
 
     interface ICoProServiceCallback
     {
         [OperationContract]
-        void NewEditorAdded(string file,int position);
+        void AddCurrentEditors(string[] editors,string[] locations);
+        [OperationContract]
+        void NewEditorAdded(string file,int position,string editor);
+        [OperationContract]
+        void EditorDisconnected(string editor);
+        [OperationContract]
+        void ChangedCaret(string file, int position, string editor);
+        [OperationContract]
+        void NewAddedText(string file, int position, string editor, string content);
+        [OperationContract]
+        void NewRemovedText(string file, int position, string editor, int end_position);
     }
 }
