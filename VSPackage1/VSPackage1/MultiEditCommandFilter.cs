@@ -159,7 +159,7 @@ namespace Company.VSPackage1
             System.Windows.Shapes.Rectangle r = new System.Windows.Shapes.Rectangle()
             {
                 Fill = brush,
-                Width = drawing.Bounds.Width / 2,
+                Width = drawing.Bounds.Width / 4,
                 Height = drawing.Bounds.Height
             };
             Canvas.SetLeft(r, g.Bounds.Left);

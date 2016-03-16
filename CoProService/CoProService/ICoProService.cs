@@ -13,6 +13,8 @@ namespace CoProService
     {
         [OperationContract]
         bool IntializePosition(string file, int position);
+        [OperationContract]
+        bool SendCaretPosition(string file, int position);
         
     }
 
