@@ -12,105 +12,86 @@ namespace Company.VSPackage1.ServiceReference1 {
     
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
-    [System.ServiceModel.ServiceContractAttribute(ConfigurationName="ServiceReference1.IEditService", CallbackContract=typeof(Company.VSPackage1.ServiceReference1.IEditServiceCallback))]
-    public interface IEditService {
+    [System.ServiceModel.ServiceContractAttribute(ConfigurationName="ServiceReference1.ICoProService", CallbackContract=typeof(Company.VSPackage1.ServiceReference1.ICoProServiceCallback))]
+    public interface ICoProService {
         
-        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IEditService/IntializePosition", ReplyAction="http://tempuri.org/IEditService/IntializePositionResponse")]
-        void IntializePosition(string file, int position);
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICoProService/IntializePosition", ReplyAction="http://tempuri.org/ICoProService/IntializePositionResponse")]
+        bool IntializePosition(string file, int position);
         
-        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IEditService/IntializePosition", ReplyAction="http://tempuri.org/IEditService/IntializePositionResponse")]
-        System.Threading.Tasks.Task IntializePositionAsync(string file, int position);
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICoProService/IntializePosition", ReplyAction="http://tempuri.org/ICoProService/IntializePositionResponse")]
+        System.Threading.Tasks.Task<bool> IntializePositionAsync(string file, int position);
         
-        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IEditService/SendCaretPosition", ReplyAction="http://tempuri.org/IEditService/SendCaretPositionResponse")]
-        void SendCaretPosition(string file, int position, string content);
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICoProService/SendCaretPosition", ReplyAction="http://tempuri.org/ICoProService/SendCaretPositionResponse")]
+        bool SendCaretPosition(string file, int position, string content);
         
-        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IEditService/SendCaretPosition", ReplyAction="http://tempuri.org/IEditService/SendCaretPositionResponse")]
-        System.Threading.Tasks.Task SendCaretPositionAsync(string file, int position, string content);
-        
-        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IEditService/GetChanges", ReplyAction="http://tempuri.org/IEditService/GetChangesResponse")]
-        void GetChanges();
-        
-        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IEditService/GetChanges", ReplyAction="http://tempuri.org/IEditService/GetChangesResponse")]
-        System.Threading.Tasks.Task GetChangesAsync();
-        
-        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IEditService/printIds", ReplyAction="http://tempuri.org/IEditService/printIdsResponse")]
-        void printIds();
-        
-        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IEditService/printIds", ReplyAction="http://tempuri.org/IEditService/printIdsResponse")]
-        System.Threading.Tasks.Task printIdsAsync();
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICoProService/SendCaretPosition", ReplyAction="http://tempuri.org/ICoProService/SendCaretPositionResponse")]
+        System.Threading.Tasks.Task<bool> SendCaretPositionAsync(string file, int position, string content);
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
-    public interface IEditServiceCallback {
+    public interface ICoProServiceCallback {
         
-        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IEditService/CallBackFunction", ReplyAction="http://tempuri.org/IEditService/CallBackFunctionResponse")]
-        void CallBackFunction(string file, int position, string sender);
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICoProService/AddCurrentEditors", ReplyAction="http://tempuri.org/ICoProService/AddCurrentEditorsResponse")]
+        void AddCurrentEditors(string[] editors, string[] locations);
         
-        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IEditService/AddNewEditor", ReplyAction="http://tempuri.org/IEditService/AddNewEditorResponse")]
-        void AddNewEditor(string file, int position, string sender);
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICoProService/NewEditorAdded", ReplyAction="http://tempuri.org/ICoProService/NewEditorAddedResponse")]
+        void NewEditorAdded(string file, int position, string editor);
         
-        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/IEditService/CallBackChanges", ReplyAction="http://tempuri.org/IEditService/CallBackChangesResponse")]
-        void CallBackChanges(string[] s);
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICoProService/EditorDisconnected", ReplyAction="http://tempuri.org/ICoProService/EditorDisconnectedResponse")]
+        void EditorDisconnected(string editor);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICoProService/ChangedCaret", ReplyAction="http://tempuri.org/ICoProService/ChangedCaretResponse")]
+        void ChangedCaret(string file, int position, string editor);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICoProService/NewAddedText", ReplyAction="http://tempuri.org/ICoProService/NewAddedTextResponse")]
+        void NewAddedText(string file, int position, string editor, string content);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICoProService/NewRemovedText", ReplyAction="http://tempuri.org/ICoProService/NewRemovedTextResponse")]
+        void NewRemovedText(string file, int position, string editor, int end_position);
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
-    public interface IEditServiceChannel : Company.VSPackage1.ServiceReference1.IEditService, System.ServiceModel.IClientChannel {
+    public interface ICoProServiceChannel : Company.VSPackage1.ServiceReference1.ICoProService, System.ServiceModel.IClientChannel {
     }
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
-    public partial class EditServiceClient : System.ServiceModel.DuplexClientBase<Company.VSPackage1.ServiceReference1.IEditService>, Company.VSPackage1.ServiceReference1.IEditService {
+    public partial class CoProServiceClient : System.ServiceModel.DuplexClientBase<Company.VSPackage1.ServiceReference1.ICoProService>, Company.VSPackage1.ServiceReference1.ICoProService {
         
-        public EditServiceClient(System.ServiceModel.InstanceContext callbackInstance) : 
+        public CoProServiceClient(System.ServiceModel.InstanceContext callbackInstance) : 
                 base(callbackInstance) {
         }
         
-        public EditServiceClient(System.ServiceModel.InstanceContext callbackInstance, string endpointConfigurationName) : 
+        public CoProServiceClient(System.ServiceModel.InstanceContext callbackInstance, string endpointConfigurationName) : 
                 base(callbackInstance, endpointConfigurationName) {
         }
         
-        public EditServiceClient(System.ServiceModel.InstanceContext callbackInstance, string endpointConfigurationName, string remoteAddress) : 
+        public CoProServiceClient(System.ServiceModel.InstanceContext callbackInstance, string endpointConfigurationName, string remoteAddress) : 
                 base(callbackInstance, endpointConfigurationName, remoteAddress) {
         }
         
-        public EditServiceClient(System.ServiceModel.InstanceContext callbackInstance, string endpointConfigurationName, System.ServiceModel.EndpointAddress remoteAddress) : 
+        public CoProServiceClient(System.ServiceModel.InstanceContext callbackInstance, string endpointConfigurationName, System.ServiceModel.EndpointAddress remoteAddress) : 
                 base(callbackInstance, endpointConfigurationName, remoteAddress) {
         }
         
-        public EditServiceClient(System.ServiceModel.InstanceContext callbackInstance, System.ServiceModel.Channels.Binding binding, System.ServiceModel.EndpointAddress remoteAddress) : 
+        public CoProServiceClient(System.ServiceModel.InstanceContext callbackInstance, System.ServiceModel.Channels.Binding binding, System.ServiceModel.EndpointAddress remoteAddress) : 
                 base(callbackInstance, binding, remoteAddress) {
         }
         
-        public void IntializePosition(string file, int position) {
-            base.Channel.IntializePosition(file, position);
+        public bool IntializePosition(string file, int position) {
+            return base.Channel.IntializePosition(file, position);
         }
         
-        public System.Threading.Tasks.Task IntializePositionAsync(string file, int position) {
+        public System.Threading.Tasks.Task<bool> IntializePositionAsync(string file, int position) {
             return base.Channel.IntializePositionAsync(file, position);
         }
         
-        public void SendCaretPosition(string file, int position, string content) {
-            base.Channel.SendCaretPosition(file, position, content);
+        public bool SendCaretPosition(string file, int position, string content) {
+            return base.Channel.SendCaretPosition(file, position, content);
         }
         
-        public System.Threading.Tasks.Task SendCaretPositionAsync(string file, int position, string content) {
+        public System.Threading.Tasks.Task<bool> SendCaretPositionAsync(string file, int position, string content) {
             return base.Channel.SendCaretPositionAsync(file, position, content);
-        }
-        
-        public void GetChanges() {
-            base.Channel.GetChanges();
-        }
-        
-        public System.Threading.Tasks.Task GetChangesAsync() {
-            return base.Channel.GetChangesAsync();
-        }
-        
-        public void printIds() {
-            base.Channel.printIds();
-        }
-        
-        public System.Threading.Tasks.Task printIdsAsync() {
-            return base.Channel.printIdsAsync();
         }
     }
 }

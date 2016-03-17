@@ -20,20 +20,28 @@ namespace Company.VSPackage1
         internal bool m_added;
         private IAdornmentLayer m_adornmentLayer;//Our adornment layer to work on
         private bool requiresHandling = false;
-        List<ITrackingPoint> trackList = new List<ITrackingPoint>();
+        Dictionary<string, ITrackingPoint> trackDict = new Dictionary<string, ITrackingPoint>();
         private MyCallBack cb;
         private Carets crts;
         static Dispatcher uiDisp;
+        static bool isFirst = true;
         public MultiEditCommandFilter(IWpfTextView textView, MyCallBack mcb, Carets cs)
         {
+
             m_textView = textView;
             m_adornmentLayer = m_textView.GetAdornmentLayer("MultiEditLayer");
             m_added = false;
             m_textView.LayoutChanged += m_textView_LayoutChanged;
             cb = mcb;
             crts = cs;
-            cb.NewCaret += new NewCaretEventHandler(my_NewCaret);//how to send by parameter the NetworkClass ref
-            cb.ChangeCaret += new ChangeCaretEventHandler(my_ChangedCaret);//how to send by parameter the NetworkClass ref
+            if (isFirst)
+            {
+                cb.NewCaret += new NewCaretEventHandler(my_NewCaret);//how to send by parameter the NetworkClass ref
+                cb.ChangeCaret += new ChangeCaretEventHandler(my_ChangedCaret);//how to send by parameter the NetworkClass ref
+                cb.AddAllEditors += new AddCurrentEditorsEventHandler(my_AddEditors);
+                isFirst = false;
+            }
+
             uiDisp = Dispatcher.CurrentDispatcher;
             ITextDocument textDoc;
             var rc = m_textView.TextBuffer.Properties.TryGetProperty<ITextDocument>(
@@ -42,7 +50,7 @@ namespace Company.VSPackage1
             st = st.Substring(st.LastIndexOf('\\') + 1);
             st = st.Split('.')[0];
             st = textDoc.FilePath.Substring(textDoc.FilePath.IndexOf(st));
-            cb.callService(st, m_textView.Caret.Position.BufferPosition.Position);
+            cb.IntializePosition(st, m_textView.Caret.Position.BufferPosition.Position);
         }
         private void my_NewCaret(object sender, ChangeCaretEventArgs e)
         {
@@ -55,7 +63,7 @@ namespace Company.VSPackage1
             //        crts.my_CaretChange(sender, e);//helps me to find which file the caret is in
             var curTrackPoint = m_textView.TextSnapshot.CreateTrackingPoint(int.Parse(e.Location),
             PointTrackingMode.Positive);
-            trackList.Add(curTrackPoint);
+            trackDict[e.Sender] = curTrackPoint;
         }
         private void my_ChangedCaret(object sender, ChangeCaretEventArgs e)
         {
@@ -66,9 +74,19 @@ namespace Company.VSPackage1
             //if (rc == true)
             //    if (e.File == textDoc.FilePath.Substring(textDoc.FilePath.LastIndexOf('\\') + 1))
             //        crts.my_CaretChange(sender, e);//helps me to find which file the caret is in
-            if(trackList.Count>0)
-            trackList[0] = m_textView.TextSnapshot.CreateTrackingPoint(int.Parse(e.Location),
-            PointTrackingMode.Positive);
+            if (trackDict.Count > 0)
+            {
+                trackDict[e.Sender] = m_textView.TextSnapshot.CreateTrackingPoint(int.Parse(e.Location),
+                PointTrackingMode.Positive);
+            }
+        }
+        private void my_AddEditors(object sender, AddEditorsEventArgs e)
+        {
+            for (int i = 0; i < e.Editors.Length; i++)
+            {
+                trackDict[e.Editors[i]]=m_textView.TextSnapshot.CreateTrackingPoint(int.Parse(e.Locations[i]),
+                PointTrackingMode.Positive);
+            }
         }
         public int Exec(ref Guid pguidCmdGroup, uint nCmdID, uint nCmdexecopt, IntPtr pvaIn, IntPtr pvaOut)
         {
@@ -87,10 +105,10 @@ namespace Company.VSPackage1
                 st = st.Substring(st.LastIndexOf('\\') + 1);
                 st = st.Split('.')[0];
                 st = textDoc.FilePath.Substring(textDoc.FilePath.IndexOf(st));
-                cb.SendCurrPos(st, m_textView.Caret.Position.BufferPosition.Position);
+                cb.SendCaretPosition(st, m_textView.Caret.Position.BufferPosition.Position, "click");
 
             }
-            else if (pguidCmdGroup == VSConstants.VSStd2K && trackList.Count > 0 && (nCmdID == (uint)VSConstants.VSStd2KCmdID.TYPECHAR ||
+            else if (pguidCmdGroup == VSConstants.VSStd2K && trackDict.Count > 0 && (nCmdID == (uint)VSConstants.VSStd2KCmdID.TYPECHAR ||
                     nCmdID == (uint)VSConstants.VSStd2KCmdID.BACKSPACE ||
                     nCmdID == (uint)VSConstants.VSStd2KCmdID.TAB ||
                     nCmdID == (uint)VSConstants.VSStd2KCmdID.UP ||
@@ -132,9 +150,9 @@ namespace Company.VSPackage1
         private void RedrawScreen()
         {
             m_adornmentLayer.RemoveAllAdornments();
-            for (int i = 0; i < trackList.Count; i++)
+            foreach(KeyValuePair<string,ITrackingPoint> entry in trackDict)
             {
-                var curTrackPoint = trackList[i];
+                var curTrackPoint = trackDict[entry.Key];
                 DrawSingleSyncPoint(curTrackPoint);
             }
         }
@@ -144,7 +162,7 @@ namespace Company.VSPackage1
             CaretPosition curPosition = m_textView.Caret.Position;
             var curTrackPoint = m_textView.TextSnapshot.CreateTrackingPoint(curPosition.BufferPosition.Position,
             PointTrackingMode.Positive);
-            trackList.Add(curTrackPoint);
+            //trackDict.Add(curTrackPoint);
         }
         private void DrawSingleSyncPoint(ITrackingPoint curTrackPoint)
         {
@@ -172,7 +190,7 @@ namespace Company.VSPackage1
         }
         private void ClearSyncPoints()
         {
-            trackList.Clear();
+            trackDict.Clear();
             m_adornmentLayer.RemoveAllAdornments();
         }
         private void InsertSyncedChar(string inputString)
@@ -182,9 +200,9 @@ namespace Company.VSPackage1
             uiDisp.Invoke(new Action(() =>
                 {
                     ITextEdit edit = m_textView.TextBuffer.CreateEdit();
-                    for (int i = 0; i < trackList.Count - 1; i++)
+                    foreach (KeyValuePair<string, ITrackingPoint> entry in trackDict)
                     {
-                        var curTrackPoint = trackList[i];
+                        var curTrackPoint = trackDict[entry.Key];
                         edit.Insert(curTrackPoint.GetPosition(m_textView.TextSnapshot), inputString);
                     }
                     edit.Apply();

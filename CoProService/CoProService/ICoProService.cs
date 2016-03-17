@@ -9,16 +9,16 @@ using System.ServiceModel;
 namespace CoProService
 {
     [ServiceContract(CallbackContract = typeof(ICoProServiceCallback))]
-    interface ICoProService
+    public interface ICoProService
     {
         [OperationContract]
         bool IntializePosition(string file, int position);
         [OperationContract]
-        bool SendCaretPosition(string file, int position);
+        bool SendCaretPosition(string file, int position,string content);
         
     }
 
-    interface ICoProServiceCallback
+    public interface ICoProServiceCallback
     {
         [OperationContract]
         void AddCurrentEditors(string[] editors,string[] locations);

@@ -11,7 +11,7 @@ using Microsoft.VisualStudio.Text;
 namespace CoProService
 {
     [ServiceBehavior(InstanceContextMode = InstanceContextMode.PerSession, ConcurrencyMode = ConcurrencyMode.Reentrant)]
-    class CoProService : ICoProService, IDisposable
+    public class CoProService : ICoProService, IDisposable
     {
         string[] currChanges = new string[10];
         static List<OperationContext> ids = new List<OperationContext>();
@@ -79,6 +79,13 @@ namespace CoProService
 
             }
             return true;
+        }
+        private void PrintIds()
+        {
+            for (int i = 0; i < ids.Count; i++)
+            {
+                Console.WriteLine(ids[i].SessionId);
+            }
         }
     }
 }

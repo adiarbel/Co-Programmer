@@ -10,83 +10,74 @@ using Microsoft.VisualStudio.Text;
 namespace Company.VSPackage1
 {
     /*TODO: define delegate*/
+    public delegate void AddCurrentEditorsEventHandler(object sender, AddEditorsEventArgs e);
     public delegate void NewCaretEventHandler(object sender, ChangeCaretEventArgs e);
     public delegate void ChangeCaretEventHandler(object sender, ChangeCaretEventArgs e);
     /*TODO: define event for that delegate*/
 
     /*TODO: define the above for each event that might come from the server's callbacks*/
     [CallbackBehavior(UseSynchronizationContext = false)]
-    class MyCallBack : IEditServiceCallback, IDisposable
+    class MyCallBack : ICoProServiceCallback, IDisposable
     {
         public event NewCaretEventHandler NewCaret;
         public event ChangeCaretEventHandler ChangeCaret;
+        public event AddCurrentEditorsEventHandler AddAllEditors;
         InstanceContext context;
         EndpointAddress myEndPoint;
         NetTcpBinding mybinding;
-        EditServiceClient wcfclient;
-        public void CallBackFunction(string file, int position, string sender)
-        {
-
-            OnCaretChanged(file, position, sender);
-        }
+        CoProServiceClient wcfclient;
         public MyCallBack()
         {
             context = new InstanceContext(this);
             mybinding = new NetTcpBinding();
-            myEndPoint = new EndpointAddress("net.tcp://localhost:8090/EditService");
-            wcfclient = new ServiceReference1.EditServiceClient(context, mybinding, myEndPoint);
-            PrintIds();
+            myEndPoint = new EndpointAddress("net.tcp://localhost:8090/CoProService");
+            wcfclient = new ServiceReference1.CoProServiceClient(context, mybinding, myEndPoint);
         }
-        public void callService(string file, int position)
+        public void IntializePosition(string file, int position)
         {
             wcfclient.IntializePosition(file, position);
         }
-        public void SendCurrPos(string file,int position)
+        public void SendCaretPosition(string file, int position, string command)
         {
-            wcfclient.SendCaretPosition(file, position, "click");
+            wcfclient.SendCaretPosition(file, position, command);
         }
-        public void getChange()
+        public void AddCurrentEditors(string[] editors, string[] locations)
         {
-            wcfclient.GetChanges();
-        }
-        public void CallBackChanges(string[] s)
-        {
-            string st = "";
-            for (int i = 0; i < s.Length; i++)
+            if(AddAllEditors!=null)
             {
-                st += s[i];
+                AddAllEditors(this, new AddEditorsEventArgs(editors, locations));
             }
         }
-        public void PrintIds()
+        public void NewEditorAdded(string file, int position, string editor)
         {
-            wcfclient.printIds();
+            if (NewCaret != null)
+            {
+                NewCaret(this, new ChangeCaretEventArgs(editor, position.ToString(), file, " "));
+            }
         }
-
+        public void ChangedCaret(string file, int position, string editor)
+        {
+            if (ChangeCaret != null)
+            {
+                ChangeCaret(this, new ChangeCaretEventArgs(editor, position.ToString(), file, " "));
+            }
+        }
+        public void EditorDisconnected(string editor)
+        {
+            throw new NotImplementedException();
+        }
+        public void NewAddedText(string file, int position, string editor, string content)
+        {
+            throw new NotImplementedException();
+        }
+        public void NewRemovedText(string file, int position, string editor, int end_position)
+        {
+            throw new NotImplementedException();
+        }
         void IDisposable.Dispose()
         {
             wcfclient.Close();
         }
-        private void OnCaretChanged(string file, int position,string sender)
-        {
-            if (ChangeCaret != null)
-            {
-                ChangeCaret(this, new ChangeCaretEventArgs(sender, position.ToString(), file, " "));
-            }
-        }
-        private void OnNewCaret(string file, int position, string sender)
-        {
-            if (NewCaret != null)
-            {
-                NewCaret(this, new ChangeCaretEventArgs(sender, position.ToString(), file, " "));
-            }
-        }
-        public void AddNewEditor(string file, int position, string sender)
-        {
-            OnNewCaret(file, position, sender);
-        }
-
-
-
     }
     public class ChangeCaretEventArgs : EventArgs
     {
@@ -123,4 +114,24 @@ namespace Company.VSPackage1
         }
 
     }
+    public class AddEditorsEventArgs : EventArgs
+    {
+        private string[] m_editors = null;
+        private string[] m_locations = null;
+
+        public AddEditorsEventArgs(string[] editors, string[] locations)
+        {
+            m_editors = editors;
+            m_locations = locations;
+        }
+        public string[] Editors
+        {
+            get { return m_editors; }
+        }
+        public string[] Locations
+        {
+            get { return m_locations; }
+        }
+    }
+
 }
