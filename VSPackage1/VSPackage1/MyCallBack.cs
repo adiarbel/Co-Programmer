@@ -10,6 +10,9 @@ using Microsoft.VisualStudio.Text;
 namespace Company.VSPackage1
 {
     /*TODO: define delegate*/
+    public delegate void RemovedTextEventHandler(object sender, ChangeCaretEventArgs e);
+    public delegate void NewTextEventHandler(object sender, ChangeCaretEventArgs e);
+    public delegate void EditorDisconnectedEventHandler(object sender, EditorDisEventArgs e);
     public delegate void AddCurrentEditorsEventHandler(object sender, AddEditorsEventArgs e);
     public delegate void NewCaretEventHandler(object sender, ChangeCaretEventArgs e);
     public delegate void ChangeCaretEventHandler(object sender, ChangeCaretEventArgs e);
@@ -20,8 +23,11 @@ namespace Company.VSPackage1
     class MyCallBack : ICoProServiceCallback, IDisposable
     {
         public event NewCaretEventHandler NewCaret;
+        public event RemovedTextEventHandler RemovedText;
         public event ChangeCaretEventHandler ChangeCaret;
         public event AddCurrentEditorsEventHandler AddAllEditors;
+        public event EditorDisconnectedEventHandler EditorDisc;
+        public event NewTextEventHandler NewText;
         InstanceContext context;
         EndpointAddress myEndPoint;
         NetTcpBinding mybinding;
@@ -43,7 +49,7 @@ namespace Company.VSPackage1
         }
         public void AddCurrentEditors(string[] editors, string[] locations)
         {
-            if(AddAllEditors!=null)
+            if (AddAllEditors != null)
             {
                 AddAllEditors(this, new AddEditorsEventArgs(editors, locations));
             }
@@ -52,27 +58,43 @@ namespace Company.VSPackage1
         {
             if (NewCaret != null)
             {
-                NewCaret(this, new ChangeCaretEventArgs(editor, position.ToString(), file, " "));
+                NewCaret(this, new ChangeCaretEventArgs(editor, position, file, " "));
             }
         }
         public void ChangedCaret(string file, int position, string editor)
         {
             if (ChangeCaret != null)
             {
-                ChangeCaret(this, new ChangeCaretEventArgs(editor, position.ToString(), file, " "));
+                ChangeCaret(this, new ChangeCaretEventArgs(editor, position, file, " "));
             }
         }
         public void EditorDisconnected(string editor)
         {
-            throw new NotImplementedException();
+            if (EditorDisc != null)
+            {
+                EditorDisc(this, new EditorDisEventArgs(editor));
+            }
         }
         public void NewAddedText(string file, int position, string editor, string content)
         {
-            throw new NotImplementedException();
+            if (NewText != null)
+            {
+                NewText(this, new ChangeCaretEventArgs(editor, position, file, content));
+            }
         }
         public void NewRemovedText(string file, int position, string editor, int end_position)
         {
-            throw new NotImplementedException();
+            if (RemovedText != null)
+            {
+                if (position == end_position)
+                {
+                    RemovedText(this, new ChangeCaretEventArgs(editor, position, file, "DELETE"));
+                }
+                else
+                {
+                    RemovedText(this, new ChangeCaretEventArgs(editor, position, file, "BACKSPACE"));
+                }
+            }
         }
         void IDisposable.Dispose()
         {
@@ -82,25 +104,25 @@ namespace Company.VSPackage1
     public class ChangeCaretEventArgs : EventArgs
     {
         // Fields
-        private string m_sender = string.Empty;
-        private string m_location = string.Empty;
+        private string m_editor = string.Empty;
+        private int m_location = -1;
         private string m_file = string.Empty;
         private string m_command = string.Empty;
 
         // Constructor
-        public ChangeCaretEventArgs(string sender, string location, string file, string command)
+        public ChangeCaretEventArgs(string editor, int location, string file, string command)
         {
-            m_sender = sender;
+            m_editor = editor;
             m_location = location;
             m_file = file;
             m_command = command;
         }
         // Properties (read-only)
-        public string Sender
+        public string Editor
         {
-            get { return m_sender; }
+            get { return m_editor; }
         }
-        public string Location
+        public int Location
         {
             get { return m_location; }
         }
@@ -133,5 +155,17 @@ namespace Company.VSPackage1
             get { return m_locations; }
         }
     }
+    public class EditorDisEventArgs : EventArgs
+    {
 
+        private string m_editor = string.Empty;
+        public EditorDisEventArgs(string editor)
+        {
+            m_editor = editor;
+        }
+        public string Editor
+        {
+            get { return m_editor; }
+        }
+    }
 }

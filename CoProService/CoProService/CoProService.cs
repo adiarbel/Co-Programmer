@@ -14,45 +14,46 @@ namespace CoProService
     public class CoProService : ICoProService, IDisposable
     {
         string[] currChanges = new string[10];
-        static List<OperationContext> ids = new List<OperationContext>();
+        static Dictionary<string, OperationContext> ids = new Dictionary<string, OperationContext>();
         static Dictionary<string, string> carets = new Dictionary<string, string>();
         string id;
-        int place = 0;
-        public void Dispose()
+        int place;
+        public CoProService()
         {
+            id = OperationContext.Current.SessionId;
+            ids[id] = OperationContext.Current;
         }
-
         public bool IntializePosition(string file, int position)
         {
             string[] assa = carets.Keys.ToArray<string>();
             ICoProServiceCallback callback;
+            OperationContext.Current.GetCallbackChannel<ICoProServiceCallback>().AddCurrentEditors(carets.Keys.ToArray<string>(), carets.Values.ToArray<string>());
             if (carets.ContainsKey(id))
             {
-                SendCaretPosition(file, position,"");
+                SendCaretPosition(file, position, "");
             }
             else
             {
                 carets[id] = "" + file + " " + position;
 
-                for (int i = 0; i < ids.Count; i++)
+                foreach (KeyValuePair<string, OperationContext> entry in ids)
                 {
-                    if (ids[i].SessionId != id)
+                    if (entry.Value.SessionId != id)
                     {
                         try
                         {
-                            callback = ids[i].GetCallbackChannel<ICoProServiceCallback>();
+                            callback = entry.Value.GetCallbackChannel<ICoProServiceCallback>();
                             callback.NewEditorAdded(file, position, id);
                         }
                         catch
                         {
-                            ids.Remove(ids[i]);
+                            ids.Remove(entry.Key);
 
                         }
                     }
 
                 }
             }
-            OperationContext.Current.GetCallbackChannel<ICoProServiceCallback>().AddCurrentEditors(carets.Keys.ToArray<string>(), carets.Values.ToArray<string>());
             return true;
         }
 
@@ -61,18 +62,33 @@ namespace CoProService
         {
             ICoProServiceCallback callback;
             carets[id] = "" + file + " " + position;
-            for (int i = 0; i < ids.Count; i++)
+            foreach (KeyValuePair<string, OperationContext> entry in ids)
             {
-                if (ids[i].SessionId != id)
+                if (entry.Value.SessionId != id)
                 {
                     try
                     {
-                        callback = ids[i].GetCallbackChannel<ICoProServiceCallback>();
-                        callback.ChangedCaret(file, position, id);
+                        callback = entry.Value.GetCallbackChannel<ICoProServiceCallback>();
+                        if (content == "click")
+                        {
+                            callback.ChangedCaret(file, position, id);
+                        }
+                        else if (content == "BACKSPACE")
+                        {
+                            callback.NewRemovedText(file, position, id, position - 1);
+                        }
+                        else if (content == "DELETE")
+                        {
+                            callback.NewRemovedText(file, position, id, position);
+                        }
+                        else
+                        {
+                            callback.NewAddedText(file, position, id, content);
+                        }
                     }
                     catch
                     {
-                        ids.Remove(ids[i]);
+                        ids.Remove(entry.Key);
 
                     }
                 }
@@ -82,9 +98,32 @@ namespace CoProService
         }
         private void PrintIds()
         {
-            for (int i = 0; i < ids.Count; i++)
+            foreach (KeyValuePair<string, OperationContext> entry in ids)
             {
-                Console.WriteLine(ids[i].SessionId);
+                Console.WriteLine(entry.Value.SessionId);
+            }
+        }
+
+        void IDisposable.Dispose()
+        {
+            ICoProServiceCallback callback;
+            ids.Remove(id);
+            carets.Remove(id);
+            foreach (KeyValuePair<string, OperationContext> entry in ids)
+            {
+
+                try
+                {
+                    callback = entry.Value.GetCallbackChannel<ICoProServiceCallback>();
+                    callback.EditorDisconnected(id);
+                }
+                catch
+                {
+                    ids.Remove(id);
+                    carets.Remove(id);
+                }
+
+
             }
         }
     }

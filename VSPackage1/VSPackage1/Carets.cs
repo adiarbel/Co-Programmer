@@ -65,14 +65,14 @@ namespace Company.VSPackage1
         public void my_CaretChange(object sender, ChangeCaretEventArgs e)
         {
 
-            TextSelection ts2 = null;
-            ts2 = DTE2.ActiveWindow.Project.ProjectItems.Item("Class2.cs").Document.Selection as TextSelection;
-            string s = e.Location.Split(',')[3];
-            int line = ts2.ActivePoint.Line;
-            int offs = ts2.ActivePoint.LineCharOffset;
-            ts2.MoveToLineAndOffset(int.Parse(e.Location.Split(',')[3]), int.Parse(e.Location.Split(',')[4]));
-            ts2.Insert("oved");//TODO: Check event calling by insert and not by pressing
-            ts2.MoveToLineAndOffset(line, offs);
+            //TextSelection ts2 = null;
+            //ts2 = DTE2.ActiveWindow.Project.ProjectItems.Item("Class2.cs").Document.Selection as TextSelection;
+            //string s = e.Location.Split(',')[3];
+            //int line = ts2.ActivePoint.Line;
+            //int offs = ts2.ActivePoint.LineCharOffset;
+            //ts2.MoveToLineAndOffset(int.Parse(e.Location.Split(',')[3]), int.Parse(e.Location.Split(',')[4]));
+            //ts2.Insert("oved");//TODO: Check event calling by insert and not by pressing
+            //ts2.MoveToLineAndOffset(line, offs);
 
 
         }
