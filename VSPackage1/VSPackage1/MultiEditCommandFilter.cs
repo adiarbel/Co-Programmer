@@ -193,6 +193,7 @@ namespace Company.VSPackage1
                 }
                 else if (pguidCmdGroup == VSConstants.VSStd2K && nCmdID == (uint)VSConstants.VSStd2KCmdID.RETURN)
                 {
+                    var typedChar = (char)(ushort)Marshal.GetObjectForNativeVariant(pvaIn);
                     cb.SendCaretPosition(filename, m_textView.Caret.Position.BufferPosition.Position, "\n");
                     //InsertSyncedChar(typedChar.ToString());
                     RedrawScreen();
