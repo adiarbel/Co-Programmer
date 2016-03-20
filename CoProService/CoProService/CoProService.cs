@@ -68,6 +68,7 @@ namespace CoProService
                 {
                     try
                     {
+
                         callback = entry.Value.GetCallbackChannel<ICoProServiceCallback>();
                         if (content == "click")
                         {

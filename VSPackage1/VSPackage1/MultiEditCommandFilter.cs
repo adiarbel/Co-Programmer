@@ -11,6 +11,9 @@ using System.Windows.Controls;
 using System.Diagnostics;
 using System.IO;
 using System.Windows.Threading;
+using EnvDTE;
+using EnvDTE80;
+using EnvDTE100;
 namespace Company.VSPackage1
 {
     class MultiEditCommandFilter : IOleCommandTarget///helps to get IO of clicked buttons 
@@ -35,6 +38,7 @@ namespace Company.VSPackage1
             m_textView.LayoutChanged += m_textView_LayoutChanged;
             cb = mcb;
             crts = cs;
+            //crts.DTE2.Events.TextEditorEvents.LineChanged += new _dispTextEditorEvents_LineChangedEventHandler();
             if (isFirst)
             {
                 cb.NewCaret += new NewCaretEventHandler(my_NewCaret);//how to send by parameter the NetworkClass ref
@@ -161,11 +165,12 @@ namespace Company.VSPackage1
                     nCmdID == (uint)VSConstants.VSStd2KCmdID.LEFT ||
                     nCmdID == (uint)VSConstants.VSStd2KCmdID.RIGHT||
                     nCmdID == (uint)VSConstants.VSStd2KCmdID.RETURN
+                
 
                     
             ))
                 requiresHandling = true;
-            else if(nCmdID==17)
+            else if(nCmdID==17)//DELETE pressed
             {
                 requiresHandling = true;
             }
@@ -193,11 +198,12 @@ namespace Company.VSPackage1
                 }
                 else if (pguidCmdGroup == VSConstants.VSStd2K && nCmdID == (uint)VSConstants.VSStd2KCmdID.RETURN)
                 {
-                    var typedChar = (char)(ushort)Marshal.GetObjectForNativeVariant(pvaIn);
+                    //var typedChar = (char)(ushort)Marshal.GetObjectForNativeVariant(pvaIn);
                     cb.SendCaretPosition(filename, m_textView.Caret.Position.BufferPosition.Position, "\n");
                     //InsertSyncedChar(typedChar.ToString());
                     RedrawScreen();
                 }
+                
             }
             return m_nextTarget.Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
         }
