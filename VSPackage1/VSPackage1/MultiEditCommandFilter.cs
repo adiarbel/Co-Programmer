@@ -29,6 +29,7 @@ namespace Company.VSPackage1
         internal Carets crts;
         static Dispatcher uiDisp;
         static bool isFirst = true;
+        int currSizeBuffer;
         public MultiEditCommandFilter(IWpfTextView textView, MyCallBack mcb, Carets cs)
         {
 
@@ -59,6 +60,8 @@ namespace Company.VSPackage1
             st = st.Split('.')[0];
             st = textDoc.FilePath.Substring(textDoc.FilePath.IndexOf(st));
             cb.IntializePosition(st, m_textView.Caret.Position.BufferPosition.Position);
+
+            currSizeBuffer = m_textView.TextSnapshot.Length;
         }
         private void my_NewCaret(object sender, ChangeCaretEventArgs e)
         {
@@ -209,7 +212,12 @@ namespace Company.VSPackage1
                    
                     RedrawScreen();
                 }
-                
+
+            } 
+            if (currSizeBuffer != m_textView.TextSnapshot.Length)
+            {
+                currSizeBuffer = m_textView.TextSnapshot.Length;
+                System.Windows.Forms.MessageBox.Show(currSizeBuffer.ToString());
             }
             return m_nextTarget.Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
         }
@@ -231,7 +239,10 @@ namespace Company.VSPackage1
                         DrawSingleSyncPoint(curTrackPoint, brushes[i]);
                         i++;
                     }
+                    
+
                 }));
+           
         }
 
         private void AddSyncPoint()
@@ -266,6 +277,7 @@ namespace Company.VSPackage1
             Canvas.SetLeft(r, g.Bounds.Left);
             Canvas.SetTop(r, g.Bounds.Top);
             m_adornmentLayer.AddAdornment(AdornmentPositioningBehavior.TextRelative, span, "MultiEditLayer", r, null);
+
         }
         private void m_textView_LayoutChanged(object sender, TextViewLayoutChangedEventArgs e)
         {

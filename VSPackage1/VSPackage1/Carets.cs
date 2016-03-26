@@ -178,17 +178,18 @@ namespace Company.VSPackage1
 
             if (KeyWasPressed)
             {
-                if (b.AbsoluteCharOffset - a.AbsoluteCharOffset >= 4)
+                if ((b.AbsoluteCharOffset - a.AbsoluteCharOffset-1)%4 == 0)
                 {
                     string st = "";
-                    for (int i = 0; i < b.AbsoluteCharOffset - a.AbsoluteCharOffset; i++)
+                    for (int i = 0; i < b.AbsoluteCharOffset - a.AbsoluteCharOffset-1; i++)
                     {
                         st += ' ';
                     }
-                    cb.SendCaretPosition(dte.ActiveDocument.FullName, a.AbsoluteCharOffset, st);
-                    
+                    cb.SendCaretPosition(dte.ActiveDocument.FullName, b.AbsoluteCharOffset-2, st);
+                    cb.SendCaretPosition(dte.ActiveDocument.FullName, b.AbsoluteCharOffset+st.Length, "click");
                 }
                 KeyWasPressed = false;
+                
             }
             //ts.Select(ts.AnchorPoint, ts.ActivePoint);
             // EnterWasPressed = false;
