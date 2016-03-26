@@ -37,15 +37,15 @@ namespace Company.VSPackage1
         TextEditorEvents te;
         MyCallBack cb;
         bool twice;
-        public bool EnterWasPressed = false;
+        public bool KeyWasPressed = false;
         public DTE2 DTE2
         {
             get { return dte ?? (dte = ServiceProvider.GlobalProvider.GetService(typeof(DTE)) as DTE2); }
         }
-        public bool EnterPress
+        public bool KeyPress
         {
-            get { return EnterWasPressed; }
-            set { EnterWasPressed = value; }
+            get { return KeyWasPressed; }
+            set { KeyWasPressed = value; }
         }
         public Carets(IWpfTextViewHost h, MyCallBack cb)
         {
@@ -176,17 +176,20 @@ namespace Company.VSPackage1
         private void EnterFix(TextPoint a, TextPoint b, int hint)
         {
 
-            if (EnterWasPressed)
+            if (KeyWasPressed)
             {
-                string st = "";
-                for (int i = 0; i < b.AbsoluteCharOffset - a.AbsoluteCharOffset; i++)
+                if (b.AbsoluteCharOffset - a.AbsoluteCharOffset >= 4)
                 {
-                    st += ' ';
+                    string st = "";
+                    for (int i = 0; i < b.AbsoluteCharOffset - a.AbsoluteCharOffset; i++)
+                    {
+                        st += ' ';
+                    }
+                    cb.SendCaretPosition(dte.ActiveDocument.FullName, a.AbsoluteCharOffset, st);
+                    
                 }
-                cb.SendCaretPosition(dte.ActiveDocument.FullName, a.AbsoluteCharOffset, st);
-                EnterWasPressed = false;
+                KeyWasPressed = false;
             }
-
             //ts.Select(ts.AnchorPoint, ts.ActivePoint);
             // EnterWasPressed = false;
 

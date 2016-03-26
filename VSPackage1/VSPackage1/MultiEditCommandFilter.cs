@@ -106,6 +106,7 @@ namespace Company.VSPackage1
         }
         private void my_AddedText(object sender, ChangeCaretEventArgs e)
         {
+            my_ChangedCaret(sender, e);
             uiDisp.Invoke(new Action(() =>
                 {
                     ITextEdit edit = m_textView.TextBuffer.CreateEdit();
@@ -164,14 +165,17 @@ namespace Company.VSPackage1
                     nCmdID == (uint)VSConstants.VSStd2KCmdID.UP ||
                     nCmdID == (uint)VSConstants.VSStd2KCmdID.DOWN ||
                     nCmdID == (uint)VSConstants.VSStd2KCmdID.LEFT ||
-                    nCmdID == (uint)VSConstants.VSStd2KCmdID.RIGHT||
+                    nCmdID == (uint)VSConstants.VSStd2KCmdID.RIGHT ||
                     nCmdID == (uint)VSConstants.VSStd2KCmdID.RETURN
-                
 
-                    
+
+
             ))
+            {
                 requiresHandling = true;
-            else if(nCmdID==17)//DELETE pressed
+                crts.KeyPress = true;
+            }
+            else if (nCmdID == 17)//DELETE pressed
             {
                 requiresHandling = true;
             }
@@ -202,7 +206,7 @@ namespace Company.VSPackage1
                     //var typedChar = (char)(ushort)Marshal.GetObjectForNativeVariant(pvaIn);
                     cb.SendCaretPosition(filename, m_textView.Caret.Position.BufferPosition.Position, "\r\n");
                     //InsertSyncedChar(typedChar.ToString());
-                    crts.EnterPress = true;
+                   
                     RedrawScreen();
                 }
                 
