@@ -135,6 +135,7 @@ namespace Company.VSPackage1
                 edit.Dispose();
             }));
         }
+        
         public int Exec(ref Guid pguidCmdGroup, uint nCmdID, uint nCmdexecopt, IntPtr pvaIn, IntPtr pvaOut)
         {
             ITextDocument textDoc;
@@ -199,8 +200,9 @@ namespace Company.VSPackage1
                 else if (pguidCmdGroup == VSConstants.VSStd2K && nCmdID == (uint)VSConstants.VSStd2KCmdID.RETURN)
                 {
                     //var typedChar = (char)(ushort)Marshal.GetObjectForNativeVariant(pvaIn);
-                    cb.SendCaretPosition(filename, m_textView.Caret.Position.BufferPosition.Position, "\n");
+                    cb.SendCaretPosition(filename, m_textView.Caret.Position.BufferPosition.Position, "\r\n");
                     //InsertSyncedChar(typedChar.ToString());
+                    crts.EnterPress = true;
                     RedrawScreen();
                 }
                 
@@ -238,7 +240,14 @@ namespace Company.VSPackage1
         private void DrawSingleSyncPoint(ITrackingPoint curTrackPoint, SolidColorBrush brush)
         {
             SnapshotSpan span;
-            span = new SnapshotSpan(curTrackPoint.GetPoint(m_textView.TextSnapshot), 1);
+            SnapshotPoint tempSnapPoint =curTrackPoint.GetPoint(m_textView.TextSnapshot);
+            if (tempSnapPoint.Position == m_textView.TextSnapshot.Length)
+            {
+                m_textView.TextSnapshot.TextBuffer.Insert(tempSnapPoint.Position, " ");
+                tempSnapPoint = tempSnapPoint.Subtract(1);
+            }
+
+            span = new SnapshotSpan(tempSnapPoint, 1);
             var g = m_textView.TextViewLines.GetLineMarkerGeometry(span);
             GeometryDrawing drawing = new GeometryDrawing(brush, null, g);
             if (drawing.Bounds.IsEmpty)

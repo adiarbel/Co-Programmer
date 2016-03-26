@@ -37,9 +37,15 @@ namespace Company.VSPackage1
         TextEditorEvents te;
         MyCallBack cb;
         bool twice;
+        public bool EnterWasPressed = false;
         public DTE2 DTE2
         {
             get { return dte ?? (dte = ServiceProvider.GlobalProvider.GetService(typeof(DTE)) as DTE2); }
+        }
+        public bool EnterPress
+        {
+            get { return EnterWasPressed; }
+            set { EnterWasPressed = value; }
         }
         public Carets(IWpfTextViewHost h, MyCallBack cb)
         {
@@ -48,18 +54,20 @@ namespace Company.VSPackage1
                 iwpf = h;
                 //tde = ((Events2)DTE2.Events).TextDocumentKeyPressEvents;
                 //tde.BeforeKeyPress += new _dispTextDocumentKeyPressEvents_BeforeKeyPressEventHandler(KeyPress_EventHandler);
-                //te = ((Events2)DTE2.Events).TextEditorEvents;
-                //te.LineChanged += new _dispTextEditorEvents_LineChangedEventHandler(LineChanged_EventHandler);
+                te = ((Events2)DTE2.Events).TextEditorEvents;
+                te.LineChanged += new _dispTextEditorEvents_LineChangedEventHandler(EnterFix);
                 this.cb = cb;
                 //cb = new MyCallBack();
                 //cb.ChangeCaret += new ChangeCaretEventHandler(my_CaretChange);
-                twice = false;
+                //twice = false;
                 //TODO: register to cb's events
                 //TODO: add a different handler function for each of the events
                 // examples: http://www.codeproject.com/Articles/20550/C-Event-Implementation-Fundamentals-Best-Practices
 
                 //ts.NewLine();
                 //ts.Insert("a");
+
+
             }
         }
         public void my_CaretChange(object sender, ChangeCaretEventArgs e)
@@ -146,24 +154,42 @@ namespace Company.VSPackage1
             //}
         }
         int countCalls = 0;
-        private void LineChanged_EventHandler(TextPoint a, TextPoint b, int i)
+        //private void LineChanged_EventHandler(TextPoint a, TextPoint b, int i)
+        //{
+        //    //MessageBox.Show( Clipboard.GetText());   
+        //    EnvDTE.TextSelection ts = dte.ActiveDocument.Selection as EnvDTE.TextSelection;
+        //    //   EnvDTE.VirtualPoint vp = ts.ActivePoint;
+        //    // System.Windows.Forms.MessageBox.Show(st);
+        //    //DTE2.ActiveDocument.Save();
+        //    string s = ts.Text;
+        //    ITextCaret c = iwpf.TextView.Caret;
+        //    MessageBox.Show("a:" + a.Line + "," + a.LineCharOffset + "," + a.DTE.ActiveDocument.Name + "\n b:" + b.Line + "," + b.LineCharOffset + b.DTE.ActiveDocument.Name + "\n" + i);
+        //    int line = ts.ActivePoint.Line;
+        //    int charoff = ts.ActivePoint.LineCharOffset;
+        //    //cb.PrintIds();
+        //    //cb.callService(a.Line + "," + a.LineCharOffset + "," + a.DTE.ActiveDocument.Name + "," + b.Line + "," + b.LineCharOffset + "," + b.DTE.ActiveDocument.Name);
+        //    TextSelection ts2 = null;
+        //    ts2 = DTE2.ActiveWindow.Project.ProjectItems.Item("Class2.cs").Document.Selection as TextSelection;
+        //    ts2.MoveToLineAndOffset(line, charoff, false);
+        //    DTE2.ActiveDocument.Save();
+        //}
+        private void EnterFix(TextPoint a, TextPoint b, int hint)
         {
-            //MessageBox.Show( Clipboard.GetText());   
-            EnvDTE.TextSelection ts = dte.ActiveDocument.Selection as EnvDTE.TextSelection;
-            //   EnvDTE.VirtualPoint vp = ts.ActivePoint;
-            // System.Windows.Forms.MessageBox.Show(st);
-            //DTE2.ActiveDocument.Save();
-            string s = ts.Text;
-            ITextCaret c = iwpf.TextView.Caret;
-            MessageBox.Show("a:" + a.Line + "," + a.LineCharOffset + "," + a.DTE.ActiveDocument.Name + "\n b:" + b.Line + "," + b.LineCharOffset + b.DTE.ActiveDocument.Name + "\n" + i);
-            int line = ts.ActivePoint.Line;
-            int charoff = ts.ActivePoint.LineCharOffset;
-            //cb.PrintIds();
-            //cb.callService(a.Line + "," + a.LineCharOffset + "," + a.DTE.ActiveDocument.Name + "," + b.Line + "," + b.LineCharOffset + "," + b.DTE.ActiveDocument.Name);
-            TextSelection ts2 = null;
-            ts2 = DTE2.ActiveWindow.Project.ProjectItems.Item("Class2.cs").Document.Selection as TextSelection;
-            ts2.MoveToLineAndOffset(line, charoff, false);
-            DTE2.ActiveDocument.Save();
+
+            if (EnterWasPressed)
+            {
+                string st = "";
+                for (int i = 0; i < b.AbsoluteCharOffset - a.AbsoluteCharOffset; i++)
+                {
+                    st += ' ';
+                }
+                cb.SendCaretPosition(dte.ActiveDocument.FullName, a.AbsoluteCharOffset, st);
+                EnterWasPressed = false;
+            }
+
+            //ts.Select(ts.AnchorPoint, ts.ActivePoint);
+            // EnterWasPressed = false;
+
         }
         IWpfTextViewHost GetTextViewHost()
         {
