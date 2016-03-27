@@ -38,6 +38,7 @@ namespace Company.VSPackage1
         MyCallBack cb;
         bool twice;
         public bool KeyWasPressed = false;
+        public bool DeleteWasPressed = false;
         public DTE2 DTE2
         {
             get { return dte ?? (dte = ServiceProvider.GlobalProvider.GetService(typeof(DTE)) as DTE2); }
@@ -56,6 +57,7 @@ namespace Company.VSPackage1
                 //tde.BeforeKeyPress += new _dispTextDocumentKeyPressEvents_BeforeKeyPressEventHandler(KeyPress_EventHandler);
                 te = ((Events2)DTE2.Events).TextEditorEvents;
                 te.LineChanged += new _dispTextEditorEvents_LineChangedEventHandler(EnterFix);
+                te.LineChanged += new _dispTextEditorEvents_LineChangedEventHandler(SelectionFix);
                 this.cb = cb;
                 //cb = new MyCallBack();
                 //cb.ChangeCaret += new ChangeCaretEventHandler(my_CaretChange);
@@ -176,23 +178,32 @@ namespace Company.VSPackage1
         private void EnterFix(TextPoint a, TextPoint b, int hint)
         {
 
-            if (KeyWasPressed)
+            if (KeyWasPressed&&a.LineCharOffset==1)
             {
-                if ((b.AbsoluteCharOffset - a.AbsoluteCharOffset-1)%4 == 0)
+                if ((b.AbsoluteCharOffset - a.AbsoluteCharOffset - 1) % 4 == 0)
                 {
                     string st = "";
-                    for (int i = 0; i < b.AbsoluteCharOffset - a.AbsoluteCharOffset-1; i++)
+                    for (int i = 0; i < b.AbsoluteCharOffset - a.AbsoluteCharOffset - 1; i++)
                     {
                         st += ' ';
                     }
-                    cb.SendCaretPosition(dte.ActiveDocument.FullName, b.AbsoluteCharOffset-2, st);
-                    cb.SendCaretPosition(dte.ActiveDocument.FullName, b.AbsoluteCharOffset+st.Length, "click");
+                    cb.SendCaretPosition(dte.ActiveDocument.FullName, -1, st);
+                    cb.SendCaretPosition(dte.ActiveDocument.FullName, 1, "click");
                 }
                 KeyWasPressed = false;
-                
+
             }
             //ts.Select(ts.AnchorPoint, ts.ActivePoint);
             // EnterWasPressed = false;
+
+        }
+        private void SelectionFix(TextPoint a, TextPoint b, int hint)
+        {
+            //ITextSelection ts = DTE2.ActiveDocument.Selection as ITextSelection;
+            //if(ts.Start.Position - ts.End.Position>0)
+            //{
+
+            //}
 
         }
         IWpfTextViewHost GetTextViewHost()

@@ -87,8 +87,16 @@ namespace Company.VSPackage1
             //        crts.my_CaretChange(sender, e);//helps me to find which file the caret is in
             if (trackDict.Count > 0)
             {
-                trackDict[e.Editor] = m_textView.TextSnapshot.CreateTrackingPoint(e.Location,
-                PointTrackingMode.Positive);
+                if(e.Location==1||e.Location==-1)
+                {
+                    trackDict[e.Editor] = m_textView.TextSnapshot.CreateTrackingPoint(e.Location + trackDict[e.Editor].GetPosition(m_textView.TextSnapshot),
+                    PointTrackingMode.Positive);
+                }
+                else
+                {
+                    trackDict[e.Editor] = m_textView.TextSnapshot.CreateTrackingPoint(e.Location,
+                    PointTrackingMode.Positive);
+                }
             }
         }
         private void my_AddEditors(object sender, AddEditorsEventArgs e)
@@ -170,9 +178,6 @@ namespace Company.VSPackage1
                     nCmdID == (uint)VSConstants.VSStd2KCmdID.LEFT ||
                     nCmdID == (uint)VSConstants.VSStd2KCmdID.RIGHT ||
                     nCmdID == (uint)VSConstants.VSStd2KCmdID.RETURN
-
-
-
             ))
             {
                 requiresHandling = true;
@@ -212,12 +217,10 @@ namespace Company.VSPackage1
                    
                     RedrawScreen();
                 }
-
             } 
             if (currSizeBuffer != m_textView.TextSnapshot.Length)
             {
                 currSizeBuffer = m_textView.TextSnapshot.Length;
-                System.Windows.Forms.MessageBox.Show(currSizeBuffer.ToString());
             }
             return m_nextTarget.Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
         }
