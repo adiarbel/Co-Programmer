@@ -32,7 +32,6 @@ namespace Company.VSPackage1
         int currSizeBuffer;
         public MultiEditCommandFilter(IWpfTextView textView, MyCallBack mcb, Carets cs)
         {
-
             m_textView = textView;
             m_adornmentLayer = m_textView.GetAdornmentLayer("MultiEditLayer");
             m_added = false;
@@ -130,18 +129,23 @@ namespace Company.VSPackage1
         }
         private void my_RemovedText(object sender, ChangeCaretEventArgs e)
         {
+            my_ChangedCaret(sender, e);
             uiDisp.Invoke(new Action(() =>
             {
                 ITextEdit edit = m_textView.TextBuffer.CreateEdit();
 
                 var curTrackPoint = trackDict[e.Editor];
-                if (e.Command == "DELETE")
+                if(e.Command.Contains("sel"))
                 {
-                    edit.Delete(e.Location, 1);
+                    edit.Delete(e.Location, int.Parse(e.Command.Split(';')[2]));
                 }
-                else if(e.Command=="BACKSPACE"&&e.Location!=0)
+                else if (e.Command.Contains("DELETE"))
                 {
-                    edit.Delete(e.Location - 1, 1);
+                    edit.Delete(e.Location, int.Parse(e.Command.Split(';')[1]));
+                }
+                else if(e.Command.Contains("BACKSPACE")&&e.Location!=0)
+                {
+                    edit.Delete(e.Location - int.Parse(e.Command.Split(';')[1]), int.Parse(e.Command.Split(';')[1]));
                 }
                 edit.Apply();
                 edit.Dispose();
@@ -170,13 +174,18 @@ namespace Company.VSPackage1
                 cb.SendCaretPosition(filename, m_textView.Caret.Position.BufferPosition.Position, "click");
 
             }
-            else if (pguidCmdGroup == VSConstants.VSStd2K && trackDict.Count > 0 && (nCmdID == (uint)VSConstants.VSStd2KCmdID.TYPECHAR ||
-                    nCmdID == (uint)VSConstants.VSStd2KCmdID.BACKSPACE ||
-                    nCmdID == (uint)VSConstants.VSStd2KCmdID.TAB ||
+            else if(pguidCmdGroup == VSConstants.VSStd2K && 
                     nCmdID == (uint)VSConstants.VSStd2KCmdID.UP ||
                     nCmdID == (uint)VSConstants.VSStd2KCmdID.DOWN ||
                     nCmdID == (uint)VSConstants.VSStd2KCmdID.LEFT ||
-                    nCmdID == (uint)VSConstants.VSStd2KCmdID.RIGHT ||
+                    nCmdID == (uint)VSConstants.VSStd2KCmdID.RIGHT)
+            {
+                cb.SendCaretPosition(filename, m_textView.Caret.Position.BufferPosition.Position, "click");
+
+            }
+            else if (pguidCmdGroup == VSConstants.VSStd2K && trackDict.Count > 0 && (nCmdID == (uint)VSConstants.VSStd2KCmdID.TYPECHAR ||
+                    nCmdID == (uint)VSConstants.VSStd2KCmdID.BACKSPACE ||
+                    nCmdID == (uint)VSConstants.VSStd2KCmdID.TAB ||
                     nCmdID == (uint)VSConstants.VSStd2KCmdID.RETURN
             ))
             {
@@ -192,20 +201,52 @@ namespace Company.VSPackage1
 
                 if (pguidCmdGroup == VSConstants.VSStd2K && nCmdID == (uint)VSConstants.VSStd2KCmdID.TYPECHAR)
                 {
-                    var typedChar = (char)(ushort)Marshal.GetObjectForNativeVariant(pvaIn);
-                    cb.SendCaretPosition(filename, m_textView.Caret.Position.BufferPosition.Position, typedChar.ToString());
+                    var typedChar = ((char)(ushort)Marshal.GetObjectForNativeVariant(pvaIn)).ToString();
+                    //if (Math.Abs(m_textView.Selection.End.Position - m_textView.Selection.Start.Position) > 0)
+                    //{
+                    //    typedChar = typedChar + ";del;" + m_textView.Selection.Start.Position + ";" + m_textView.Selection.End.Position + ";";
+                    //    cb.SendCaretPosition(filename, m_textView.Selection.Start.Position, typedChar);
+                    //}
+                    //else
+                    //{
+                    //    cb.SendCaretPosition(filename, m_textView.Caret.Position.BufferPosition.Position, typedChar);
+                    //}
+                    cb.SendCaretPosition(filename, m_textView.Caret.Position.BufferPosition.Position, typedChar);
                     //InsertSyncedChar(typedChar.ToString());
                     RedrawScreen();
                 }
                 else if (pguidCmdGroup == VSConstants.VSStd2K && nCmdID == (uint)VSConstants.VSStd2KCmdID.BACKSPACE)
                 {
-                    cb.SendCaretPosition(filename, m_textView.Caret.Position.BufferPosition.Position, "BACKSPACE");
+                    if (Math.Abs(m_textView.Selection.End.Position - m_textView.Selection.Start.Position) > 0)
+                    {
+
+                        cb.SendCaretPosition(filename, m_textView.Selection.Start.Position, "BACKSPACE;sel;" + (m_textView.Selection.End.Position - m_textView.Selection.Start.Position) + ";");
+                    }
+                    else
+                    {
+                        if((crts.DTE2.ActiveDocument.Selection as TextSelection).ActivePoint.LineCharOffset==1)
+                        {
+                            cb.SendCaretPosition(filename, m_textView.Caret.Position.BufferPosition.Position, "BACKSPACE;2;");
+                        }
+                        else
+                        {
+                            cb.SendCaretPosition(filename, m_textView.Caret.Position.BufferPosition.Position, "BACKSPACE;1;");
+                        }
+                    }
                     // SyncedBackSpace();
                     RedrawScreen();
                 }
                 else if (nCmdID == 17)
                 {
-                    cb.SendCaretPosition(filename, m_textView.Caret.Position.BufferPosition.Position, "DELETE");
+                    if (Math.Abs(m_textView.Selection.End.Position - m_textView.Selection.Start.Position) > 0)
+                    {
+
+                        cb.SendCaretPosition(filename, m_textView.Selection.Start.Position, "DELETE;sel" +(m_textView.Selection.End.Position - m_textView.Selection.Start.Position)+ ";");
+                    }
+                    else
+                    {
+                        cb.SendCaretPosition(filename, m_textView.Caret.Position.BufferPosition.Position, "DELETE;1;");
+                    }
                     // SyncedDelete();
                     RedrawScreen();
                 }
@@ -242,8 +283,6 @@ namespace Company.VSPackage1
                         DrawSingleSyncPoint(curTrackPoint, brushes[i]);
                         i++;
                     }
-                    
-
                 }));
            
         }

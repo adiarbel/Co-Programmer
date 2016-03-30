@@ -47,7 +47,7 @@ namespace Company.VSPackage1.ServiceReference1 {
         void NewAddedText(string file, int position, string editor, string content);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICoProService/NewRemovedText", ReplyAction="http://tempuri.org/ICoProService/NewRemovedTextResponse")]
-        void NewRemovedText(string file, int position, string editor, int end_position);
+        void NewRemovedText(string file, int position, string editor, string instruc);
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]

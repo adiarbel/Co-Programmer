@@ -31,6 +31,6 @@ namespace CoProService
         [OperationContract]
         void NewAddedText(string file, int position, string editor, string content);
         [OperationContract]
-        void NewRemovedText(string file, int position, string editor, int end_position);
+        void NewRemovedText(string file, int position, string editor, string instruc);
     }
 }

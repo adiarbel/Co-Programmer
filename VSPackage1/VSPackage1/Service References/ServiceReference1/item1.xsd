@@ -106,7 +106,7 @@
         <xs:element minOccurs="0" name="file" nillable="true" type="xs:string" />
         <xs:element minOccurs="0" name="position" type="xs:int" />
         <xs:element minOccurs="0" name="editor" nillable="true" type="xs:string" />
-        <xs:element minOccurs="0" name="end_position" type="xs:int" />
+        <xs:element minOccurs="0" name="instruc" nillable="true" type="xs:string" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>

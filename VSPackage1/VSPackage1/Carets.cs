@@ -57,7 +57,6 @@ namespace Company.VSPackage1
                 //tde.BeforeKeyPress += new _dispTextDocumentKeyPressEvents_BeforeKeyPressEventHandler(KeyPress_EventHandler);
                 te = ((Events2)DTE2.Events).TextEditorEvents;
                 te.LineChanged += new _dispTextEditorEvents_LineChangedEventHandler(EnterFix);
-                te.LineChanged += new _dispTextEditorEvents_LineChangedEventHandler(SelectionFix);
                 this.cb = cb;
                 //cb = new MyCallBack();
                 //cb.ChangeCaret += new ChangeCaretEventHandler(my_CaretChange);
@@ -197,15 +196,7 @@ namespace Company.VSPackage1
             // EnterWasPressed = false;
 
         }
-        private void SelectionFix(TextPoint a, TextPoint b, int hint)
-        {
-            //ITextSelection ts = DTE2.ActiveDocument.Selection as ITextSelection;
-            //if(ts.Start.Position - ts.End.Position>0)
-            //{
-
-            //}
-
-        }
+        
         IWpfTextViewHost GetTextViewHost()
         {
             return iwpf;

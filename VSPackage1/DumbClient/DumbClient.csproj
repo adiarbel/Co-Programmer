@@ -54,7 +54,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-    <None Include="Service References\ServiceReference1\EditService.wsdl" />
+    <None Include="Service References\ServiceReference1\CoProService.wsdl" />
     <None Include="Service References\ServiceReference1\item.xsd">
       <SubType>Designer</SubType>
     </None>

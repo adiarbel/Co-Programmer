@@ -82,18 +82,13 @@ namespace Company.VSPackage1
                 NewText(this, new ChangeCaretEventArgs(editor, position, file, content));
             }
         }
-        public void NewRemovedText(string file, int position, string editor, int end_position)
+        public void NewRemovedText(string file, int position, string editor, string instruc)
         {
             if (RemovedText != null)
             {
-                if (position == end_position)
-                {
-                    RemovedText(this, new ChangeCaretEventArgs(editor, position, file, "DELETE"));
-                }
-                else
-                {
-                    RemovedText(this, new ChangeCaretEventArgs(editor, position, file, "BACKSPACE"));
-                }
+
+                RemovedText(this, new ChangeCaretEventArgs(editor, position, file, instruc));
+
             }
         }
         void IDisposable.Dispose()

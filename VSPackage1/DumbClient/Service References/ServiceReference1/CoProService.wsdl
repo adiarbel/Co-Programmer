@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:wsap="http://schemas.xmlsoap.org/ws/2004/08/addressing/policy" xmlns:wsa10="http://www.w3.org/2005/08/addressing" xmlns:tns="http://tempuri.org/" xmlns:msc="http://schemas.microsoft.com/ws/2005/12/wsdl/contract" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:wsx="http://schemas.xmlsoap.org/ws/2004/09/mex" xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy" xmlns:wsam="http://www.w3.org/2007/05/addressing/metadata" xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/08/addressing" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="CoProService" targetNamespace="http://tempuri.org/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsp:Policy wsu:Id="NetTcpBinding_ICoProService_policy">
+    <wsp:ExactlyOne>
+      <wsp:All>
+        <msb:BinaryEncoding xmlns:msb="http://schemas.microsoft.com/ws/06/2004/mspolicy/netbinary1" />
+        <sp:TransportBinding xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy">
+          <wsp:Policy>
+            <sp:TransportToken>
+              <wsp:Policy>
+                <msf:WindowsTransportSecurity xmlns:msf="http://schemas.microsoft.com/ws/2006/05/framing/policy">
+                  <msf:ProtectionLevel>EncryptAndSign</msf:ProtectionLevel>
+                </msf:WindowsTransportSecurity>
+              </wsp:Policy>
+            </sp:TransportToken>
+            <sp:AlgorithmSuite>
+              <wsp:Policy>
+                <sp:Basic256 />
+              </wsp:Policy>
+            </sp:AlgorithmSuite>
+            <sp:Layout>
+              <wsp:Policy>
+                <sp:Strict />
+              </wsp:Policy>
+            </sp:Layout>
+          </wsp:Policy>
+        </sp:TransportBinding>
+        <wsaw:UsingAddressing />
+      </wsp:All>
+    </wsp:ExactlyOne>
+  </wsp:Policy>
+  <wsdl:types>
+    <xsd:schema targetNamespace="http://tempuri.org/Imports">
+      <xsd:import schemaLocation="http://localhost:8080/?xsd=xsd0" namespace="http://tempuri.org/" />
+      <xsd:import schemaLocation="http://localhost:8080/?xsd=xsd1" namespace="http://schemas.microsoft.com/2003/10/Serialization/" />
+      <xsd:import schemaLocation="http://localhost:8080/?xsd=xsd2" namespace="http://schemas.microsoft.com/2003/10/Serialization/Arrays" />
+    </xsd:schema>
+  </wsdl:types>
+  <wsdl:message name="ICoProService_IntializePosition_InputMessage">
+    <wsdl:part name="parameters" element="tns:IntializePosition" />
+  </wsdl:message>
+  <wsdl:message name="ICoProService_IntializePosition_OutputMessage">
+    <wsdl:part name="parameters" element="tns:IntializePositionResponse" />
+  </wsdl:message>
+  <wsdl:message name="ICoProService_SendCaretPosition_InputMessage">
+    <wsdl:part name="parameters" element="tns:SendCaretPosition" />
+  </wsdl:message>
+  <wsdl:message name="ICoProService_SendCaretPosition_OutputMessage">
+    <wsdl:part name="parameters" element="tns:SendCaretPositionResponse" />
+  </wsdl:message>
+  <wsdl:message name="ICoProService_AddCurrentEditors_OutputCallbackMessage">
+    <wsdl:part name="parameters" element="tns:AddCurrentEditors" />
+  </wsdl:message>
+  <wsdl:message name="ICoProService_AddCurrentEditors_InputCallbackMessage">
+    <wsdl:part name="parameters" element="tns:AddCurrentEditorsResponse" />
+  </wsdl:message>
+  <wsdl:message name="ICoProService_NewEditorAdded_OutputCallbackMessage">
+    <wsdl:part name="parameters" element="tns:NewEditorAdded" />
+  </wsdl:message>
+  <wsdl:message name="ICoProService_NewEditorAdded_InputCallbackMessage">
+    <wsdl:part name="parameters" element="tns:NewEditorAddedResponse" />
+  </wsdl:message>
+  <wsdl:message name="ICoProService_EditorDisconnected_OutputCallbackMessage">
+    <wsdl:part name="parameters" element="tns:EditorDisconnected" />
+  </wsdl:message>
+  <wsdl:message name="ICoProService_EditorDisconnected_InputCallbackMessage">
+    <wsdl:part name="parameters" element="tns:EditorDisconnectedResponse" />
+  </wsdl:message>
+  <wsdl:message name="ICoProService_ChangedCaret_OutputCallbackMessage">
+    <wsdl:part name="parameters" element="tns:ChangedCaret" />
+  </wsdl:message>
+  <wsdl:message name="ICoProService_ChangedCaret_InputCallbackMessage">
+    <wsdl:part name="parameters" element="tns:ChangedCaretResponse" />
+  </wsdl:message>
+  <wsdl:message name="ICoProService_NewAddedText_OutputCallbackMessage">
+    <wsdl:part name="parameters" element="tns:NewAddedText" />
+  </wsdl:message>
+  <wsdl:message name="ICoProService_NewAddedText_InputCallbackMessage">
+    <wsdl:part name="parameters" element="tns:NewAddedTextResponse" />
+  </wsdl:message>
+  <wsdl:message name="ICoProService_NewRemovedText_OutputCallbackMessage">
+    <wsdl:part name="parameters" element="tns:NewRemovedText" />
+  </wsdl:message>
+  <wsdl:message name="ICoProService_NewRemovedText_InputCallbackMessage">
+    <wsdl:part name="parameters" element="tns:NewRemovedTextResponse" />
+  </wsdl:message>
+  <wsdl:portType name="ICoProService">
+    <wsdl:operation name="IntializePosition">
+      <wsdl:input wsaw:Action="http://tempuri.org/ICoProService/IntializePosition" message="tns:ICoProService_IntializePosition_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/ICoProService/IntializePositionResponse" message="tns:ICoProService_IntializePosition_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="SendCaretPosition">
+      <wsdl:input wsaw:Action="http://tempuri.org/ICoProService/SendCaretPosition" message="tns:ICoProService_SendCaretPosition_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/ICoProService/SendCaretPositionResponse" message="tns:ICoProService_SendCaretPosition_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="AddCurrentEditors">
+      <wsdl:output wsaw:Action="http://tempuri.org/ICoProService/AddCurrentEditors" message="tns:ICoProService_AddCurrentEditors_OutputCallbackMessage" />
+      <wsdl:input wsaw:Action="http://tempuri.org/ICoProService/AddCurrentEditorsResponse" message="tns:ICoProService_AddCurrentEditors_InputCallbackMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="NewEditorAdded">
+      <wsdl:output wsaw:Action="http://tempuri.org/ICoProService/NewEditorAdded" message="tns:ICoProService_NewEditorAdded_OutputCallbackMessage" />
+      <wsdl:input wsaw:Action="http://tempuri.org/ICoProService/NewEditorAddedResponse" message="tns:ICoProService_NewEditorAdded_InputCallbackMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="EditorDisconnected">
+      <wsdl:output wsaw:Action="http://tempuri.org/ICoProService/EditorDisconnected" message="tns:ICoProService_EditorDisconnected_OutputCallbackMessage" />
+      <wsdl:input wsaw:Action="http://tempuri.org/ICoProService/EditorDisconnectedResponse" message="tns:ICoProService_EditorDisconnected_InputCallbackMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="ChangedCaret">
+      <wsdl:output wsaw:Action="http://tempuri.org/ICoProService/ChangedCaret" message="tns:ICoProService_ChangedCaret_OutputCallbackMessage" />
+      <wsdl:input wsaw:Action="http://tempuri.org/ICoProService/ChangedCaretResponse" message="tns:ICoProService_ChangedCaret_InputCallbackMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="NewAddedText">
+      <wsdl:output wsaw:Action="http://tempuri.org/ICoProService/NewAddedText" message="tns:ICoProService_NewAddedText_OutputCallbackMessage" />
+      <wsdl:input wsaw:Action="http://tempuri.org/ICoProService/NewAddedTextResponse" message="tns:ICoProService_NewAddedText_InputCallbackMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="NewRemovedText">
+      <wsdl:output wsaw:Action="http://tempuri.org/ICoProService/NewRemovedText" message="tns:ICoProService_NewRemovedText_OutputCallbackMessage" />
+      <wsdl:input wsaw:Action="http://tempuri.org/ICoProService/NewRemovedTextResponse" message="tns:ICoProService_NewRemovedText_InputCallbackMessage" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="NetTcpBinding_ICoProService" type="tns:ICoProService">
+    <wsp:PolicyReference URI="#NetTcpBinding_ICoProService_policy" />
+    <soap12:binding transport="http://schemas.microsoft.com/soap/tcp" />
+    <wsdl:operation name="IntializePosition">
+      <soap12:operation soapAction="http://tempuri.org/ICoProService/IntializePosition" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="SendCaretPosition">
+      <soap12:operation soapAction="http://tempuri.org/ICoProService/SendCaretPosition" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="AddCurrentEditors">
+      <soap12:operation soapAction="http://tempuri.org/ICoProService/AddCurrentEditors" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="NewEditorAdded">
+      <soap12:operation soapAction="http://tempuri.org/ICoProService/NewEditorAdded" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="EditorDisconnected">
+      <soap12:operation soapAction="http://tempuri.org/ICoProService/EditorDisconnected" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ChangedCaret">
+      <soap12:operation soapAction="http://tempuri.org/ICoProService/ChangedCaret" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="NewAddedText">
+      <soap12:operation soapAction="http://tempuri.org/ICoProService/NewAddedText" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="NewRemovedText">
+      <soap12:operation soapAction="http://tempuri.org/ICoProService/NewRemovedText" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="CoProService">
+    <wsdl:port name="NetTcpBinding_ICoProService" binding="tns:NetTcpBinding_ICoProService">
+      <soap12:address location="net.tcp://localhost:8090/CoProService" />
+      <wsa10:EndpointReference>
+        <wsa10:Address>net.tcp://localhost:8090/CoProService</wsa10:Address>
+        <Identity xmlns="http://schemas.xmlsoap.org/ws/2006/02/addressingidentity">
+          <Upn>HP-250\User</Upn>
+        </Identity>
+      </wsa10:EndpointReference>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

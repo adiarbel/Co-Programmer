@@ -11,7 +11,9 @@
   </xs:element>
   <xs:element name="IntializePositionResponse">
     <xs:complexType>
-      <xs:sequence />
+      <xs:sequence>
+        <xs:element minOccurs="0" name="IntializePositionResult" type="xs:boolean" />
+      </xs:sequence>
     </xs:complexType>
   </xs:element>
   <xs:element name="SendCaretPosition">
@@ -25,65 +27,90 @@
   </xs:element>
   <xs:element name="SendCaretPositionResponse">
     <xs:complexType>
-      <xs:sequence />
+      <xs:sequence>
+        <xs:element minOccurs="0" name="SendCaretPositionResult" type="xs:boolean" />
+      </xs:sequence>
     </xs:complexType>
   </xs:element>
-  <xs:element name="GetChanges">
+  <xs:element name="AddCurrentEditors">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element xmlns:q1="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="editors" nillable="true" type="q1:ArrayOfstring" />
+        <xs:element xmlns:q2="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="locations" nillable="true" type="q2:ArrayOfstring" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="AddCurrentEditorsResponse">
     <xs:complexType>
       <xs:sequence />
     </xs:complexType>
   </xs:element>
-  <xs:element name="GetChangesResponse">
-    <xs:complexType>
-      <xs:sequence />
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="printIds">
-    <xs:complexType>
-      <xs:sequence />
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="printIdsResponse">
-    <xs:complexType>
-      <xs:sequence />
-    </xs:complexType>
-  </xs:element>
-  <xs:element name="CallBackFunction">
+  <xs:element name="NewEditorAdded">
     <xs:complexType>
       <xs:sequence>
         <xs:element minOccurs="0" name="file" nillable="true" type="xs:string" />
         <xs:element minOccurs="0" name="position" type="xs:int" />
-        <xs:element minOccurs="0" name="sender" nillable="true" type="xs:string" />
+        <xs:element minOccurs="0" name="editor" nillable="true" type="xs:string" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
-  <xs:element name="CallBackFunctionResponse">
+  <xs:element name="NewEditorAddedResponse">
     <xs:complexType>
       <xs:sequence />
     </xs:complexType>
   </xs:element>
-  <xs:element name="AddNewEditor">
+  <xs:element name="EditorDisconnected">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="editor" nillable="true" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="EditorDisconnectedResponse">
+    <xs:complexType>
+      <xs:sequence />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="ChangedCaret">
     <xs:complexType>
       <xs:sequence>
         <xs:element minOccurs="0" name="file" nillable="true" type="xs:string" />
         <xs:element minOccurs="0" name="position" type="xs:int" />
-        <xs:element minOccurs="0" name="sender" nillable="true" type="xs:string" />
+        <xs:element minOccurs="0" name="editor" nillable="true" type="xs:string" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
-  <xs:element name="AddNewEditorResponse">
+  <xs:element name="ChangedCaretResponse">
     <xs:complexType>
       <xs:sequence />
     </xs:complexType>
   </xs:element>
-  <xs:element name="CallBackChanges">
+  <xs:element name="NewAddedText">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q1="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="s" nillable="true" type="q1:ArrayOfstring" />
+        <xs:element minOccurs="0" name="file" nillable="true" type="xs:string" />
+        <xs:element minOccurs="0" name="position" type="xs:int" />
+        <xs:element minOccurs="0" name="editor" nillable="true" type="xs:string" />
+        <xs:element minOccurs="0" name="content" nillable="true" type="xs:string" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
-  <xs:element name="CallBackChangesResponse">
+  <xs:element name="NewAddedTextResponse">
+    <xs:complexType>
+      <xs:sequence />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="NewRemovedText">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="file" nillable="true" type="xs:string" />
+        <xs:element minOccurs="0" name="position" type="xs:int" />
+        <xs:element minOccurs="0" name="editor" nillable="true" type="xs:string" />
+        <xs:element minOccurs="0" name="instruc" nillable="true" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="NewRemovedTextResponse">
     <xs:complexType>
       <xs:sequence />
     </xs:complexType>
