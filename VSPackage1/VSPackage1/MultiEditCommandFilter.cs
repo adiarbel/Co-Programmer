@@ -29,6 +29,7 @@ namespace Company.VSPackage1
         internal Carets crts;
         static Dispatcher uiDisp;
         static bool isFirst = true;
+        bool delayFixer = false;
         int currSizeBuffer;
         public MultiEditCommandFilter(IWpfTextView textView, MyCallBack mcb, Carets cs)
         {
@@ -122,7 +123,16 @@ namespace Company.VSPackage1
                     ITextEdit edit = m_textView.TextBuffer.CreateEdit();
 
                     var curTrackPoint = trackDict[e.Editor];
-                    edit.Insert(curTrackPoint.GetPosition(m_textView.TextSnapshot), e.Command);
+                    if(e.Command.Contains("del")) 
+                    {
+                        edit.Delete(curTrackPoint.GetPosition(m_textView.TextSnapshot),int.Parse(e.Command.Split(';')[2]));
+                        edit.Insert(curTrackPoint.GetPosition(m_textView.TextSnapshot), e.Command.Split(';')[0]);
+                    }
+                    else 
+                    {
+
+                        edit.Insert(curTrackPoint.GetPosition(m_textView.TextSnapshot), e.Command);
+                    }
                     edit.Apply();
                     edit.Dispose();
                 }));
@@ -154,6 +164,7 @@ namespace Company.VSPackage1
         
         public int Exec(ref Guid pguidCmdGroup, uint nCmdID, uint nCmdexecopt, IntPtr pvaIn, IntPtr pvaOut)
         {
+            
             ITextDocument textDoc;
             var rc = m_textView.TextBuffer.Properties.TryGetProperty<ITextDocument>(
               typeof(ITextDocument), out textDoc);
@@ -166,6 +177,11 @@ namespace Company.VSPackage1
             // When Alt Clicking, we need to add Edit points.
             Debug.WriteLine("=====" + nCmdID + " " + pguidCmdGroup.ToString() + nCmdexecopt + " " + pvaIn.ToString() + " " + pvaOut.ToString(), "adi");
             Debug.WriteLine((uint)VSConstants.VSStd2KCmdID.RETURN);
+            if (delayFixer)
+            {
+                cb.SendCaretPosition(filename, m_textView.Caret.Position.BufferPosition.Position, "click");
+                delayFixer = false;
+            }
             if (pguidCmdGroup == VSConstants.VSStd2K && nCmdID == (uint)VSConstants.VSStd2KCmdID.ECMD_LEFTCLICK)
             {
                 requiresHandling = true;
@@ -180,8 +196,7 @@ namespace Company.VSPackage1
                     nCmdID == (uint)VSConstants.VSStd2KCmdID.LEFT ||
                     nCmdID == (uint)VSConstants.VSStd2KCmdID.RIGHT)
             {
-                cb.SendCaretPosition(filename, m_textView.Caret.Position.BufferPosition.Position, "click");
-
+                delayFixer = true;
             }
             else if (pguidCmdGroup == VSConstants.VSStd2K && trackDict.Count > 0 && (nCmdID == (uint)VSConstants.VSStd2KCmdID.TYPECHAR ||
                     nCmdID == (uint)VSConstants.VSStd2KCmdID.BACKSPACE ||
@@ -202,16 +217,16 @@ namespace Company.VSPackage1
                 if (pguidCmdGroup == VSConstants.VSStd2K && nCmdID == (uint)VSConstants.VSStd2KCmdID.TYPECHAR)
                 {
                     var typedChar = ((char)(ushort)Marshal.GetObjectForNativeVariant(pvaIn)).ToString();
-                    //if (Math.Abs(m_textView.Selection.End.Position - m_textView.Selection.Start.Position) > 0)
-                    //{
-                    //    typedChar = typedChar + ";del;" + m_textView.Selection.Start.Position + ";" + m_textView.Selection.End.Position + ";";
-                    //    cb.SendCaretPosition(filename, m_textView.Selection.Start.Position, typedChar);
-                    //}
-                    //else
-                    //{
-                    //    cb.SendCaretPosition(filename, m_textView.Caret.Position.BufferPosition.Position, typedChar);
-                    //}
-                    cb.SendCaretPosition(filename, m_textView.Caret.Position.BufferPosition.Position, typedChar);
+                    if (Math.Abs(m_textView.Selection.End.Position - m_textView.Selection.Start.Position) > 0)
+                    {
+                        typedChar = typedChar + ";del;" + Math.Abs(m_textView.Selection.End.Position - m_textView.Selection.Start.Position) + ";";
+                        cb.SendCaretPosition(filename, m_textView.Selection.Start.Position, typedChar);
+                    }
+                    else
+                    {
+                        cb.SendCaretPosition(filename, m_textView.Caret.Position.BufferPosition.Position, typedChar);
+                    }
+                    //cb.SendCaretPosition(filename, m_textView.Caret.Position.BufferPosition.Position, typedChar);
                     //InsertSyncedChar(typedChar.ToString());
                     RedrawScreen();
                 }
@@ -220,7 +235,7 @@ namespace Company.VSPackage1
                     if (Math.Abs(m_textView.Selection.End.Position - m_textView.Selection.Start.Position) > 0)
                     {
 
-                        cb.SendCaretPosition(filename, m_textView.Selection.Start.Position, "BACKSPACE;sel;" + (m_textView.Selection.End.Position - m_textView.Selection.Start.Position) + ";");
+                        cb.SendCaretPosition(filename, m_textView.Selection.Start.Position, "BACKSPACE;sel;" + Math.Abs(m_textView.Selection.End.Position - m_textView.Selection.Start.Position) + ";");
                     }
                     else
                     {
@@ -241,7 +256,7 @@ namespace Company.VSPackage1
                     if (Math.Abs(m_textView.Selection.End.Position - m_textView.Selection.Start.Position) > 0)
                     {
 
-                        cb.SendCaretPosition(filename, m_textView.Selection.Start.Position, "DELETE;sel" +(m_textView.Selection.End.Position - m_textView.Selection.Start.Position)+ ";");
+                        cb.SendCaretPosition(filename, m_textView.Selection.Start.Position, "DELETE;sel" +Math.Abs(m_textView.Selection.End.Position - m_textView.Selection.Start.Position)+ ";");
                     }
                     else
                     {
