@@ -56,7 +56,8 @@ namespace Company.VSPackage1
                 //tde = ((Events2)DTE2.Events).TextDocumentKeyPressEvents;
                 //tde.BeforeKeyPress += new _dispTextDocumentKeyPressEvents_BeforeKeyPressEventHandler(KeyPress_EventHandler);
                 te = ((Events2)DTE2.Events).TextEditorEvents;
-                te.LineChanged += new _dispTextEditorEvents_LineChangedEventHandler(EnterFix);
+                //te.LineChanged += new _dispTextEditorEvents_LineChangedEventHandler(EnterFix);
+                //te.LineChanged += new _dispTextEditorEvents_LineChangedEventHandler(IntelisenseFix);
                 this.cb = cb;
                 //cb = new MyCallBack();
                 //cb.ChangeCaret += new ChangeCaretEventHandler(my_CaretChange);
@@ -71,6 +72,8 @@ namespace Company.VSPackage1
 
             }
         }
+
+        
         public void my_CaretChange(object sender, ChangeCaretEventArgs e)
         {
 
@@ -176,8 +179,10 @@ namespace Company.VSPackage1
         //}
         private void EnterFix(TextPoint a, TextPoint b, int hint)
         {
-
-            if (KeyWasPressed&&a.LineCharOffset==1)
+            TextSelection ts2 = null;
+            ts2 = DTE2.ActiveWindow.Selection as TextSelection;
+            string s = ts2.Text;
+            if (KeyWasPressed && a.LineCharOffset == 1)
             {
                 if ((b.AbsoluteCharOffset - a.AbsoluteCharOffset - 1) % 4 == 0)
                 {
@@ -194,9 +199,16 @@ namespace Company.VSPackage1
             }
             //ts.Select(ts.AnchorPoint, ts.ActivePoint);
             // EnterWasPressed = false;
-
         }
-        
+        private void IntelisenseFix(TextPoint a, TextPoint b, int hint)
+        {
+            TextSelection ts2 = null;
+            ts2 = DTE2.ActiveWindow.Selection as TextSelection;
+            string s = ts2.Text;
+            //MessageBox.Show(s);
+            //send text
+            int i = 0;
+        }
         IWpfTextViewHost GetTextViewHost()
         {
             return iwpf;
