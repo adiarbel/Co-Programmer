@@ -135,7 +135,7 @@ namespace Company.VSPackage1
         /// </summary>
         private void MenuItemCallback(object sender, EventArgs e)
         {
-            //CoProWindow c = new CoProWindow(DTE);
+            CoProWindow c = new CoProWindow(DTE2);
             // c.Show();      
             //Carets cs = new Carets(GetCurrentViewHost());
             

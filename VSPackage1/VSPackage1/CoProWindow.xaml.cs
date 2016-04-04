@@ -19,8 +19,8 @@ namespace Company.VSPackage1
     /// </summary>
     public partial class CoProWindow : Window
     {
-        private EnvDTE.DTE DTE;
-        public CoProWindow(EnvDTE.DTE dte)
+        private EnvDTE80.DTE2 DTE;
+        public CoProWindow(EnvDTE80.DTE2 dte)
         {
             this.DTE = dte;
             InitializeComponent();

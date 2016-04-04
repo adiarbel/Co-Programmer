@@ -72,6 +72,12 @@ namespace Company.VSPackage1
                 ITextDocument textDoc;
                 var rc = m_textView.TextBuffer.Properties.TryGetProperty<ITextDocument>(
                   typeof(ITextDocument), out textDoc);
+                foreach (EnvDTE.Project a in crts.DTE2.Solution.Projects)
+                {
+                    foreach (EnvDTE.ProjectItem b in a.ProjectItems)
+                    {
+                    }
+                }
                 string filename = crts.DTE2.Solution.FullName;
                 filename = filename.Substring(filename.LastIndexOf('\\') + 1);
                 filename = filename.Split('.')[0];
