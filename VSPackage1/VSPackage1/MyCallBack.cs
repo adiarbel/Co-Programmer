@@ -36,7 +36,7 @@ namespace Company.VSPackage1
         public MyCallBack()
         {
             INetFwRule firewallRule = (INetFwRule)Activator.CreateInstance(
-                    Type.GetTypeFromProgID("HNetCfg.FWRule"));
+                   Type.GetTypeFromProgID("HNetCfg.FWRule"));
             firewallRule.Enabled = true;
             firewallRule.InterfaceTypes = "All";
             string st = "10.0.0.9";
