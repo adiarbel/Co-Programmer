@@ -4,6 +4,7 @@ using System.ServiceModel.Description;
 using System.Xml;
 using System.Linq;
 using System.Collections.Generic;
+using NetFwTypeLib;
 namespace CoProServiceHost
 {
     class Program
@@ -29,7 +30,17 @@ namespace CoProServiceHost
                     host = new ServiceHost(typeof(CoProService.CoProService), new Uri[] { new Uri("http://localhost:" + port), new Uri("net.tcp://localhost:" + (port + 10)) });
                 }
             }
-            
+            INetFwRule firewallRule = (INetFwRule)Activator.CreateInstance(
+                  Type.GetTypeFromProgID("HNetCfg.FWRule"));
+            firewallRule.Enabled = true;
+            firewallRule.InterfaceTypes = "All";
+            string st = (8080 + 10).ToString();
+            firewallRule.LocalPorts = st;
+            firewallRule.RemoteAddresses = "10.0.0.9";
+            firewallRule.Protocol = 6; // TCP
+            INetFwPolicy2 firewallPolicy = (INetFwPolicy2)Activator.CreateInstance(
+                Type.GetTypeFromProgID("HNetCfg.FwPolicy2"));
+            firewallPolicy.Rules.Add(firewallRule);
             Console.WriteLine("Host started @" + DateTime.Now.ToString());
             Console.WriteLine(host.BaseAddresses[0].ToString() + '\n' + host.BaseAddresses[1].ToString());
             Console.ReadLine();

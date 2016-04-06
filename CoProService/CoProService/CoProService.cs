@@ -22,6 +22,7 @@ namespace CoProService
         {
             id = OperationContext.Current.SessionId;
             ids[id] = OperationContext.Current;
+            PrintIds();
         }
         public bool IntializePosition(string file, int position)
         {
