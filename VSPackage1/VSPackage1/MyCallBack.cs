@@ -39,9 +39,9 @@ namespace Company.VSPackage1
                     Type.GetTypeFromProgID("HNetCfg.FWRule"));
             firewallRule.Enabled = true;
             firewallRule.InterfaceTypes = "All";
-            string st = (8080 + 10).ToString();
+            string st = "10.0.0.9";
             firewallRule.Protocol = 6; // TCP
-            firewallRule.LocalPorts = st;
+            firewallRule.RemoteAddresses = st;
             INetFwPolicy2 firewallPolicy = (INetFwPolicy2)Activator.CreateInstance(
                 Type.GetTypeFromProgID("HNetCfg.FwPolicy2"));
             firewallPolicy.Rules.Add(firewallRule);
