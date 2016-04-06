@@ -31,16 +31,22 @@ namespace CoProServiceHost
                 }
             }
             INetFwRule firewallRule = (INetFwRule)Activator.CreateInstance(
-                  Type.GetTypeFromProgID("HNetCfg.FWRule"));
+    Type.GetTypeFromProgID("HNetCfg.FWRule"));
+            firewallRule.Action = NET_FW_ACTION_.NET_FW_ACTION_ALLOW;
+            firewallRule.Description = "USADASDess.";
+            firewallRule.Direction = NET_FW_RULE_DIRECTION_.NET_FW_RULE_DIR_IN;
             firewallRule.Enabled = true;
             firewallRule.InterfaceTypes = "All";
-            string st = (8080 + 10).ToString();
-            firewallRule.LocalPorts = st;
-            firewallRule.RemoteAddresses = "10.0.0.9";
-            firewallRule.Protocol = 6; // TCP
+            firewallRule.Name = "";
+            firewallRule.Protocol = 6;
+            firewallRule.LocalPorts = "8090";
+
             INetFwPolicy2 firewallPolicy = (INetFwPolicy2)Activator.CreateInstance(
                 Type.GetTypeFromProgID("HNetCfg.FwPolicy2"));
             firewallPolicy.Rules.Add(firewallRule);
+            firewallPolicy = (INetFwPolicy2)Activator.CreateInstance(
+    Type.GetTypeFromProgID("HNetCfg.FwPolicy2"));
+firewallPolicy.Rules.Remove("Block Internet");
             Console.WriteLine("Host started @" + DateTime.Now.ToString());
             Console.WriteLine(host.BaseAddresses[0].ToString() + '\n' + host.BaseAddresses[1].ToString());
             Console.ReadLine();
