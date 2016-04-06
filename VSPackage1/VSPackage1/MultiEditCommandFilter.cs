@@ -74,9 +74,8 @@ namespace Company.VSPackage1
                   typeof(ITextDocument), out textDoc);
                 foreach (EnvDTE.Project a in crts.DTE2.Solution.Projects)
                 {
-                    foreach (EnvDTE.ProjectItem b in a.ProjectItems)
-                    {
-                    }
+                    DTE2.ActiveWindow.Project.ProjectItems.Item("Class2.cs").Document.DTE.
+
                 }
                 string filename = crts.DTE2.Solution.FullName;
                 filename = filename.Substring(filename.LastIndexOf('\\') + 1);
