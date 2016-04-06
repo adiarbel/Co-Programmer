@@ -74,7 +74,7 @@ namespace CoProService
                         {
                             callback.ChangedCaret(file, position, id);
                         }
-                        else if (content.Contains("BACKSPACE") || content.Contains("DELETE"))
+                        else if (content.Contains("DELETE"))
                         {
                             callback.NewRemovedText(file, position, id, content);
                         }
