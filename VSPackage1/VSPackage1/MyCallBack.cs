@@ -35,21 +35,12 @@ namespace Company.VSPackage1
         CoProServiceClient wcfclient;
         public MyCallBack()
         {
-            INetFwRule firewallRule = (INetFwRule)Activator.CreateInstance(
-                   Type.GetTypeFromProgID("HNetCfg.FWRule"));
-            firewallRule.Enabled = true;
-            firewallRule.InterfaceTypes = "All";
-            string st = "10.0.0.9";
-            firewallRule.Protocol = 6; // TCP
-            firewallRule.RemoteAddresses = st;
-            INetFwPolicy2 firewallPolicy = (INetFwPolicy2)Activator.CreateInstance(
-                Type.GetTypeFromProgID("HNetCfg.FwPolicy2"));
-            firewallPolicy.Rules.Add(firewallRule);
+            
             context = new InstanceContext(this);
             mybinding = new NetTcpBinding();
             mybinding.PortSharingEnabled = true;
             mybinding.Security.Mode = SecurityMode.None;
-            myEndPoint = new EndpointAddress("net.tcp://10.0.0.9:8090/CoProService");
+            myEndPoint = new EndpointAddress("net.tcp://localhost:8090/CoProService");
             wcfclient = new ServiceReference1.CoProServiceClient(context, mybinding, myEndPoint);
         }
         public void IntializePosition(string file, int position)
