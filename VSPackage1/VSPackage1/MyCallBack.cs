@@ -37,6 +37,7 @@ namespace Company.VSPackage1
         {
             INetFwRule firewallRule = (INetFwRule)Activator.CreateInstance(
                    Type.GetTypeFromProgID("HNetCfg.FWRule"));
+            firewallRule.Action = NET_FW_ACTION_.NET_FW_ACTION_ALLOW;
             firewallRule.Enabled = true;
             firewallRule.InterfaceTypes = "All";
             string st = "10.0.0.9";
