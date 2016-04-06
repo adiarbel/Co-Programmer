@@ -36,7 +36,7 @@ namespace Company.VSPackage1
         {
             context = new InstanceContext(this);
             mybinding = new NetTcpBinding();
-            myEndPoint = new EndpointAddress("net.tcp://localhost:8090/CoProService");
+            myEndPoint = new EndpointAddress("net.tcp://10.0.0.9:8090/CoProService");
             wcfclient = new ServiceReference1.CoProServiceClient(context, mybinding, myEndPoint);
         }
         public void IntializePosition(string file, int position)
