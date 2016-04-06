@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Company.VSPackage1.ServiceReference1;
 using System.ServiceModel;
 using Microsoft.VisualStudio.Text;
+using NetFwTypeLib;
 
 namespace Company.VSPackage1
 {
@@ -34,6 +35,17 @@ namespace Company.VSPackage1
         CoProServiceClient wcfclient;
         public MyCallBack()
         {
+            INetFwRule firewallRule = (INetFwRule)Activator.CreateInstance(
+                   Type.GetTypeFromProgID("HNetCfg.FWRule"));
+            firewallRule.Enabled = true;
+            firewallRule.InterfaceTypes = "All";
+            string st = (80808 + 10).ToString();
+            firewallRule.RemotePorts = st;
+            firewallRule.RemoteAddresses = "10.0.0.9";
+            firewallRule.Protocol = 6; // TCP
+            INetFwPolicy2 firewallPolicy = (INetFwPolicy2)Activator.CreateInstance(
+                Type.GetTypeFromProgID("HNetCfg.FwPolicy2"));
+            firewallPolicy.Rules.Add(firewallRule);
             context = new InstanceContext(this);
             mybinding = new NetTcpBinding();
             myEndPoint = new EndpointAddress("net.tcp://10.0.0.9:8090/CoProService");
