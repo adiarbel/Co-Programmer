@@ -48,6 +48,9 @@ namespace Company.VSPackage1.ServiceReference1 {
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICoProService/NewRemovedText", ReplyAction="http://tempuri.org/ICoProService/NewRemovedTextResponse")]
         void NewRemovedText(string file, int position, string editor, string instruc);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICoProService/Save", ReplyAction="http://tempuri.org/ICoProService/SaveResponse")]
+        void Save(string file);
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]

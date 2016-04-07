@@ -4,27 +4,6 @@
     <wsp:ExactlyOne>
       <wsp:All>
         <msb:BinaryEncoding xmlns:msb="http://schemas.microsoft.com/ws/06/2004/mspolicy/netbinary1" />
-        <sp:TransportBinding xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy">
-          <wsp:Policy>
-            <sp:TransportToken>
-              <wsp:Policy>
-                <msf:WindowsTransportSecurity xmlns:msf="http://schemas.microsoft.com/ws/2006/05/framing/policy">
-                  <msf:ProtectionLevel>EncryptAndSign</msf:ProtectionLevel>
-                </msf:WindowsTransportSecurity>
-              </wsp:Policy>
-            </sp:TransportToken>
-            <sp:AlgorithmSuite>
-              <wsp:Policy>
-                <sp:Basic256 />
-              </wsp:Policy>
-            </sp:AlgorithmSuite>
-            <sp:Layout>
-              <wsp:Policy>
-                <sp:Strict />
-              </wsp:Policy>
-            </sp:Layout>
-          </wsp:Policy>
-        </sp:TransportBinding>
         <wsaw:UsingAddressing />
       </wsp:All>
     </wsp:ExactlyOne>
@@ -84,6 +63,12 @@
   <wsdl:message name="ICoProService_NewRemovedText_InputCallbackMessage">
     <wsdl:part name="parameters" element="tns:NewRemovedTextResponse" />
   </wsdl:message>
+  <wsdl:message name="ICoProService_Save_OutputCallbackMessage">
+    <wsdl:part name="parameters" element="tns:Save" />
+  </wsdl:message>
+  <wsdl:message name="ICoProService_Save_InputCallbackMessage">
+    <wsdl:part name="parameters" element="tns:SaveResponse" />
+  </wsdl:message>
   <wsdl:portType name="ICoProService">
     <wsdl:operation name="IntializePosition">
       <wsdl:input wsaw:Action="http://tempuri.org/ICoProService/IntializePosition" message="tns:ICoProService_IntializePosition_InputMessage" />
@@ -116,6 +101,10 @@
     <wsdl:operation name="NewRemovedText">
       <wsdl:output wsaw:Action="http://tempuri.org/ICoProService/NewRemovedText" message="tns:ICoProService_NewRemovedText_OutputCallbackMessage" />
       <wsdl:input wsaw:Action="http://tempuri.org/ICoProService/NewRemovedTextResponse" message="tns:ICoProService_NewRemovedText_InputCallbackMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="Save">
+      <wsdl:output wsaw:Action="http://tempuri.org/ICoProService/Save" message="tns:ICoProService_Save_OutputCallbackMessage" />
+      <wsdl:input wsaw:Action="http://tempuri.org/ICoProService/SaveResponse" message="tns:ICoProService_Save_InputCallbackMessage" />
     </wsdl:operation>
   </wsdl:portType>
   <wsdl:binding name="NetTcpBinding_ICoProService" type="tns:ICoProService">
@@ -193,15 +182,21 @@
         <soap12:body use="literal" />
       </wsdl:output>
     </wsdl:operation>
+    <wsdl:operation name="Save">
+      <soap12:operation soapAction="http://tempuri.org/ICoProService/Save" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
   </wsdl:binding>
   <wsdl:service name="CoProService">
     <wsdl:port name="NetTcpBinding_ICoProService" binding="tns:NetTcpBinding_ICoProService">
       <soap12:address location="net.tcp://localhost:8090/CoProService" />
       <wsa10:EndpointReference>
         <wsa10:Address>net.tcp://localhost:8090/CoProService</wsa10:Address>
-        <Identity xmlns="http://schemas.xmlsoap.org/ws/2006/02/addressingidentity">
-          <Upn>HP-250\User</Upn>
-        </Identity>
       </wsa10:EndpointReference>
     </wsdl:port>
   </wsdl:service>

@@ -49,6 +49,7 @@ namespace Company.VSPackage1
                 cb.EditorDisc += new EditorDisconnectedEventHandler(my_EditorDisc);
                 cb.NewText += new NewTextEventHandler(my_AddedText);
                 cb.RemovedText += new RemovedTextEventHandler(my_RemovedText);
+                cb.save += new SaveEventHandler(my_Save);
                 textView.TextBuffer.Changed += TextBuffer_Changed;
                 isFirst = false;
             }
@@ -61,6 +62,7 @@ namespace Company.VSPackage1
             st = st.Substring(st.LastIndexOf('\\') + 1);
             st = st.Split('.')[0];
             st = textDoc.FilePath.Substring(textDoc.FilePath.IndexOf(st));
+            st = st.Substring(st.LastIndexOf('\\') + 1);
             cb.IntializePosition(st, m_textView.Caret.Position.BufferPosition.Position);
 
             currSizeBuffer = m_textView.TextSnapshot.Length;
@@ -74,13 +76,14 @@ namespace Company.VSPackage1
                   typeof(ITextDocument), out textDoc);
                 foreach (EnvDTE.Project a in crts.DTE2.Solution.Projects)
                 {
-                    
+
 
                 }
                 string filename = crts.DTE2.Solution.FullName;
                 filename = filename.Substring(filename.LastIndexOf('\\') + 1);
                 filename = filename.Split('.')[0];
                 filename = textDoc.FilePath.Substring(textDoc.FilePath.IndexOf(filename));
+                filename = filename.Substring(filename.LastIndexOf('\\') + 1);
                 for (int i = 0; i < e.Changes.Count; i++)
                 {
                     if (e.Changes[i].OldText != "")
@@ -94,6 +97,22 @@ namespace Company.VSPackage1
                 }
             }
             mySide = true;
+        }
+        public void my_Save(object sender, ChangeCaretEventArgs e)
+        {
+            if (e.File == "all")
+            {
+                crts.DTE2.ActiveWindow.Project.Save();
+            }
+            else
+            {
+                var b = crts.DTE2.ActiveWindow.Project.ProjectItems.Item(e.File).IsOpen;
+                if (b)
+                {
+                    crts.DTE2.ActiveWindow.Project.ProjectItems.Item(e.File).Save();
+                }
+            }
+            mySide = false;
         }
         private void my_NewCaret(object sender, ChangeCaretEventArgs e)
         {
@@ -191,11 +210,12 @@ namespace Company.VSPackage1
             filename = filename.Substring(filename.LastIndexOf('\\') + 1);
             filename = filename.Split('.')[0];
             filename = textDoc.FilePath.Substring(textDoc.FilePath.IndexOf(filename));
+            filename = filename.Substring(filename.LastIndexOf('\\') + 1);
             RedrawScreen();
             requiresHandling = false;
             // When Alt Clicking, we need to add Edit points.
             Debug.WriteLine("=====" + nCmdID + " " + pguidCmdGroup.ToString() + nCmdexecopt + " " + pvaIn.ToString() + " " + pvaOut.ToString(), "adi");
-            Debug.WriteLine((uint)VSConstants.VSStd2KCmdID.RETURN);
+            Debug.WriteLine((uint)VSConstants.VSStd97CmdID.SaveProjectItem);
             if (delayFixer)
             {
                 cb.SendCaretPosition(filename, m_textView.Caret.Position.BufferPosition.Position, "click");
@@ -216,6 +236,20 @@ namespace Company.VSPackage1
                     nCmdID == (uint)VSConstants.VSStd2KCmdID.RIGHT)
             {
                 delayFixer = true;
+            }
+            else if (nCmdID == (uint)VSConstants.VSStd97CmdID.SaveProjectItem)
+            {
+                if (mySide)
+                    cb.SendCaretPosition(filename, 0, "save");
+                mySide = true;
+
+            }
+            else if (nCmdID == (uint)VSConstants.VSStd97CmdID.SaveSolution)
+            {
+                if (mySide)
+                    cb.SendCaretPosition(filename, 0, "saveS");
+                mySide = true;
+
             }
             //else if (pguidCmdGroup == VSConstants.VSStd2K && trackDict.Count > 0 && (nCmdID == (uint)VSConstants.VSStd2KCmdID.TYPECHAR ||
             //        nCmdID == (uint)VSConstants.VSStd2KCmdID.BACKSPACE ||

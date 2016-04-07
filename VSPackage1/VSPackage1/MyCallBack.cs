@@ -17,6 +17,7 @@ namespace Company.VSPackage1
     public delegate void AddCurrentEditorsEventHandler(object sender, AddEditorsEventArgs e);
     public delegate void NewCaretEventHandler(object sender, ChangeCaretEventArgs e);
     public delegate void ChangeCaretEventHandler(object sender, ChangeCaretEventArgs e);
+    public delegate void SaveEventHandler(object sender, ChangeCaretEventArgs e);
     /*TODO: define event for that delegate*/
 
     /*TODO: define the above for each event that might come from the server's callbacks*/
@@ -29,6 +30,7 @@ namespace Company.VSPackage1
         public event AddCurrentEditorsEventHandler AddAllEditors;
         public event EditorDisconnectedEventHandler EditorDisc;
         public event NewTextEventHandler NewText;
+        public event SaveEventHandler save;
         InstanceContext context;
         EndpointAddress myEndPoint;
         NetTcpBinding mybinding;
@@ -92,6 +94,15 @@ namespace Company.VSPackage1
             {
 
                 RemovedText(this, new ChangeCaretEventArgs(editor, position, file, instruc));
+
+            }
+        }
+        public void Save(string file)
+        {
+            if (save != null)
+            {
+
+                save(this, new ChangeCaretEventArgs(" ",0,file," "));
 
             }
         }

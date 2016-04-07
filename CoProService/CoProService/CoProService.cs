@@ -79,6 +79,17 @@ namespace CoProService
                         {
                             callback.NewRemovedText(file, position, id, content);
                         }
+                        else if(content.Contains("save"))
+                        {
+                            if(content=="saveS")
+                            {
+                                callback.Save("all");
+                            }
+                            else
+                            {
+                                callback.Save(file);
+                            }
+                        }
                         else
                         {
                             callback.NewAddedText(file, position, id, content);
