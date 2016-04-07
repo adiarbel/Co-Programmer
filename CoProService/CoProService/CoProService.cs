@@ -57,8 +57,6 @@ namespace CoProService
             }
             return true;
         }
-
-
         public bool SendCaretPosition(string file, int position, string content)
         {
             ICoProServiceCallback callback;

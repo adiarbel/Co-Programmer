@@ -32,6 +32,7 @@ namespace Company.VSPackage1
         bool mySide = true;
         bool delayFixer = false;
         int currSizeBuffer;
+        string filename;
         public MultiEditCommandFilter(IWpfTextView textView, MyCallBack mcb, Carets cs)
         {
             m_textView = textView;
@@ -43,27 +44,27 @@ namespace Company.VSPackage1
             //crts.DTE2.Events.TextEditorEvents.LineChanged += new _dispTextEditorEvents_LineChangedEventHandler();
             if (isFirst)
             {
-                cb.NewCaret += new NewCaretEventHandler(my_NewCaret);//how to send by parameter the NetworkClass ref
-                cb.ChangeCaret += new ChangeCaretEventHandler(my_ChangedCaret);//how to send by parameter the NetworkClass ref
                 cb.AddAllEditors += new AddCurrentEditorsEventHandler(my_AddEditors);
-                cb.EditorDisc += new EditorDisconnectedEventHandler(my_EditorDisc);
-                cb.NewText += new NewTextEventHandler(my_AddedText);
-                cb.RemovedText += new RemovedTextEventHandler(my_RemovedText);
-                cb.save += new SaveEventHandler(my_Save);
-                textView.TextBuffer.Changed += TextBuffer_Changed;
                 isFirst = false;
             }
+            cb.NewCaret += new NewCaretEventHandler(my_NewCaret);
+            cb.ChangeCaret += new ChangeCaretEventHandler(my_ChangedCaret);
+            cb.EditorDisc += new EditorDisconnectedEventHandler(my_EditorDisc);
+            cb.NewText += new NewTextEventHandler(my_AddedText);
+            cb.RemovedText += new RemovedTextEventHandler(my_RemovedText);
+            cb.save += new SaveEventHandler(my_Save);
+            textView.TextBuffer.Changed += TextBuffer_Changed;
             InitBrushes();
             uiDisp = Dispatcher.CurrentDispatcher;
             ITextDocument textDoc;
             var rc = m_textView.TextBuffer.Properties.TryGetProperty<ITextDocument>(
               typeof(ITextDocument), out textDoc);
-            string st = crts.DTE2.Solution.FullName;
-            st = st.Substring(st.LastIndexOf('\\') + 1);
-            st = st.Split('.')[0];
-            st = textDoc.FilePath.Substring(textDoc.FilePath.IndexOf(st));
-            st = st.Substring(st.LastIndexOf('\\') + 1);
-            cb.IntializePosition(st, m_textView.Caret.Position.BufferPosition.Position);
+            filename = crts.DTE2.Solution.FullName;
+            filename = filename.Substring(filename.LastIndexOf('\\') + 1);
+            filename = filename.Split('.')[0];
+            filename = textDoc.FilePath.Substring(textDoc.FilePath.IndexOf(filename));
+            filename = filename.Substring(filename.LastIndexOf('\\') + 1);
+            cb.IntializePosition(filename, m_textView.Caret.Position.BufferPosition.Position);
 
             currSizeBuffer = m_textView.TextSnapshot.Length;
         }
@@ -71,19 +72,7 @@ namespace Company.VSPackage1
         {
             if (mySide)
             {
-                ITextDocument textDoc;
-                var rc = m_textView.TextBuffer.Properties.TryGetProperty<ITextDocument>(
-                  typeof(ITextDocument), out textDoc);
-                foreach (EnvDTE.Project a in crts.DTE2.Solution.Projects)
-                {
 
-
-                }
-                string filename = crts.DTE2.Solution.FullName;
-                filename = filename.Substring(filename.LastIndexOf('\\') + 1);
-                filename = filename.Split('.')[0];
-                filename = textDoc.FilePath.Substring(textDoc.FilePath.IndexOf(filename));
-                filename = filename.Substring(filename.LastIndexOf('\\') + 1);
                 for (int i = 0; i < e.Changes.Count; i++)
                 {
                     if (e.Changes[i].OldText != "")
@@ -100,19 +89,22 @@ namespace Company.VSPackage1
         }
         public void my_Save(object sender, ChangeCaretEventArgs e)
         {
-            if (e.File == "all")
+            if (e.File == filename)
             {
-                crts.DTE2.ActiveWindow.Project.Save();
-            }
-            else
-            {
-                var b = crts.DTE2.ActiveWindow.Project.ProjectItems.Item(e.File).IsOpen;
-                if (b)
+                if (e.File == "all")
                 {
-                    crts.DTE2.ActiveWindow.Project.ProjectItems.Item(e.File).Save();
+                    crts.DTE2.ActiveWindow.Project.Save();
                 }
+                else
+                {
+                    var b = crts.DTE2.ActiveWindow.Project.ProjectItems.Item(e.File).IsOpen;
+                    if (b)
+                    {
+                        crts.DTE2.ActiveWindow.Project.ProjectItems.Item(e.File).Save();
+                    }
+                }
+                mySide = false;
             }
-            mySide = false;
         }
         private void my_NewCaret(object sender, ChangeCaretEventArgs e)
         {
@@ -123,9 +115,12 @@ namespace Company.VSPackage1
             //if (rc == true)
             //    if (e.File == textDoc.FilePath.Substring(textDoc.FilePath.LastIndexOf('\\') + 1))
             //        crts.my_CaretChange(sender, e);//helps me to find which file the caret is in
-            var curTrackPoint = m_textView.TextSnapshot.CreateTrackingPoint(e.Location,
-            PointTrackingMode.Positive);
-            trackDict[e.Editor] = curTrackPoint;
+            if (e.File == filename)
+            {
+                var curTrackPoint = m_textView.TextSnapshot.CreateTrackingPoint(e.Location,
+                PointTrackingMode.Positive);
+                trackDict[e.Editor] = curTrackPoint;
+            }
         }
         private void my_ChangedCaret(object sender, ChangeCaretEventArgs e)
         {
@@ -138,15 +133,22 @@ namespace Company.VSPackage1
             //        crts.my_CaretChange(sender, e);//helps me to find which file the caret is in
             if (trackDict.Count > 0)
             {
-                if (e.Location == 1 || e.Location == -1)
+                if (e.File == filename)
                 {
-                    trackDict[e.Editor] = m_textView.TextSnapshot.CreateTrackingPoint(e.Location + trackDict[e.Editor].GetPosition(m_textView.TextSnapshot),
-                    PointTrackingMode.Positive);
+                    if (e.Location == 1 || e.Location == -1)
+                    {
+                        trackDict[e.Editor] = m_textView.TextSnapshot.CreateTrackingPoint(e.Location + trackDict[e.Editor].GetPosition(m_textView.TextSnapshot),
+                        PointTrackingMode.Positive);
+                    }
+                    else
+                    {
+                        trackDict[e.Editor] = m_textView.TextSnapshot.CreateTrackingPoint(e.Location,
+                        PointTrackingMode.Positive);
+                    }
                 }
                 else
                 {
-                    trackDict[e.Editor] = m_textView.TextSnapshot.CreateTrackingPoint(e.Location,
-                    PointTrackingMode.Positive);
+                    trackDict[e.Editor] = null;
                 }
             }
         }
@@ -168,49 +170,47 @@ namespace Company.VSPackage1
         }
         private void my_AddedText(object sender, ChangeCaretEventArgs e)
         {
-            my_ChangedCaret(sender, e);
-            uiDisp.Invoke(new Action(() =>
+            if (e.File == filename)
+            {
+                my_ChangedCaret(sender, e);
+                uiDisp.Invoke(new Action(() =>
+                    {
+                        ITextEdit edit = m_textView.TextBuffer.CreateEdit();
+
+                        var curTrackPoint = trackDict[e.Editor];
+
+
+                        edit.Insert(curTrackPoint.GetPosition(m_textView.TextSnapshot), e.Command);
+
+                        mySide = false;
+                        edit.Apply();
+                        edit.Dispose();
+
+
+                    }));
+            }
+        }
+        private void my_RemovedText(object sender, ChangeCaretEventArgs e)
+        {
+            if (e.File == filename)
+            {
+                my_ChangedCaret(sender, e);
+                uiDisp.Invoke(new Action(() =>
                 {
                     ITextEdit edit = m_textView.TextBuffer.CreateEdit();
 
                     var curTrackPoint = trackDict[e.Editor];
 
-
-                    edit.Insert(curTrackPoint.GetPosition(m_textView.TextSnapshot), e.Command);
+                    edit.Delete(e.Location, int.Parse(e.Command.Split(';')[1]));
 
                     mySide = false;
                     edit.Apply();
                     edit.Dispose();
                 }));
+            }
         }
-        private void my_RemovedText(object sender, ChangeCaretEventArgs e)
-        {
-            my_ChangedCaret(sender, e);
-            uiDisp.Invoke(new Action(() =>
-            {
-                ITextEdit edit = m_textView.TextBuffer.CreateEdit();
-
-                var curTrackPoint = trackDict[e.Editor];
-
-                edit.Delete(e.Location, int.Parse(e.Command.Split(';')[1]));
-
-                mySide = false;
-                edit.Apply();
-                edit.Dispose();
-            }));
-        }
-
         public int Exec(ref Guid pguidCmdGroup, uint nCmdID, uint nCmdexecopt, IntPtr pvaIn, IntPtr pvaOut)
         {
-
-            ITextDocument textDoc;
-            var rc = m_textView.TextBuffer.Properties.TryGetProperty<ITextDocument>(
-              typeof(ITextDocument), out textDoc);
-            string filename = crts.DTE2.Solution.FullName;
-            filename = filename.Substring(filename.LastIndexOf('\\') + 1);
-            filename = filename.Split('.')[0];
-            filename = textDoc.FilePath.Substring(textDoc.FilePath.IndexOf(filename));
-            filename = filename.Substring(filename.LastIndexOf('\\') + 1);
             RedrawScreen();
             requiresHandling = false;
             // When Alt Clicking, we need to add Edit points.
@@ -351,8 +351,11 @@ namespace Company.VSPackage1
                     foreach (KeyValuePair<string, ITrackingPoint> entry in trackDict)
                     {
                         var curTrackPoint = trackDict[entry.Key];
-                        DrawSingleSyncPoint(curTrackPoint, brushes[i]);
-                        i++;
+                        if (curTrackPoint != null)
+                        {
+                            DrawSingleSyncPoint(curTrackPoint, brushes[i]);
+                            i++;
+                        }
                     }
                 }));
 
