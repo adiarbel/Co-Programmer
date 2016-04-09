@@ -118,7 +118,6 @@ namespace CoProService
             carets.Remove(id);
             foreach (KeyValuePair<string, OperationContext> entry in ids)
             {
-
                 try
                 {
                     callback = entry.Value.GetCallbackChannel<ICoProServiceCallback>();
