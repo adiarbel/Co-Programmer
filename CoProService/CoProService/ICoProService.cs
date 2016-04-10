@@ -15,7 +15,10 @@ namespace CoProService
         bool IntializePosition(string file, int position);
         [OperationContract]
         bool SendCaretPosition(string file, int position,string content);
-        
+        [OperationContract]
+        int ShareProject(string projName, string[] ids);
+        [OperationContract]
+        bool SetAdmin(bool adm);
     }
 
     public interface ICoProServiceCallback
@@ -34,5 +37,7 @@ namespace CoProService
         void NewRemovedText(string file, int position, string editor, string instruc);
         [OperationContract]
         void Save(string file);
+        [OperationContract]
+        void CloneProject(string fileName,byte[] zipFile);
     }
 }

@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 using System.Runtime.Serialization;
 using System.ServiceModel;
 using Microsoft.VisualStudio.Text;
-
+using System.IO;
+using System.IO.Compression;
 
 namespace CoProService
 {
@@ -18,11 +19,31 @@ namespace CoProService
         static Dictionary<string, string> carets = new Dictionary<string, string>();
         string id;
         int place;
+        bool isAdmin;
+        static string admin = "";
         public CoProService()
         {
             id = OperationContext.Current.SessionId;
             ids[id] = OperationContext.Current;
             PrintIds();
+            isAdmin = false;
+        }
+        public bool SetAdmin(bool adm)
+        {
+            if (admin != "" && adm)
+            {
+                return false;
+            }
+            isAdmin = adm;
+            if (adm)
+            {
+                admin = id;
+            }
+            else
+            {
+                admin = "";
+            }
+            return true;
         }
         public bool IntializePosition(string file, int position)
         {
@@ -31,7 +52,7 @@ namespace CoProService
             OperationContext.Current.GetCallbackChannel<ICoProServiceCallback>().AddCurrentEditors(carets.Keys.ToArray<string>(), carets.Values.ToArray<string>());
             if (carets.ContainsKey(id))
             {
-                SendCaretPosition(file, position, "");
+                SendCaretPosition(file, position, "click");
             }
             else
             {
@@ -67,7 +88,6 @@ namespace CoProService
                 {
                     try
                     {
-
                         callback = entry.Value.GetCallbackChannel<ICoProServiceCallback>();
                         if (content == "click")
                         {
@@ -77,9 +97,9 @@ namespace CoProService
                         {
                             callback.NewRemovedText(file, position, id, content);
                         }
-                        else if(content.Contains("save"))
+                        else if (content.Contains("save"))
                         {
-                            if(content=="saveS")
+                            if (content == "saveS")
                             {
                                 callback.Save("all");
                             }
@@ -103,6 +123,34 @@ namespace CoProService
             }
             return true;
         }
+
+        public int ShareProject(string path, string projName, string[] identifications)
+        {
+            if (isAdmin)
+            {
+                ZipProject(path);
+                byte[] zipfile = File.ReadAllBytes(path.Substring(0, path.LastIndexOf('\\') + 1) + "\\proj.zip");
+                for (int i = 0; i < identifications.Length; i++)
+                {
+                    ids[identifications[i]].GetCallbackChannel<ICoProServiceCallback>().CloneProject(projName, zipfile);
+                    
+                }
+                return 1;
+            }
+            return 0;
+        }
+        private void ZipProject(string path)
+        {
+            try
+            {
+                ZipFile.CreateFromDirectory(path, path.Substring(0,path.LastIndexOf('\\')+1) + "\\proj.zip");
+            }
+            catch
+            {
+                File.Delete(path.Substring(0, path.LastIndexOf('\\') + 1)  +"\\proj.zip");
+                ZipFile.CreateFromDirectory(path, path.Substring(0, path.LastIndexOf('\\') + 1) +"\\proj.zip");
+            }
+        }
         private void PrintIds()
         {
             foreach (KeyValuePair<string, OperationContext> entry in ids)
@@ -116,6 +164,10 @@ namespace CoProService
             ICoProServiceCallback callback;
             ids.Remove(id);
             carets.Remove(id);
+            if (admin == id)
+            {
+                admin = "";
+            }
             foreach (KeyValuePair<string, OperationContext> entry in ids)
             {
                 try

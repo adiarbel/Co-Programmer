@@ -131,26 +131,25 @@ namespace Company.VSPackage1
             //if (rc == true)
             //    if (e.File == textDoc.FilePath.Substring(textDoc.FilePath.LastIndexOf('\\') + 1))
             //        crts.my_CaretChange(sender, e);//helps me to find which file the caret is in
-            if (trackDict.Count > 0)
+
+            if (e.File == filename)
             {
-                if (e.File == filename)
+                if (e.Location == 1 || e.Location == -1)
                 {
-                    if (e.Location == 1 || e.Location == -1)
-                    {
-                        trackDict[e.Editor] = m_textView.TextSnapshot.CreateTrackingPoint(e.Location + trackDict[e.Editor].GetPosition(m_textView.TextSnapshot),
-                        PointTrackingMode.Positive);
-                    }
-                    else
-                    {
-                        trackDict[e.Editor] = m_textView.TextSnapshot.CreateTrackingPoint(e.Location,
-                        PointTrackingMode.Positive);
-                    }
+                    trackDict[e.Editor] = m_textView.TextSnapshot.CreateTrackingPoint(e.Location + trackDict[e.Editor].GetPosition(m_textView.TextSnapshot),
+                    PointTrackingMode.Positive);
                 }
                 else
                 {
-                    trackDict[e.Editor] = null;
+                    trackDict[e.Editor] = m_textView.TextSnapshot.CreateTrackingPoint(e.Location,
+                    PointTrackingMode.Positive);
                 }
             }
+            else
+            {
+                trackDict[e.Editor] = null;
+            }
+
         }
         private void my_AddEditors(object sender, AddEditorsEventArgs e)
         {
