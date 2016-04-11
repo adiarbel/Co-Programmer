@@ -35,14 +35,22 @@ namespace Company.VSPackage1
         EndpointAddress myEndPoint;
         NetTcpBinding mybinding;
         CoProServiceClient wcfclient;
+        string[] iport = new string[2];
         public MyCallBack()
         {
-            
             context = new InstanceContext(this);
             mybinding = new NetTcpBinding();
             mybinding.PortSharingEnabled = true;
             mybinding.Security.Mode = SecurityMode.None;
-            myEndPoint = new EndpointAddress("net.tcp://localhost:8090/CoProService");
+        }
+        public void SetIpPort(string ip, string port)
+        {
+            iport[0] = ip;
+            iport[1] = port;
+        }
+        public void Connect()
+        {
+            myEndPoint = new EndpointAddress("net.tcp://"+iport[0]+":"+iport[1]+"/CoProService");
             wcfclient = new ServiceReference1.CoProServiceClient(context, mybinding, myEndPoint);
         }
         public void IntializePosition(string file, int position)
@@ -109,6 +117,11 @@ namespace Company.VSPackage1
         void IDisposable.Dispose()
         {
             wcfclient.Close();
+        }
+
+        public void CloneProject(string fileName, byte[] zipFile)
+        {
+            throw new NotImplementedException();
         }
     }
     public class ChangeCaretEventArgs : EventArgs

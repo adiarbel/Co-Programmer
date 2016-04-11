@@ -27,6 +27,18 @@
   <wsdl:message name="ICoProService_SendCaretPosition_OutputMessage">
     <wsdl:part name="parameters" element="tns:SendCaretPositionResponse" />
   </wsdl:message>
+  <wsdl:message name="ICoProService_ShareProject_InputMessage">
+    <wsdl:part name="parameters" element="tns:ShareProject" />
+  </wsdl:message>
+  <wsdl:message name="ICoProService_ShareProject_OutputMessage">
+    <wsdl:part name="parameters" element="tns:ShareProjectResponse" />
+  </wsdl:message>
+  <wsdl:message name="ICoProService_SetAdmin_InputMessage">
+    <wsdl:part name="parameters" element="tns:SetAdmin" />
+  </wsdl:message>
+  <wsdl:message name="ICoProService_SetAdmin_OutputMessage">
+    <wsdl:part name="parameters" element="tns:SetAdminResponse" />
+  </wsdl:message>
   <wsdl:message name="ICoProService_AddCurrentEditors_OutputCallbackMessage">
     <wsdl:part name="parameters" element="tns:AddCurrentEditors" />
   </wsdl:message>
@@ -69,6 +81,12 @@
   <wsdl:message name="ICoProService_Save_InputCallbackMessage">
     <wsdl:part name="parameters" element="tns:SaveResponse" />
   </wsdl:message>
+  <wsdl:message name="ICoProService_CloneProject_OutputCallbackMessage">
+    <wsdl:part name="parameters" element="tns:CloneProject" />
+  </wsdl:message>
+  <wsdl:message name="ICoProService_CloneProject_InputCallbackMessage">
+    <wsdl:part name="parameters" element="tns:CloneProjectResponse" />
+  </wsdl:message>
   <wsdl:portType name="ICoProService">
     <wsdl:operation name="IntializePosition">
       <wsdl:input wsaw:Action="http://tempuri.org/ICoProService/IntializePosition" message="tns:ICoProService_IntializePosition_InputMessage" />
@@ -77,6 +95,14 @@
     <wsdl:operation name="SendCaretPosition">
       <wsdl:input wsaw:Action="http://tempuri.org/ICoProService/SendCaretPosition" message="tns:ICoProService_SendCaretPosition_InputMessage" />
       <wsdl:output wsaw:Action="http://tempuri.org/ICoProService/SendCaretPositionResponse" message="tns:ICoProService_SendCaretPosition_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="ShareProject">
+      <wsdl:input wsaw:Action="http://tempuri.org/ICoProService/ShareProject" message="tns:ICoProService_ShareProject_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/ICoProService/ShareProjectResponse" message="tns:ICoProService_ShareProject_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="SetAdmin">
+      <wsdl:input wsaw:Action="http://tempuri.org/ICoProService/SetAdmin" message="tns:ICoProService_SetAdmin_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/ICoProService/SetAdminResponse" message="tns:ICoProService_SetAdmin_OutputMessage" />
     </wsdl:operation>
     <wsdl:operation name="AddCurrentEditors">
       <wsdl:output wsaw:Action="http://tempuri.org/ICoProService/AddCurrentEditors" message="tns:ICoProService_AddCurrentEditors_OutputCallbackMessage" />
@@ -106,6 +132,10 @@
       <wsdl:output wsaw:Action="http://tempuri.org/ICoProService/Save" message="tns:ICoProService_Save_OutputCallbackMessage" />
       <wsdl:input wsaw:Action="http://tempuri.org/ICoProService/SaveResponse" message="tns:ICoProService_Save_InputCallbackMessage" />
     </wsdl:operation>
+    <wsdl:operation name="CloneProject">
+      <wsdl:output wsaw:Action="http://tempuri.org/ICoProService/CloneProject" message="tns:ICoProService_CloneProject_OutputCallbackMessage" />
+      <wsdl:input wsaw:Action="http://tempuri.org/ICoProService/CloneProjectResponse" message="tns:ICoProService_CloneProject_InputCallbackMessage" />
+    </wsdl:operation>
   </wsdl:portType>
   <wsdl:binding name="NetTcpBinding_ICoProService" type="tns:ICoProService">
     <wsp:PolicyReference URI="#NetTcpBinding_ICoProService_policy" />
@@ -121,6 +151,24 @@
     </wsdl:operation>
     <wsdl:operation name="SendCaretPosition">
       <soap12:operation soapAction="http://tempuri.org/ICoProService/SendCaretPosition" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ShareProject">
+      <soap12:operation soapAction="http://tempuri.org/ICoProService/ShareProject" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="SetAdmin">
+      <soap12:operation soapAction="http://tempuri.org/ICoProService/SetAdmin" style="document" />
       <wsdl:input>
         <soap12:body use="literal" />
       </wsdl:input>
@@ -184,6 +232,15 @@
     </wsdl:operation>
     <wsdl:operation name="Save">
       <soap12:operation soapAction="http://tempuri.org/ICoProService/Save" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="CloneProject">
+      <soap12:operation soapAction="http://tempuri.org/ICoProService/CloneProject" style="document" />
       <wsdl:input>
         <soap12:body use="literal" />
       </wsdl:input>

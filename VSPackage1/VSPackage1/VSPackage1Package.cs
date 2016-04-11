@@ -53,6 +53,7 @@ namespace Company.VSPackage1
         private IWpfTextViewHost iwpf;
         TextDocumentKeyPressEvents tde;
         TextEditorEvents te;
+        Service service;
         char[] text = new char[50];
         int place = 0;
         MyCallBack cb;
@@ -124,6 +125,9 @@ namespace Company.VSPackage1
                 CommandID menuCommandID = new CommandID(GuidList.guidTopLevelMenuCmdSet, (int)PkgCmdIDList.cmdidMyCommand);
                 MenuCommand menuItem = new MenuCommand(MenuItemCallback, menuCommandID);
                 mcs.AddCommand(menuItem);
+                menuCommandID = new CommandID(GuidList.guidTopLevelMenuCmdSet, (int)PkgCmdIDList.cmdidMyCommand2);
+                menuItem = new MenuCommand(MenuItemCallback, menuCommandID);
+                mcs.AddCommand(menuItem);
             }
         }
         #endregion
@@ -135,14 +139,15 @@ namespace Company.VSPackage1
         /// </summary>
         private void MenuItemCallback(object sender, EventArgs e)
         {
+            service = new Service();
             CoProWindow c = new CoProWindow(DTE2);
-            // c.Show();      
+            c.Show();
             //Carets cs = new Carets(GetCurrentViewHost());
-            
-           
+
+
         }
-        
-        
+
+
 
 
 

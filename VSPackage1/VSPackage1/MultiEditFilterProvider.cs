@@ -7,6 +7,7 @@ using Microsoft.VisualStudio.Utilities;
 using Microsoft.VisualStudio.Editor;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.TextManager.Interop;
+using Microsoft.VisualStudio.Text;
 
 namespace Company.VSPackage1
 {
@@ -25,11 +26,14 @@ namespace Company.VSPackage1
         Carets cs;
         public void VsTextViewCreated(IVsTextView textViewAdapter)
         {
-            cs = new Carets(GetCurrentViewHost(textViewAdapter), cb);
+            cb.SetIpPort("localhost", "8090");
+            cb.Connect();
             IWpfTextView textView = editorFactory.GetWpfTextView(textViewAdapter);//gets the text view
+            cs = new Carets(GetCurrentViewHost(textViewAdapter), cb);
             if (textView == null)
                 return;
-            AddCommandFilter(textViewAdapter, new MultiEditCommandFilter(textView,cb,cs));//adds an instance of our command filter to the text view
+            AddCommandFilter(textViewAdapter, new MultiEditCommandFilter(textView, cb, cs));//adds an instance of our command filter to the text view
+
         }
         IWpfTextViewHost GetCurrentViewHost(IVsTextView vTextView)
         {

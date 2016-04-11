@@ -26,6 +26,18 @@ namespace Company.VSPackage1.ServiceReference1 {
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICoProService/SendCaretPosition", ReplyAction="http://tempuri.org/ICoProService/SendCaretPositionResponse")]
         System.Threading.Tasks.Task<bool> SendCaretPositionAsync(string file, int position, string content);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICoProService/ShareProject", ReplyAction="http://tempuri.org/ICoProService/ShareProjectResponse")]
+        int ShareProject(string path, string projName, string[] ids);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICoProService/ShareProject", ReplyAction="http://tempuri.org/ICoProService/ShareProjectResponse")]
+        System.Threading.Tasks.Task<int> ShareProjectAsync(string path, string projName, string[] ids);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICoProService/SetAdmin", ReplyAction="http://tempuri.org/ICoProService/SetAdminResponse")]
+        bool SetAdmin(bool adm);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICoProService/SetAdmin", ReplyAction="http://tempuri.org/ICoProService/SetAdminResponse")]
+        System.Threading.Tasks.Task<bool> SetAdminAsync(bool adm);
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
@@ -51,6 +63,9 @@ namespace Company.VSPackage1.ServiceReference1 {
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICoProService/Save", ReplyAction="http://tempuri.org/ICoProService/SaveResponse")]
         void Save(string file);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICoProService/CloneProject", ReplyAction="http://tempuri.org/ICoProService/CloneProjectResponse")]
+        void CloneProject(string fileName, byte[] zipFile);
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
@@ -95,6 +110,22 @@ namespace Company.VSPackage1.ServiceReference1 {
         
         public System.Threading.Tasks.Task<bool> SendCaretPositionAsync(string file, int position, string content) {
             return base.Channel.SendCaretPositionAsync(file, position, content);
+        }
+        
+        public int ShareProject(string path, string projName, string[] ids) {
+            return base.Channel.ShareProject(path, projName, ids);
+        }
+        
+        public System.Threading.Tasks.Task<int> ShareProjectAsync(string path, string projName, string[] ids) {
+            return base.Channel.ShareProjectAsync(path, projName, ids);
+        }
+        
+        public bool SetAdmin(bool adm) {
+            return base.Channel.SetAdmin(adm);
+        }
+        
+        public System.Threading.Tasks.Task<bool> SetAdminAsync(bool adm) {
+            return base.Channel.SetAdminAsync(adm);
         }
     }
 }
