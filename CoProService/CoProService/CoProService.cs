@@ -19,12 +19,14 @@ namespace CoProService
         static Dictionary<string, string> carets = new Dictionary<string, string>();
         string id;
         int place;
+        Object locker = new Object();
         bool isAdmin;
         static string admin = "";
         public CoProService()
         {
             id = OperationContext.Current.SessionId;
             ids[id] = OperationContext.Current;
+
             PrintIds();
             isAdmin = false;
         }
@@ -56,6 +58,7 @@ namespace CoProService
             }
             else
             {
+
                 carets[id] = "" + file + " " + position;
 
                 foreach (KeyValuePair<string, OperationContext> entry in ids)
@@ -81,7 +84,9 @@ namespace CoProService
         public bool SendCaretPosition(string file, int position, string content)
         {
             ICoProServiceCallback callback;
+
             carets[id] = "" + file + " " + position;
+
             foreach (KeyValuePair<string, OperationContext> entry in ids)
             {
                 if (entry.Value.SessionId != id)
@@ -115,6 +120,7 @@ namespace CoProService
                     }
                     catch
                     {
+
                         ids.Remove(entry.Key);
 
                     }
@@ -132,8 +138,9 @@ namespace CoProService
                 byte[] zipfile = File.ReadAllBytes(path.Substring(0, path.LastIndexOf('\\') + 1) + "\\proj.zip");
                 for (int i = 0; i < identifications.Length; i++)
                 {
+
                     ids[identifications[i]].GetCallbackChannel<ICoProServiceCallback>().CloneProject(projName, zipfile);
-                    
+
                 }
                 return 1;
             }
@@ -143,12 +150,12 @@ namespace CoProService
         {
             try
             {
-                ZipFile.CreateFromDirectory(path, path.Substring(0,path.LastIndexOf('\\')+1) + "\\proj.zip");
+                ZipFile.CreateFromDirectory(path, path.Substring(0, path.LastIndexOf('\\') + 1) + "\\proj.zip");
             }
             catch
             {
-                File.Delete(path.Substring(0, path.LastIndexOf('\\') + 1)  +"\\proj.zip");
-                ZipFile.CreateFromDirectory(path, path.Substring(0, path.LastIndexOf('\\') + 1) +"\\proj.zip");
+                File.Delete(path.Substring(0, path.LastIndexOf('\\') + 1) + "\\proj.zip");
+                ZipFile.CreateFromDirectory(path, path.Substring(0, path.LastIndexOf('\\') + 1) + "\\proj.zip");
             }
         }
         private void PrintIds()
@@ -168,21 +175,8 @@ namespace CoProService
             {
                 admin = "";
             }
-            foreach (KeyValuePair<string, OperationContext> entry in ids)
-            {
-                try
-                {
-                    callback = entry.Value.GetCallbackChannel<ICoProServiceCallback>();
-                    callback.EditorDisconnected(id);
-                }
-                catch
-                {
-                    ids.Remove(id);
-                    carets.Remove(id);
-                }
-
-
-            }
+            ids.Clear();
+            carets.Clear();
         }
     }
 }
