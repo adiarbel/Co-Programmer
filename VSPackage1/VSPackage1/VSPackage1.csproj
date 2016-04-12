@@ -230,7 +230,7 @@
     <WCFMetadataStorage Include="Service References\ServiceReference1\" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\CoProService\CoProService\CoProService.csproj">
+    <ProjectReference Include="..\CoProService\CoProService.csproj">
       <Project>{7fd1987e-f3b1-4727-943b-d266eef4d537}</Project>
       <Name>CoProService</Name>
     </ProjectReference>

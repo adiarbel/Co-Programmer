@@ -121,7 +121,7 @@ namespace Company.VSPackage1
 
         public void CloneProject(string fileName, byte[] zipFile)
         {
-            throw new NotImplementedException();
+            
         }
     }
     public class ChangeCaretEventArgs : EventArgs
