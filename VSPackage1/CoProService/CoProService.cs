@@ -18,6 +18,7 @@ namespace CoProService
         static Dictionary<string, OperationContext> ids = new Dictionary<string, OperationContext>();
         static Dictionary<string, string> carets = new Dictionary<string, string>();
         string id;
+        List<string> ShareProjectIDs = new List<string>();
         int place;
         Object locker = new Object();
         bool isAdmin;
@@ -28,7 +29,7 @@ namespace CoProService
             ids[id] = OperationContext.Current;
 
             //PrintIds();
-            isAdmin = false;
+            isAdmin = true;
         }
         public bool SetAdmin(bool adm)
         {
@@ -130,16 +131,22 @@ namespace CoProService
             }
             return true;
         }
-
-        public int ShareProject(string path, string projName, string[] identifications)
+        public void GetProject()
+        {
+            lock (ShareProjectIDs)
+            {
+                ShareProjectIDs.Add(id);
+            }
+        }
+        public int ShareProject(string path, string projName)
         {
             if (isAdmin)
             {
                 ZipProject(path);
                 byte[] zipfile = File.ReadAllBytes(path.Substring(0, path.LastIndexOf('\\') + 1) + "\\proj.zip");
-                for (int i = 0; i < identifications.Length; i++)
+                for (int i = 0; i < ShareProjectIDs.Count; i++)
                 {
-                    ids[identifications[i]].GetCallbackChannel<ICoProServiceCallback>().CloneProject(projName, zipfile);
+                    ids[ShareProjectIDs[i]].GetCallbackChannel<ICoProServiceCallback>().CloneProject(projName, zipfile);
                 }
                 return 1;
             }

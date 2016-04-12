@@ -7,6 +7,8 @@ using Company.VSPackage1.ServiceReference1;
 using System.ServiceModel;
 using Microsoft.VisualStudio.Text;
 using NetFwTypeLib;
+using System.IO;
+using System.IO.Compression;
 
 namespace Company.VSPackage1
 {
@@ -22,7 +24,7 @@ namespace Company.VSPackage1
 
     /*TODO: define the above for each event that might come from the server's callbacks*/
     [CallbackBehavior(UseSynchronizationContext = false)]
-    class MyCallBack : ICoProServiceCallback, IDisposable
+    public class MyCallBack : ICoProServiceCallback, IDisposable
     {
         public event NewCaretEventHandler NewCaret;
         public event RemovedTextEventHandler RemovedText;
@@ -35,6 +37,7 @@ namespace Company.VSPackage1
         EndpointAddress myEndPoint;
         NetTcpBinding mybinding;
         CoProServiceClient wcfclient;
+        string proj;
         string[] iport = new string[2];
         public MyCallBack()
         {
@@ -43,6 +46,16 @@ namespace Company.VSPackage1
             mybinding.PortSharingEnabled = true;
             mybinding.Security.Mode = SecurityMode.None;
         }
+        public void SetProjPath(string path)
+        {
+            proj = path;
+
+        }
+        public string GetId()
+        {
+            string st = wcfclient.InnerDuplexChannel.SessionId;
+            return st;
+        }
         public void SetIpPort(string ip, string port)
         {
             iport[0] = ip;
@@ -50,7 +63,7 @@ namespace Company.VSPackage1
         }
         public void Connect()
         {
-            myEndPoint = new EndpointAddress("net.tcp://"+iport[0]+":"+iport[1]+"/CoProService");
+            myEndPoint = new EndpointAddress("net.tcp://" + iport[0] + ":" + iport[1] + "/CoProService");
             wcfclient = new ServiceReference1.CoProServiceClient(context, mybinding, myEndPoint);
         }
         public void IntializePosition(string file, int position)
@@ -60,6 +73,11 @@ namespace Company.VSPackage1
         public void SendCaretPosition(string file, int position, string command)
         {
             wcfclient.SendCaretPosition(file, position, command);
+        }
+        public void GetProject(string path, string name)
+        {
+            wcfclient.GetProject();
+            wcfclient.ShareProject(path, name);
         }
         public void AddCurrentEditors(string[] editors, string[] locations)
         {
@@ -110,7 +128,7 @@ namespace Company.VSPackage1
             if (save != null)
             {
 
-                save(this, new ChangeCaretEventArgs(" ",0,file," "));
+                save(this, new ChangeCaretEventArgs(" ", 0, file, " "));
 
             }
         }
@@ -121,7 +139,10 @@ namespace Company.VSPackage1
 
         public void CloneProject(string fileName, byte[] zipFile)
         {
-            
+            File.WriteAllBytes(proj + "\\proj.zip", zipFile);
+            ZipFile.ExtractToDirectory(proj + "\\proj.zip", proj + "\\" + fileName);
+            File.Delete(proj + "\\proj.zip");
+
         }
     }
     public class ChangeCaretEventArgs : EventArgs

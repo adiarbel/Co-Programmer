@@ -16,7 +16,10 @@ namespace CoProService
         [OperationContract]
         bool SendCaretPosition(string file, int position,string content);
         [OperationContract]
-        int ShareProject(string path,string projName, string[] ids);
+        int ShareProject(string path,string projName);
+        [OperationContract]
+        void GetProject();
+
         [OperationContract]
         bool SetAdmin(bool adm);
     }

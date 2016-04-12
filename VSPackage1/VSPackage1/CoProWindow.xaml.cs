@@ -19,15 +19,21 @@ namespace Company.VSPackage1
     /// </summary>
     public partial class CoProWindow : Window
     {
-        private EnvDTE80.DTE2 DTE;
-        public CoProWindow(EnvDTE80.DTE2 dte)
+        MyCallBack cb;
+        public CoProWindow(MyCallBack calb)
         {
-            this.DTE = dte;
             InitializeComponent();
+            cb = calb;
         }
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-
+            var dialog = new System.Windows.Forms.FolderBrowserDialog();
+            System.Windows.Forms.DialogResult result = dialog.ShowDialog();
+            var addr = textBox1.Text;
+            cb.SetIpPort(addr.ToString().Split(',')[0], addr.ToString().Split(',')[1]);
+            cb.Connect();
+            cb.SetProjPath(dialog.SelectedPath);
+            cb.GetProject(@"C:\Users\Arbel\Documents\Visual Studio 2013\Projects\ConsoleApplication1", "ConsoleApplication1");
             //if (DTE.ActiveDocument != null)
             //{
             //    EnvDTE.TextSelection ts = DTE.ActiveDocument.Selection as EnvDTE.TextSelection;

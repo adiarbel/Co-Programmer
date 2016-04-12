@@ -3,7 +3,32 @@
   <wsp:Policy wsu:Id="NetTcpBinding_ICoProService_policy">
     <wsp:ExactlyOne>
       <wsp:All>
+        <wsrm:RMAssertion xmlns:wsrm="http://schemas.xmlsoap.org/ws/2005/02/rm/policy">
+          <wsrm:InactivityTimeout Milliseconds="600000" />
+          <wsrm:AcknowledgementInterval Milliseconds="200" />
+        </wsrm:RMAssertion>
         <msb:BinaryEncoding xmlns:msb="http://schemas.microsoft.com/ws/06/2004/mspolicy/netbinary1" />
+        <sp:TransportBinding xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy">
+          <wsp:Policy>
+            <sp:TransportToken>
+              <wsp:Policy>
+                <msf:WindowsTransportSecurity xmlns:msf="http://schemas.microsoft.com/ws/2006/05/framing/policy">
+                  <msf:ProtectionLevel>EncryptAndSign</msf:ProtectionLevel>
+                </msf:WindowsTransportSecurity>
+              </wsp:Policy>
+            </sp:TransportToken>
+            <sp:AlgorithmSuite>
+              <wsp:Policy>
+                <sp:Basic256 />
+              </wsp:Policy>
+            </sp:AlgorithmSuite>
+            <sp:Layout>
+              <wsp:Policy>
+                <sp:Strict />
+              </wsp:Policy>
+            </sp:Layout>
+          </wsp:Policy>
+        </sp:TransportBinding>
         <wsaw:UsingAddressing />
       </wsp:All>
     </wsp:ExactlyOne>
@@ -32,6 +57,12 @@
   </wsdl:message>
   <wsdl:message name="ICoProService_ShareProject_OutputMessage">
     <wsdl:part name="parameters" element="tns:ShareProjectResponse" />
+  </wsdl:message>
+  <wsdl:message name="ICoProService_GetProject_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetProject" />
+  </wsdl:message>
+  <wsdl:message name="ICoProService_GetProject_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetProjectResponse" />
   </wsdl:message>
   <wsdl:message name="ICoProService_SetAdmin_InputMessage">
     <wsdl:part name="parameters" element="tns:SetAdmin" />
@@ -100,6 +131,10 @@
       <wsdl:input wsaw:Action="http://tempuri.org/ICoProService/ShareProject" message="tns:ICoProService_ShareProject_InputMessage" />
       <wsdl:output wsaw:Action="http://tempuri.org/ICoProService/ShareProjectResponse" message="tns:ICoProService_ShareProject_OutputMessage" />
     </wsdl:operation>
+    <wsdl:operation name="GetProject">
+      <wsdl:input wsaw:Action="http://tempuri.org/ICoProService/GetProject" message="tns:ICoProService_GetProject_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/ICoProService/GetProjectResponse" message="tns:ICoProService_GetProject_OutputMessage" />
+    </wsdl:operation>
     <wsdl:operation name="SetAdmin">
       <wsdl:input wsaw:Action="http://tempuri.org/ICoProService/SetAdmin" message="tns:ICoProService_SetAdmin_InputMessage" />
       <wsdl:output wsaw:Action="http://tempuri.org/ICoProService/SetAdminResponse" message="tns:ICoProService_SetAdmin_OutputMessage" />
@@ -160,6 +195,15 @@
     </wsdl:operation>
     <wsdl:operation name="ShareProject">
       <soap12:operation soapAction="http://tempuri.org/ICoProService/ShareProject" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetProject">
+      <soap12:operation soapAction="http://tempuri.org/ICoProService/GetProject" style="document" />
       <wsdl:input>
         <soap12:body use="literal" />
       </wsdl:input>
@@ -254,6 +298,9 @@
       <soap12:address location="net.tcp://localhost:8090/CoProService" />
       <wsa10:EndpointReference>
         <wsa10:Address>net.tcp://localhost:8090/CoProService</wsa10:Address>
+        <Identity xmlns="http://schemas.xmlsoap.org/ws/2006/02/addressingidentity">
+          <Upn>ARBELNEWPC\Arbel</Upn>
+        </Identity>
       </wsa10:EndpointReference>
     </wsdl:port>
   </wsdl:service>

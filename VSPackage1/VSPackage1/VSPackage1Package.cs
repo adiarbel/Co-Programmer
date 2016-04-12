@@ -140,7 +140,8 @@ namespace Company.VSPackage1
         private void MenuItemCallback(object sender, EventArgs e)
         {
             service = new Service();
-            CoProWindow c = new CoProWindow(DTE2);
+            MyCallBack cb = new MyCallBack();
+            CoProWindow c = new CoProWindow(cb);
             c.Show();
             //Carets cs = new Carets(GetCurrentViewHost());
 

@@ -28,10 +28,16 @@ namespace Company.VSPackage1.ServiceReference1 {
         System.Threading.Tasks.Task<bool> SendCaretPositionAsync(string file, int position, string content);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICoProService/ShareProject", ReplyAction="http://tempuri.org/ICoProService/ShareProjectResponse")]
-        int ShareProject(string path, string projName, string[] ids);
+        int ShareProject(string path, string projName);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICoProService/ShareProject", ReplyAction="http://tempuri.org/ICoProService/ShareProjectResponse")]
-        System.Threading.Tasks.Task<int> ShareProjectAsync(string path, string projName, string[] ids);
+        System.Threading.Tasks.Task<int> ShareProjectAsync(string path, string projName);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICoProService/GetProject", ReplyAction="http://tempuri.org/ICoProService/GetProjectResponse")]
+        void GetProject();
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICoProService/GetProject", ReplyAction="http://tempuri.org/ICoProService/GetProjectResponse")]
+        System.Threading.Tasks.Task GetProjectAsync();
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICoProService/SetAdmin", ReplyAction="http://tempuri.org/ICoProService/SetAdminResponse")]
         bool SetAdmin(bool adm);
@@ -112,12 +118,20 @@ namespace Company.VSPackage1.ServiceReference1 {
             return base.Channel.SendCaretPositionAsync(file, position, content);
         }
         
-        public int ShareProject(string path, string projName, string[] ids) {
-            return base.Channel.ShareProject(path, projName, ids);
+        public int ShareProject(string path, string projName) {
+            return base.Channel.ShareProject(path, projName);
         }
         
-        public System.Threading.Tasks.Task<int> ShareProjectAsync(string path, string projName, string[] ids) {
-            return base.Channel.ShareProjectAsync(path, projName, ids);
+        public System.Threading.Tasks.Task<int> ShareProjectAsync(string path, string projName) {
+            return base.Channel.ShareProjectAsync(path, projName);
+        }
+        
+        public void GetProject() {
+            base.Channel.GetProject();
+        }
+        
+        public System.Threading.Tasks.Task GetProjectAsync() {
+            return base.Channel.GetProjectAsync();
         }
         
         public bool SetAdmin(bool adm) {
