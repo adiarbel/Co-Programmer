@@ -58,9 +58,10 @@ namespace CoProService
             }
             else
             {
-
-                carets[id] = "" + file + " " + position;
-
+                lock (carets)
+                {
+                    carets[id] = "" + file + " " + position;
+                }
                 foreach (KeyValuePair<string, OperationContext> entry in ids)
                 {
                     if (entry.Value.SessionId != id)
