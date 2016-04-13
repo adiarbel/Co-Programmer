@@ -22,6 +22,8 @@ namespace CoProService
 
         [OperationContract]
         bool SetAdmin(bool adm);
+        [OperationContract]
+        bool IsConnected();
     }
 
     public interface ICoProServiceCallback

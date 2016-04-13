@@ -44,6 +44,12 @@ namespace Company.VSPackage1.ServiceReference1 {
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICoProService/SetAdmin", ReplyAction="http://tempuri.org/ICoProService/SetAdminResponse")]
         System.Threading.Tasks.Task<bool> SetAdminAsync(bool adm);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICoProService/IsConnected", ReplyAction="http://tempuri.org/ICoProService/IsConnectedResponse")]
+        bool IsConnected();
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICoProService/IsConnected", ReplyAction="http://tempuri.org/ICoProService/IsConnectedResponse")]
+        System.Threading.Tasks.Task<bool> IsConnectedAsync();
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
@@ -140,6 +146,14 @@ namespace Company.VSPackage1.ServiceReference1 {
         
         public System.Threading.Tasks.Task<bool> SetAdminAsync(bool adm) {
             return base.Channel.SetAdminAsync(adm);
+        }
+        
+        public bool IsConnected() {
+            return base.Channel.IsConnected();
+        }
+        
+        public System.Threading.Tasks.Task<bool> IsConnectedAsync() {
+            return base.Channel.IsConnectedAsync();
         }
     }
 }

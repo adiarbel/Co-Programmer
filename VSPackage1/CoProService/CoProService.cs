@@ -27,9 +27,8 @@ namespace CoProService
         {
             id = OperationContext.Current.SessionId;
             ids[id] = OperationContext.Current;
-
             //PrintIds();
-            isAdmin = true;
+            isAdmin = false;
         }
         public bool SetAdmin(bool adm)
         {
@@ -148,6 +147,7 @@ namespace CoProService
                 {
                     ids[ShareProjectIDs[i]].GetCallbackChannel<ICoProServiceCallback>().CloneProject(projName, zipfile);
                 }
+                File.Delete(path.Substring(0, path.LastIndexOf('\\') + 1) + "\\proj.zip");
                 return 1;
             }
             return 0;
@@ -164,12 +164,9 @@ namespace CoProService
                 ZipFile.CreateFromDirectory(path, path.Substring(0, path.LastIndexOf('\\') + 1) + "\\proj.zip");
             }
         }
-        private void PrintIds()
+        public bool IsConnected()
         {
-            foreach (KeyValuePair<string, OperationContext> entry in ids)
-            {
-                Console.WriteLine(entry.Value.SessionId);
-            }
+            return true;
         }
 
         void IDisposable.Dispose()

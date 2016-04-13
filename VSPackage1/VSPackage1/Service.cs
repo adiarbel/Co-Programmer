@@ -87,5 +87,9 @@ namespace Company.VSPackage1
             host.Close();
             fwPolicy2.Rules.Remove("PortCoProgrammer");
         }
+        public System.Collections.ObjectModel.ReadOnlyCollection<Uri> GetAddresses()
+        {
+            return host.BaseAddresses;
+        }
     }
 }

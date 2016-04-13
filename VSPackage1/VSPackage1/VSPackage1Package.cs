@@ -2,6 +2,7 @@
 using EnvDTE80;
 using EnvDTE100;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.Runtime.InteropServices;
@@ -57,6 +58,7 @@ namespace Company.VSPackage1
         char[] text = new char[50];
         int place = 0;
         MyCallBack cb;
+        static Dictionary<string, MenuCommand> cmds = new Dictionary<string, MenuCommand>();
         private DTE2 DTE2
         {
             get { return dte ?? (dte = ServiceProvider.GlobalProvider.GetService(typeof(DTE)) as DTE2); }
@@ -65,7 +67,10 @@ namespace Company.VSPackage1
         {
             get { return iwpf ?? (iwpf = ServiceProvider.GlobalProvider.GetService(typeof(IWpfTextViewHost)) as IWpfTextViewHost); }
         }
-
+        public static Dictionary<string, MenuCommand> MenuCommands
+        {
+            get { return cmds; }
+        }
 
         /// <summary>
         /// Default constructor of the package.
@@ -122,11 +127,19 @@ namespace Company.VSPackage1
             {
                 // Create the command for the menu item.
 
-                CommandID menuCommandID = new CommandID(GuidList.guidTopLevelMenuCmdSet, (int)PkgCmdIDList.cmdidMyCommand);
-                MenuCommand menuItem = new MenuCommand(MenuItemCallback, menuCommandID);
+                CommandID menuCommandID = new CommandID(GuidList.guidTopLevelMenuCmdSet, (int)PkgCmdIDList.connectToServer);
+                MenuCommand menuItem = new MenuCommand(ConnectCallback, menuCommandID);
+                cmds["connectToServer"]=menuItem;
                 mcs.AddCommand(menuItem);
-                menuCommandID = new CommandID(GuidList.guidTopLevelMenuCmdSet, (int)PkgCmdIDList.cmdidMyCommand2);
-                menuItem = new MenuCommand(MenuItemCallback, menuCommandID);
+                menuCommandID = new CommandID(GuidList.guidTopLevelMenuCmdSet, (int)PkgCmdIDList.cloneProject);
+                menuItem = new MenuCommand(CloneCallback, menuCommandID);
+                menuItem.Visible = true;
+                cmds["cloneProject"] = menuItem;
+                mcs.AddCommand(menuItem);
+                menuCommandID = new CommandID(GuidList.guidTopLevelMenuCmdSet, (int)PkgCmdIDList.hostProject);
+                menuItem = new MenuCommand(HostCallback, menuCommandID);
+                menuItem.Enabled = true;
+                cmds["hostProject"] = menuItem;
                 mcs.AddCommand(menuItem);
             }
         }
@@ -137,15 +150,23 @@ namespace Company.VSPackage1
         /// See the Initialize method to see how the menu item is associated to this function using
         /// the OleMenuCommandService service and the MenuCommand class.
         /// </summary>
-        private void MenuItemCallback(object sender, EventArgs e)
+        private void ConnectCallback(object sender, EventArgs e)
         {
-            service = new Service();
-            MyCallBack cb = new MyCallBack();
+            cb = new MyCallBack();
             CoProWindow c = new CoProWindow(cb);
             c.Show();
             //Carets cs = new Carets(GetCurrentViewHost());
 
 
+        }
+        private void CloneCallback(object sender, EventArgs e)
+        {
+            CloneWindow c = new CloneWindow(cb);
+            c.Show();
+        }
+        private void HostCallback(object sender, EventArgs e)
+        {
+            service = new Service();
         }
 
 

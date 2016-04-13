@@ -61,10 +61,18 @@ namespace Company.VSPackage1
             iport[0] = ip;
             iport[1] = port;
         }
-        public void Connect()
+        public bool Connect()
         {
             myEndPoint = new EndpointAddress("net.tcp://" + iport[0] + ":" + iport[1] + "/CoProService");
             wcfclient = new ServiceReference1.CoProServiceClient(context, mybinding, myEndPoint);
+            try
+            {
+                return wcfclient.IsConnected();
+            }
+            catch
+            {
+                return false;
+            }
         }
         public void IntializePosition(string file, int position)
         {
