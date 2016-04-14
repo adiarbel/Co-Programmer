@@ -8,6 +8,7 @@ using Microsoft.VisualStudio.Editor;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.TextManager.Interop;
 using Microsoft.VisualStudio.Text;
+using System.IO;
 
 namespace Company.VSPackage1
 {
@@ -26,14 +27,29 @@ namespace Company.VSPackage1
         Carets cs;
         public void VsTextViewCreated(IVsTextView textViewAdapter)
         {
-            cb.SetIpPort("localhost", "8090");
-            cb.Connect();
-            IWpfTextView textView = editorFactory.GetWpfTextView(textViewAdapter);//gets the text view
             cs = new Carets(GetCurrentViewHost(textViewAdapter), cb);
-            if (textView == null)
-                return;
-            AddCommandFilter(textViewAdapter, new MultiEditCommandFilter(textView, cb, cs));//adds an instance of our command filter to the text view
-
+            var slnName = cs.DTE2.Solution.FullName;
+            var adminFile = slnName.Substring(0, slnName.Substring(0, slnName.LastIndexOf('\\')).LastIndexOf('\\')) + "\\admin.txt";
+            if (File.Exists(adminFile))
+            {
+                StreamReader sr = new StreamReader(adminFile);
+                string dir = sr.ReadToEnd();
+                if (dir == slnName.Substring(0, slnName.LastIndexOf('\\')))
+                {
+                    VSPackage1Package.service = new Service();
+                }
+            }
+            if (File.Exists(slnName.Substring(0, slnName.LastIndexOf('\\')) + "\\client.txt"))
+            {
+                cb.SetIpPort("localhost", "8090");
+                if (cb.Connect())
+                {
+                    IWpfTextView textView = editorFactory.GetWpfTextView(textViewAdapter);//gets the text view
+                    if (textView == null)
+                        return;
+                    AddCommandFilter(textViewAdapter, new MultiEditCommandFilter(textView, cb, cs));//adds an instance of our command filter to the text view
+                }
+            }
         }
         IWpfTextViewHost GetCurrentViewHost(IVsTextView vTextView)
         {

@@ -20,13 +20,11 @@ namespace Company.VSPackage1
     /// </summary>
     public partial class HostProjectWindow : Window
     {
-        MyCallBack cb;
-        Service sv;
-        public HostProjectWindow(MyCallBack cb,Service sv)
+        EnvDTE80.DTE2 dte;
+        public HostProjectWindow(EnvDTE80.DTE2 dte)
         {
             InitializeComponent();
-            this.cb = cb;
-            this.sv = sv;
+            this.dte = dte;
         }
         private void ChooseDirectory_Click(object sender,RoutedEventArgs e)
         {
