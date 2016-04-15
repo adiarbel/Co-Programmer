@@ -9,6 +9,7 @@ using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.TextManager.Interop;
 using Microsoft.VisualStudio.Text;
 using System.IO;
+using System.Text;
 
 namespace Company.VSPackage1
 {
@@ -27,6 +28,7 @@ namespace Company.VSPackage1
         Carets cs;
         public void VsTextViewCreated(IVsTextView textViewAdapter)
         {
+            bool setAdmin = false;
             cs = new Carets(GetCurrentViewHost(textViewAdapter), cb);
             var slnName = cs.DTE2.Solution.FullName;
             var adminFile = slnName.Substring(0, slnName.Substring(0, slnName.LastIndexOf('\\')).LastIndexOf('\\')) + "\\admin.txt";
@@ -37,18 +39,36 @@ namespace Company.VSPackage1
                 if (dir == slnName.Substring(0, slnName.LastIndexOf('\\')))
                 {
                     VSPackage1Package.service = new Service();
+                    FileStream fs = File.Create(slnName.Substring(0, slnName.LastIndexOf('\\')) + "\\client.txt");
+                    string ipPort = "localhost:" + (VSPackage1Package.service.PortOfService()+10).ToString();
+                    fs.Write(Encoding.ASCII.GetBytes(ipPort), 0, ipPort.Length);
+                    fs.Close();
+                    setAdmin = true;
                 }
             }
             if (File.Exists(slnName.Substring(0, slnName.LastIndexOf('\\')) + "\\client.txt"))
             {
-                cb.SetIpPort("localhost", "8090");
+                
+                StreamReader sr = new StreamReader(slnName.Substring(0, slnName.LastIndexOf('\\')) + "\\client.txt");
+                string iport = sr.ReadToEnd();
+                cb.SetIpPort(iport.Split(':')[0],iport.Split(':')[1]);
                 if (cb.Connect())
                 {
+                    if (setAdmin)
+                    {
+                        cb.SetAdmin(true);
+                    }
+                    cb.SetProjPath(slnName.Substring(0, slnName.LastIndexOf('\\')));
                     IWpfTextView textView = editorFactory.GetWpfTextView(textViewAdapter);//gets the text view
                     if (textView == null)
                         return;
                     AddCommandFilter(textViewAdapter, new MultiEditCommandFilter(textView, cb, cs));//adds an instance of our command filter to the text view
                 }
+            }
+            else
+            {
+                cb = null;
+                cs = null;
             }
         }
         IWpfTextViewHost GetCurrentViewHost(IVsTextView vTextView)

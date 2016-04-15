@@ -9,14 +9,15 @@ using System.ServiceModel.Description;
 
 namespace Company.VSPackage1
 {
-    class Service
+    public class Service
     {
         ServiceHost host;
         INetFwPolicy2 fwPolicy2;
+        int port;
         public Service()
         {
             bool flag = true;
-            int port = 8080;
+            port = 8080;
             NetTcpBinding mybinding;
             ServiceMetadataBehavior smb;
             host = new ServiceHost(typeof(CoProService.CoProService), new Uri[] { new Uri("http://localhost:" + port), new Uri("net.tcp://localhost:" + (port + 10)) });
@@ -90,6 +91,10 @@ namespace Company.VSPackage1
         public System.Collections.ObjectModel.ReadOnlyCollection<Uri> GetAddresses()
         {
             return host.BaseAddresses;
+        }
+        public int PortOfService()
+        {
+            return port;
         }
     }
 }

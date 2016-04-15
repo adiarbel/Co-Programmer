@@ -32,20 +32,20 @@ namespace Company.VSPackage1
         {
             var dialog = new System.Windows.Forms.FolderBrowserDialog();
             System.Windows.Forms.DialogResult result = dialog.ShowDialog();
-            while (Directory.EnumerateFiles(dialog.SelectedPath).Any())
+            dirBlock.Text = dialog.SelectedPath;
+            while (Directory.EnumerateFiles(dialog.SelectedPath).Any() && Directory.EnumerateDirectories(dialog.SelectedPath).Any())
             {
-                dirBlock.Text = dialog.SelectedPath;
                 System.Windows.MessageBox.Show("Please choose an empty folder for cloning the project");
                 dialog.ShowDialog();
+                dirBlock.Text = dialog.SelectedPath;
             }
-
             cb.SetProjPath(dialog.SelectedPath);
-            cb.GetProject(@"C:\Users\Arbel\Documents\Visual Studio 2013\Projects\ConsoleApplication1", "ConsoleApplication1");
         }
 
         private void Done_Click(object sender, RoutedEventArgs e)
         {
-
+            cb.GetProject();
+            this.Close();
         }
     }
 }

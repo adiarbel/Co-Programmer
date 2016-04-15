@@ -23,7 +23,7 @@ namespace Company.VSPackage1
     /*TODO: define event for that delegate*/
 
     /*TODO: define the above for each event that might come from the server's callbacks*/
-    [CallbackBehavior(UseSynchronizationContext = false)]
+    [CallbackBehavior(UseSynchronizationContext = false, ConcurrencyMode=ConcurrencyMode.Reentrant)]
     public class MyCallBack : ICoProServiceCallback, IDisposable
     {
         public event NewCaretEventHandler NewCaret;
@@ -56,6 +56,10 @@ namespace Company.VSPackage1
             string st = wcfclient.InnerDuplexChannel.SessionId;
             return st;
         }
+        public bool SetAdmin(bool adm)
+        {
+            return wcfclient.SetAdmin(adm);
+        }
         public void SetIpPort(string ip, string port)
         {
             iport[0] = ip;
@@ -82,10 +86,10 @@ namespace Company.VSPackage1
         {
             wcfclient.SendCaretPosition(file, position, command);
         }
-        public void GetProject(string path, string name)
+        public void GetProject()
         {
             wcfclient.GetProject();
-            wcfclient.ShareProject(path, name);
+            wcfclient.Abort();
         }
         public void AddCurrentEditors(string[] editors, string[] locations)
         {
@@ -150,7 +154,23 @@ namespace Company.VSPackage1
             File.WriteAllBytes(proj + "\\proj.zip", zipFile);
             ZipFile.ExtractToDirectory(proj + "\\proj.zip", proj + "\\" + fileName);
             File.Delete(proj + "\\proj.zip");
-
+            FileStream fs =  File.Create(proj +"\\"+ fileName +"\\client.txt");
+            fs.Write(Encoding.ASCII.GetBytes(iport[0]+':'+iport[1]),0,(iport[0]+':'+iport[1]).Length);
+            fs.Close();
+        }
+        public void ApproveCloning(string[] idsToApprove)
+        {
+            string st="";
+            for (int i = 0; i < idsToApprove.Length; i++)
+            {
+                st += idsToApprove[i] + '\n';
+            }
+            System.Windows.Forms.DialogResult result = System.Windows.Forms.MessageBox.Show("Do you want to approve cloning for the following?:\n"+st, "Confirmation", System.Windows.Forms.MessageBoxButtons.YesNoCancel);
+            if (result == System.Windows.Forms.DialogResult.Yes)
+            {
+                wcfclient.ShareProject(proj, proj.Substring(proj.LastIndexOf('\\')+1));
+            }
+            
         }
     }
     public class ChangeCaretEventArgs : EventArgs

@@ -36,8 +36,8 @@ namespace Company.VSPackage1
             else
             {
                 System.Windows.MessageBox.Show("You are now connected!");
+                this.Close();
             }
-            this.Close();
         }
     }
 }

@@ -18,7 +18,7 @@ namespace CoProService
         static Dictionary<string, OperationContext> ids = new Dictionary<string, OperationContext>();
         static Dictionary<string, string> carets = new Dictionary<string, string>();
         string id;
-        List<string> ShareProjectIDs = new List<string>();
+        static List<string> ShareProjectIDs = new List<string>();
         int place;
         Object locker = new Object();
         bool isAdmin;
@@ -121,9 +121,7 @@ namespace CoProService
                     }
                     catch
                     {
-
                         ids.Remove(entry.Key);
-
                     }
                 }
 
@@ -136,6 +134,7 @@ namespace CoProService
             {
                 ShareProjectIDs.Add(id);
             }
+            ids[admin].GetCallbackChannel<ICoProServiceCallback>().ApproveCloning(ShareProjectIDs.ToArray());
         }
         public int ShareProject(string path, string projName)
         {
@@ -148,6 +147,7 @@ namespace CoProService
                     ids[ShareProjectIDs[i]].GetCallbackChannel<ICoProServiceCallback>().CloneProject(projName, zipfile);
                 }
                 File.Delete(path.Substring(0, path.LastIndexOf('\\') + 1) + "\\proj.zip");
+                ShareProjectIDs.Clear();
                 return 1;
             }
             return 0;
@@ -172,14 +172,30 @@ namespace CoProService
         void IDisposable.Dispose()
         {
             ICoProServiceCallback callback;
-            ids.Remove(id);
-            carets.Remove(id);
+            lock (ids)
+            {
+                ids.Remove(id);
+            }
+            lock (carets)
+            {
+                carets.Remove(id);
+            }
             if (admin == id)
             {
                 admin = "";
             }
-            ids.Clear();
-            carets.Clear();
+            foreach (KeyValuePair<string, OperationContext> entry in ids)
+            {
+                try
+                {
+                    callback = entry.Value.GetCallbackChannel<ICoProServiceCallback>();
+                    callback.EditorDisconnected(id);
+                }
+                catch
+                {
+                    //removal
+                }
+            }
         }
     }
 }

@@ -29,11 +29,13 @@ namespace Company.VSPackage1
         private void ChooseDirectory_Click(object sender,RoutedEventArgs e)
         {
             var dialog = new System.Windows.Forms.FolderBrowserDialog();
-            while (Directory.EnumerateFiles(dialog.SelectedPath).Any())
+            dialog.ShowDialog();
+            dirBlock.Text = dialog.SelectedPath;
+            while (!(Directory.EnumerateFiles(dialog.SelectedPath).Any() && Directory.EnumerateDirectories(dialog.SelectedPath).Any()))
             {
-                dirBlock.Text = dialog.SelectedPath;
                 System.Windows.MessageBox.Show("Please do not choose an empty folder for sharing");
                 dialog.ShowDialog();
+                dirBlock.Text = dialog.SelectedPath;
             }
         }
         private void Done_Click(object sender, RoutedEventArgs e)
@@ -41,6 +43,7 @@ namespace Company.VSPackage1
             FileStream fs = File.Create(dirBlock.Text.Substring(0, dirBlock.Text.LastIndexOf('\\'))+"\\admin.txt");
             fs.Write(Encoding.ASCII.GetBytes(dirBlock.Text), 0, dirBlock.Text.Length);
             fs.Close();
+            this.Close();
         }
     }
 }

@@ -43,6 +43,8 @@ namespace CoProService
         [OperationContract]
         void Save(string file);
         [OperationContract]
-        void CloneProject(string fileName,byte[] zipFile);
+        void CloneProject(string fileName, byte[] zipFile);
+        [OperationContract]
+        void ApproveCloning(string[] idsToApprove);
     }
 }

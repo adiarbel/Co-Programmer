@@ -78,6 +78,9 @@ namespace Company.VSPackage1.ServiceReference1 {
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICoProService/CloneProject", ReplyAction="http://tempuri.org/ICoProService/CloneProjectResponse")]
         void CloneProject(string fileName, byte[] zipFile);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICoProService/ApproveCloning", ReplyAction="http://tempuri.org/ICoProService/ApproveCloningResponse")]
+        void ApproveCloning(string[] idsToApprove);
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
