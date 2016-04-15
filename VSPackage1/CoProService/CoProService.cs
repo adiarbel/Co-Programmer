@@ -73,7 +73,7 @@ namespace CoProService
                         }
                         catch
                         {
-                            ids.Remove(entry.Key);
+                            //ids.Remove(entry.Key);
 
                         }
                     }
@@ -121,7 +121,7 @@ namespace CoProService
                     }
                     catch
                     {
-                        ids.Remove(entry.Key);
+                        //ids.Remove(entry.Key);
                     }
                 }
 
@@ -184,11 +184,12 @@ namespace CoProService
             {
                 admin = "";
             }
-            foreach (KeyValuePair<string, OperationContext> entry in ids)
+            OperationContext[] ocarr = ids.Values.ToArray<OperationContext>();
+            for (int i = 0; i < ocarr.Length;i++ )
             {
                 try
                 {
-                    callback = entry.Value.GetCallbackChannel<ICoProServiceCallback>();
+                    callback = ocarr[i].GetCallbackChannel<ICoProServiceCallback>();
                     callback.EditorDisconnected(id);
                 }
                 catch
