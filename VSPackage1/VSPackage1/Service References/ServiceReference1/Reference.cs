@@ -50,6 +50,12 @@ namespace Company.VSPackage1.ServiceReference1 {
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICoProService/IsConnected", ReplyAction="http://tempuri.org/ICoProService/IsConnectedResponse")]
         System.Threading.Tasks.Task<bool> IsConnectedAsync();
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICoProService/GetExpectedSeq", ReplyAction="http://tempuri.org/ICoProService/GetExpectedSeqResponse")]
+        int GetExpectedSeq();
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICoProService/GetExpectedSeq", ReplyAction="http://tempuri.org/ICoProService/GetExpectedSeqResponse")]
+        System.Threading.Tasks.Task<int> GetExpectedSeqAsync();
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
@@ -68,10 +74,10 @@ namespace Company.VSPackage1.ServiceReference1 {
         void ChangedCaret(string file, int position, string editor);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICoProService/NewAddedText", ReplyAction="http://tempuri.org/ICoProService/NewAddedTextResponse")]
-        void NewAddedText(string file, int position, string editor, string content);
+        void NewAddedText(string file, int position, string editor, string content, int seq);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICoProService/NewRemovedText", ReplyAction="http://tempuri.org/ICoProService/NewRemovedTextResponse")]
-        void NewRemovedText(string file, int position, string editor, string instruc);
+        void NewRemovedText(string file, int position, string editor, string instruc, int seq);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICoProService/Save", ReplyAction="http://tempuri.org/ICoProService/SaveResponse")]
         void Save(string file);
@@ -157,6 +163,14 @@ namespace Company.VSPackage1.ServiceReference1 {
         
         public System.Threading.Tasks.Task<bool> IsConnectedAsync() {
             return base.Channel.IsConnectedAsync();
+        }
+        
+        public int GetExpectedSeq() {
+            return base.Channel.GetExpectedSeq();
+        }
+        
+        public System.Threading.Tasks.Task<int> GetExpectedSeqAsync() {
+            return base.Channel.GetExpectedSeqAsync();
         }
     }
 }

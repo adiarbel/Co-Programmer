@@ -83,6 +83,18 @@
       </xs:sequence>
     </xs:complexType>
   </xs:element>
+  <xs:element name="GetExpectedSeq">
+    <xs:complexType>
+      <xs:sequence />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="GetExpectedSeqResponse">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="GetExpectedSeqResult" type="xs:int" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
   <xs:element name="AddCurrentEditors">
     <xs:complexType>
       <xs:sequence>
@@ -143,6 +155,7 @@
         <xs:element minOccurs="0" name="position" type="xs:int" />
         <xs:element minOccurs="0" name="editor" nillable="true" type="xs:string" />
         <xs:element minOccurs="0" name="content" nillable="true" type="xs:string" />
+        <xs:element minOccurs="0" name="seq" type="xs:int" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -158,6 +171,7 @@
         <xs:element minOccurs="0" name="position" type="xs:int" />
         <xs:element minOccurs="0" name="editor" nillable="true" type="xs:string" />
         <xs:element minOccurs="0" name="instruc" nillable="true" type="xs:string" />
+        <xs:element minOccurs="0" name="seq" type="xs:int" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>

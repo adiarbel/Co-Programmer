@@ -13,8 +13,8 @@ using System.IO.Compression;
 namespace Company.VSPackage1
 {
     /*TODO: define delegate*/
-    public delegate void RemovedTextEventHandler(object sender, ChangeCaretEventArgs e);
-    public delegate void NewTextEventHandler(object sender, ChangeCaretEventArgs e);
+    public delegate void RemovedTextEventHandler(object sender, EditedTextEventArgs e);
+    public delegate void NewTextEventHandler(object sender, EditedTextEventArgs e);
     public delegate void EditorDisconnectedEventHandler(object sender, EditorDisEventArgs e);
     public delegate void AddCurrentEditorsEventHandler(object sender, AddEditorsEventArgs e);
     public delegate void NewCaretEventHandler(object sender, ChangeCaretEventArgs e);
@@ -33,12 +33,19 @@ namespace Company.VSPackage1
         public event EditorDisconnectedEventHandler EditorDisc;
         public event NewTextEventHandler NewText;
         public event SaveEventHandler save;
+        public static Object locker = new Object();
         InstanceContext context;
         EndpointAddress myEndPoint;
         NetTcpBinding mybinding;
         CoProServiceClient wcfclient;
+        int expecSeq;
         string proj;
         string[] iport = new string[2];
+        public int ExpectedSequence
+        {
+            get { return expecSeq; }
+            set { expecSeq = value; }
+        }
         public MyCallBack()
         {
             context = new InstanceContext(this);
@@ -71,12 +78,14 @@ namespace Company.VSPackage1
             wcfclient = new ServiceReference1.CoProServiceClient(context, mybinding, myEndPoint);
             try
             {
+                ExpectedSequence = wcfclient.GetExpectedSeq(); //insert function that gets the id
                 return wcfclient.IsConnected();
             }
             catch
             {
                 return false;
             }
+           
         }
         public void IntializePosition(string file, int position)
         {
@@ -119,19 +128,19 @@ namespace Company.VSPackage1
                 EditorDisc(this, new EditorDisEventArgs(editor));
             }
         }
-        public void NewAddedText(string file, int position, string editor, string content)
+        public void NewAddedText(string file, int position, string editor, string content,int seq)
         {
             if (NewText != null)
             {
-                NewText(this, new ChangeCaretEventArgs(editor, position, file, content));
+                NewText(this, new EditedTextEventArgs(editor, position, file, content,seq));
             }
         }
-        public void NewRemovedText(string file, int position, string editor, string instruc)
+        public void NewRemovedText(string file, int position, string editor, string instruc,int seq)
         {
             if (RemovedText != null)
             {
 
-                RemovedText(this, new ChangeCaretEventArgs(editor, position, file, instruc));
+                RemovedText(this, new EditedTextEventArgs(editor, position, file, instruc,seq));
 
             }
         }
@@ -176,10 +185,10 @@ namespace Company.VSPackage1
     public class ChangeCaretEventArgs : EventArgs
     {
         // Fields
-        private string m_editor = string.Empty;
-        private int m_location = -1;
-        private string m_file = string.Empty;
-        private string m_command = string.Empty;
+        protected string m_editor = string.Empty;
+        protected int m_location = -1;
+        protected string m_file = string.Empty;
+        protected string m_command = string.Empty;
 
         // Constructor
         public ChangeCaretEventArgs(string editor, int location, string file, string command)
@@ -207,6 +216,22 @@ namespace Company.VSPackage1
             get { return m_command; }
         }
 
+    }
+    public class EditedTextEventArgs : ChangeCaretEventArgs
+    {
+        // Fields
+        private int m_seq = -1;
+        // Constructor
+        public EditedTextEventArgs(string editor, int location, string file, string command,int seq):base(editor,location,file,command)
+        {
+            m_seq = seq;
+        }
+        // Properties (read-only)
+        
+        public int Seq
+        {
+            get { return m_seq; }
+        }
     }
     public class AddEditorsEventArgs : EventArgs
     {

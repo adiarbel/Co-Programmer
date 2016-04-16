@@ -27,8 +27,7 @@ namespace Company.VSPackage1
         }
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            var addr = textBox1.Text;
-            cb.SetIpPort(addr.ToString().Split(':')[0], addr.ToString().Split(':')[1]);
+            cb.SetIpPort(ip.Text,port.Text);
             if(!cb.Connect())
             {
                 System.Windows.MessageBox.Show("Try again connection failed...");

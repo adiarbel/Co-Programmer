@@ -51,6 +51,12 @@
   <wsdl:message name="ICoProService_IsConnected_OutputMessage">
     <wsdl:part name="parameters" element="tns:IsConnectedResponse" />
   </wsdl:message>
+  <wsdl:message name="ICoProService_GetExpectedSeq_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetExpectedSeq" />
+  </wsdl:message>
+  <wsdl:message name="ICoProService_GetExpectedSeq_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetExpectedSeqResponse" />
+  </wsdl:message>
   <wsdl:message name="ICoProService_AddCurrentEditors_OutputCallbackMessage">
     <wsdl:part name="parameters" element="tns:AddCurrentEditors" />
   </wsdl:message>
@@ -129,6 +135,10 @@
     <wsdl:operation name="IsConnected">
       <wsdl:input wsaw:Action="http://tempuri.org/ICoProService/IsConnected" message="tns:ICoProService_IsConnected_InputMessage" />
       <wsdl:output wsaw:Action="http://tempuri.org/ICoProService/IsConnectedResponse" message="tns:ICoProService_IsConnected_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="GetExpectedSeq">
+      <wsdl:input wsaw:Action="http://tempuri.org/ICoProService/GetExpectedSeq" message="tns:ICoProService_GetExpectedSeq_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/ICoProService/GetExpectedSeqResponse" message="tns:ICoProService_GetExpectedSeq_OutputMessage" />
     </wsdl:operation>
     <wsdl:operation name="AddCurrentEditors">
       <wsdl:output wsaw:Action="http://tempuri.org/ICoProService/AddCurrentEditors" message="tns:ICoProService_AddCurrentEditors_OutputCallbackMessage" />
@@ -217,6 +227,15 @@
     </wsdl:operation>
     <wsdl:operation name="IsConnected">
       <soap12:operation soapAction="http://tempuri.org/ICoProService/IsConnected" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetExpectedSeq">
+      <soap12:operation soapAction="http://tempuri.org/ICoProService/GetExpectedSeq" style="document" />
       <wsdl:input>
         <soap12:body use="literal" />
       </wsdl:input>

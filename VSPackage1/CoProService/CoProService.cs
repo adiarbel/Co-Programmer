@@ -17,9 +17,10 @@ namespace CoProService
         string[] currChanges = new string[10];
         static Dictionary<string, OperationContext> ids = new Dictionary<string, OperationContext>();
         static Dictionary<string, string> carets = new Dictionary<string, string>();
-        string id;
         static List<string> ShareProjectIDs = new List<string>();
+        static int seqId = 0;
         int place;
+        string id;
         Object locker = new Object();
         bool isAdmin;
         static string admin = "";
@@ -101,7 +102,11 @@ namespace CoProService
                         }
                         else if (content.Contains("DELETE"))
                         {
-                            callback.NewRemovedText(file, position, id, content);
+                            lock (locker)
+                            {
+                                callback.NewRemovedText(file, position, id, content, seqId);
+                                seqId++;
+                            }
                         }
                         else if (content.Contains("save"))
                         {
@@ -116,7 +121,11 @@ namespace CoProService
                         }
                         else
                         {
-                            callback.NewAddedText(file, position, id, content);
+                            lock (locker)
+                            {
+                                callback.NewAddedText(file, position, id, content, seqId);
+                                seqId++;
+                            }
                         }
                     }
                     catch
@@ -169,6 +178,15 @@ namespace CoProService
             return true;
         }
 
+        public int GetExpectedSeq()
+        {
+            int seq;
+            lock(locker)
+            {
+                seq = seqId;
+            }
+            return seq;
+        }
         void IDisposable.Dispose()
         {
             ICoProServiceCallback callback;
@@ -185,7 +203,7 @@ namespace CoProService
                 admin = "";
             }
             OperationContext[] ocarr = ids.Values.ToArray<OperationContext>();
-            for (int i = 0; i < ocarr.Length;i++ )
+            for (int i = 0; i < ocarr.Length; i++)
             {
                 try
                 {

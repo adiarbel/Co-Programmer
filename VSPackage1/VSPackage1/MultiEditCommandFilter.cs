@@ -167,8 +167,15 @@ namespace Company.VSPackage1
             trackDict.Remove(e.Editor);
             RedrawScreen();
         }
-        private void my_AddedText(object sender, ChangeCaretEventArgs e)
+        private void my_AddedText(object sender, EditedTextEventArgs e)
         {
+            lock (MyCallBack.locker)
+            {
+                while (e.Seq == cb.ExpectedSequence)//if excpected id is the id i got
+                {
+                    System.Threading.Monitor.Wait(MyCallBack.locker);
+                }
+            }
             if (e.File == filename)
             {
                 my_ChangedCaret(sender, e);
@@ -187,10 +194,18 @@ namespace Company.VSPackage1
 
 
                     }));
+                cb.ExpectedSequence++;
             }
         }
-        private void my_RemovedText(object sender, ChangeCaretEventArgs e)
+        private void my_RemovedText(object sender, EditedTextEventArgs e)
         {
+            lock (MyCallBack.locker)
+            {
+                while (e.Seq == cb.ExpectedSequence)//if excpected id is the id i got
+                {
+                    System.Threading.Monitor.Wait(MyCallBack.locker);
+                }
+            }
             if (e.File == filename)
             {
                 my_ChangedCaret(sender, e);
@@ -206,6 +221,7 @@ namespace Company.VSPackage1
                     edit.Apply();
                     edit.Dispose();
                 }));
+                cb.ExpectedSequence++;
             }
         }
         public int Exec(ref Guid pguidCmdGroup, uint nCmdID, uint nCmdexecopt, IntPtr pvaIn, IntPtr pvaOut)

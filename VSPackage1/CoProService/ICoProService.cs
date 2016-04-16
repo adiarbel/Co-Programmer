@@ -24,6 +24,8 @@ namespace CoProService
         bool SetAdmin(bool adm);
         [OperationContract]
         bool IsConnected();
+        [OperationContract]
+        int GetExpectedSeq();
     }
 
     public interface ICoProServiceCallback
@@ -37,9 +39,9 @@ namespace CoProService
         [OperationContract]
         void ChangedCaret(string file, int position, string editor);
         [OperationContract]
-        void NewAddedText(string file, int position, string editor, string content);
+        void NewAddedText(string file, int position, string editor, string content,int seq);
         [OperationContract]
-        void NewRemovedText(string file, int position, string editor, string instruc);
+        void NewRemovedText(string file, int position, string editor, string instruc, int seq);
         [OperationContract]
         void Save(string file);
         [OperationContract]

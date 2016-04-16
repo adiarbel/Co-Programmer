@@ -31,7 +31,7 @@ namespace Company.VSPackage1
             var dialog = new System.Windows.Forms.FolderBrowserDialog();
             dialog.ShowDialog();
             dirBlock.Text = dialog.SelectedPath;
-            while (!(Directory.EnumerateFiles(dialog.SelectedPath).Any() && Directory.EnumerateDirectories(dialog.SelectedPath).Any()))
+            while (!(Directory.EnumerateFiles(dialog.SelectedPath).Any() && Directory.EnumerateDirectories(dialog.SelectedPath).Any())&& dialog.SelectedPath!="")
             {
                 System.Windows.MessageBox.Show("Please do not choose an empty folder for sharing");
                 dialog.ShowDialog();
@@ -42,6 +42,7 @@ namespace Company.VSPackage1
         {
             FileStream fs = File.Create(dirBlock.Text.Substring(0, dirBlock.Text.LastIndexOf('\\'))+"\\admin.txt");
             fs.Write(Encoding.ASCII.GetBytes(dirBlock.Text), 0, dirBlock.Text.Length);
+            //File.GetLastWriteTime();
             fs.Close();
             this.Close();
         }
