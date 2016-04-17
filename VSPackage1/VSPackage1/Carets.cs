@@ -52,6 +52,7 @@ namespace Company.VSPackage1
                 //te.LineChanged += new _dispTextEditorEvents_LineChangedEventHandler(EnterFix);
                 //te.LineChanged += new _dispTextEditorEvents_LineChangedEventHandler(IntelisenseFix);
                 this.cb = cb;
+                DTE2.Events.SolutionEvents.BeforeClosing += ShutDown;
                 //cb = new MyCallBack();
                 //cb.ChangeCaret += new ChangeCaretEventHandler(my_CaretChange);
                 //twice = false;
@@ -74,7 +75,44 @@ namespace Company.VSPackage1
         {
             iwpf = h;
         }
+        private void ShutDown()
+        {
 
+            
+            if (cb != null)
+            {
+                FileStream fs = File.Create(cb.ProjPath + "\\CoProFiles\\timestamps.txt");
+                fs.Close();
+                StreamWriter sw = new StreamWriter(cb.ProjPath + "\\CoProFiles\\timestamps.txt");
+                sw.Write(TimeStampDirectory(cb.ProjPath, 1, cb.ProjPath.Substring(cb.ProjPath.LastIndexOf('\\'))));
+                sw.Close();
+                cb.Abort();
+            } 
+            if (VSPackage1Package.service != null)
+            {
+                VSPackage1Package.service.Close();
+            }
+        }
+        private  string TimeStampDirectory(string target_dir, int lev, string relPath)
+        {
+            string[] files = Directory.GetFiles(target_dir);
+            string[] dirs = Directory.GetDirectories(target_dir);
+            string filesInfo = "";
+            string currDir;
+            foreach (string dir in dirs)
+            {
+                currDir = dir.Substring(dir.LastIndexOf('\\'));
+                if (currDir != "\\bin" && currDir != "\\obj" && currDir != "\\CoProFiles")
+                    filesInfo += lev + relPath + ' ' + TimeStampDirectory(dir, lev + 1, relPath + currDir);
+            }
+
+            foreach (string file in files)
+            {
+                filesInfo += ";" + file.Substring(file.LastIndexOf('\\')) + "," + File.GetLastWriteTimeUtc(file) + "," + relPath;
+            }
+
+            return filesInfo;
+        }
     }
 }
 

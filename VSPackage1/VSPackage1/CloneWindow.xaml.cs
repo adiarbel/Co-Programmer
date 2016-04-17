@@ -39,7 +39,7 @@ namespace Company.VSPackage1
                 dialog.ShowDialog();
                 dirBlock.Text = dialog.SelectedPath;
             }
-            cb.SetProjPath(dialog.SelectedPath);
+            cb.ProjPath = dialog.SelectedPath;
         }
 
         private void Done_Click(object sender, RoutedEventArgs e)

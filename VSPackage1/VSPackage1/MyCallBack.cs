@@ -53,9 +53,10 @@ namespace Company.VSPackage1
             mybinding.PortSharingEnabled = true;
             mybinding.Security.Mode = SecurityMode.None;
         }
-        public void SetProjPath(string path)
+        public string ProjPath
         {
-            proj = path;
+            get { return proj; }
+            set { proj = value; }
 
         }
         public string GetId()
@@ -163,7 +164,11 @@ namespace Company.VSPackage1
             File.WriteAllBytes(proj + "\\proj.zip", zipFile);
             ZipFile.ExtractToDirectory(proj + "\\proj.zip", proj + "\\" + fileName);
             File.Delete(proj + "\\proj.zip");
-            FileStream fs =  File.Create(proj +"\\"+ fileName +"\\client.txt");
+            if(!Directory.Exists(proj +"\\"+ fileName+"CoProFiles"))
+            {
+                Directory.CreateDirectory(proj + "\\" + fileName + "CoProFiles");
+            }
+            FileStream fs = File.Create(proj + "\\" + fileName + "CoProFiles" + "\\client.txt");
             fs.Write(Encoding.ASCII.GetBytes(iport[0]+':'+iport[1]),0,(iport[0]+':'+iport[1]).Length);
             fs.Close();
         }
@@ -180,6 +185,10 @@ namespace Company.VSPackage1
                 wcfclient.ShareProject(proj, proj.Substring(proj.LastIndexOf('\\')+1));
             }
             
+        }
+        public void Abort()
+        {
+            wcfclient.Abort();
         }
     }
     public class ChangeCaretEventArgs : EventArgs

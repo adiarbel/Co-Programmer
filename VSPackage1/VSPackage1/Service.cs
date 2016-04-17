@@ -45,7 +45,6 @@ namespace Company.VSPackage1
                 {
                     Task.Factory.StartNew(() =>
                         {
-
                             host.Open();
                         });
                     flag = false;

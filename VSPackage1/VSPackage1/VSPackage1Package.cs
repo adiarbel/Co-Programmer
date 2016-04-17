@@ -54,7 +54,7 @@ namespace Company.VSPackage1
         private IWpfTextViewHost iwpf;
         public static Service service=null;
         int place = 0;
-        public static MyCallBack cb;
+        public static MyCallBack cb =null;
         static Dictionary<string, MenuCommand> cmds = new Dictionary<string, MenuCommand>();
         private DTE2 DTE2
         {
@@ -117,8 +117,6 @@ namespace Company.VSPackage1
         {
             Debug.WriteLine(string.Format(CultureInfo.CurrentCulture, "Entering Initialize() of: {0}", this.ToString()));
             base.Initialize();
-            DTE2.Events.DTEEvents.OnBeginShutdown += new _dispDTEEvents_OnBeginShutdownEventHandler(ShutDown);
-
             // Add our command handlers for menu (commands must exist in the .vsct file)
             OleMenuCommandService mcs = GetService(typeof(IMenuCommandService)) as OleMenuCommandService;
             if (null != mcs)
@@ -169,14 +167,7 @@ namespace Company.VSPackage1
             //service = new Service();
         }
 
-        private void ShutDown()
-        {
-            if(service!=null)
-            {
-                service.Close();
-            }
-        }
-
+        
 
 
     }
