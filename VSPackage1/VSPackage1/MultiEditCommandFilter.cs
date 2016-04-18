@@ -169,8 +169,8 @@ namespace Company.VSPackage1
         }
         private void my_AddedText(object sender, EditedTextEventArgs e)
         {
-            //lock (MyCallBack.locker)
-           // {
+            lock (MyCallBack.locker)
+            {
                 while (e.Seq != cb.ExpectedSequence)//if excpected id is the id i got
                 {
                     System.Threading.Monitor.Wait(MyCallBack.locker);
@@ -194,14 +194,14 @@ namespace Company.VSPackage1
 
                         }));
                     cb.ExpectedSequence++;
-                  //  System.Threading.Monitor.PulseAll(MyCallBack.locker);
+                    System.Threading.Monitor.PulseAll(MyCallBack.locker);
                 }
-            //}
+            }
         }
         private void my_RemovedText(object sender, EditedTextEventArgs e)
         {
-            //lock (MyCallBack.locker)
-            //{
+            lock (MyCallBack.locker)
+            {
                 while (e.Seq != cb.ExpectedSequence)//if excpected id is the id i got
                 {
                     System.Threading.Monitor.Wait(MyCallBack.locker);
@@ -223,9 +223,9 @@ namespace Company.VSPackage1
                         edit.Dispose();
                     }));
                     cb.ExpectedSequence++;
-                    //System.Threading.Monitor.PulseAll(MyCallBack.locker);
+                    System.Threading.Monitor.PulseAll(MyCallBack.locker);
                 }
-           // }
+            }
         }
         public int Exec(ref Guid pguidCmdGroup, uint nCmdID, uint nCmdexecopt, IntPtr pvaIn, IntPtr pvaOut)
         {
