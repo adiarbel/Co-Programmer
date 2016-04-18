@@ -169,60 +169,63 @@ namespace Company.VSPackage1
         }
         private void my_AddedText(object sender, EditedTextEventArgs e)
         {
-            lock (MyCallBack.locker)
-            {
-                while (e.Seq == cb.ExpectedSequence)//if excpected id is the id i got
+            //lock (MyCallBack.locker)
+           // {
+                while (e.Seq != cb.ExpectedSequence)//if excpected id is the id i got
                 {
                     System.Threading.Monitor.Wait(MyCallBack.locker);
                 }
-            }
-            if (e.File == filename)
-            {
-                my_ChangedCaret(sender, e);
-                uiDisp.Invoke(new Action(() =>
+                if (e.File == filename)
+                {
+                    my_ChangedCaret(sender, e);
+                    uiDisp.Invoke(new Action(() =>
+                        {
+                            ITextEdit edit = m_textView.TextBuffer.CreateEdit();
+
+                            var curTrackPoint = trackDict[e.Editor];
+
+
+                            edit.Insert(curTrackPoint.GetPosition(m_textView.TextSnapshot), e.Command);
+
+                            mySide = false;
+                            edit.Apply();
+                            edit.Dispose();
+
+
+                        }));
+                    cb.ExpectedSequence++;
+                  //  System.Threading.Monitor.PulseAll(MyCallBack.locker);
+                }
+            //}
+        }
+        private void my_RemovedText(object sender, EditedTextEventArgs e)
+        {
+            //lock (MyCallBack.locker)
+            //{
+                while (e.Seq != cb.ExpectedSequence)//if excpected id is the id i got
+                {
+                    System.Threading.Monitor.Wait(MyCallBack.locker);
+                }
+
+                if (e.File == filename)
+                {
+                    my_ChangedCaret(sender, e);
+                    uiDisp.Invoke(new Action(() =>
                     {
                         ITextEdit edit = m_textView.TextBuffer.CreateEdit();
 
                         var curTrackPoint = trackDict[e.Editor];
 
-
-                        edit.Insert(curTrackPoint.GetPosition(m_textView.TextSnapshot), e.Command);
+                        edit.Delete(e.Location, int.Parse(e.Command.Split(';')[1]));
 
                         mySide = false;
                         edit.Apply();
                         edit.Dispose();
-
-
                     }));
-                cb.ExpectedSequence++;
-            }
-        }
-        private void my_RemovedText(object sender, EditedTextEventArgs e)
-        {
-            lock (MyCallBack.locker)
-            {
-                while (e.Seq == cb.ExpectedSequence)//if excpected id is the id i got
-                {
-                    System.Threading.Monitor.Wait(MyCallBack.locker);
+                    cb.ExpectedSequence++;
+                    //System.Threading.Monitor.PulseAll(MyCallBack.locker);
                 }
-            }
-            if (e.File == filename)
-            {
-                my_ChangedCaret(sender, e);
-                uiDisp.Invoke(new Action(() =>
-                {
-                    ITextEdit edit = m_textView.TextBuffer.CreateEdit();
-
-                    var curTrackPoint = trackDict[e.Editor];
-
-                    edit.Delete(e.Location, int.Parse(e.Command.Split(';')[1]));
-
-                    mySide = false;
-                    edit.Apply();
-                    edit.Dispose();
-                }));
-                cb.ExpectedSequence++;
-            }
+           // }
         }
         public int Exec(ref Guid pguidCmdGroup, uint nCmdID, uint nCmdexecopt, IntPtr pvaIn, IntPtr pvaOut)
         {
