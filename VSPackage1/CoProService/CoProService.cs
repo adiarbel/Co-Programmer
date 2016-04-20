@@ -70,7 +70,7 @@ namespace CoProService
                         try
                         {
                             callback = entry.Value.GetCallbackChannel<ICoProServiceCallback>();
-                            callback.NewEditorAdded(file, position, id);
+                            callback.NewEditorAdded(file, position, id,seqId);
                         }
                         catch
                         {
@@ -98,7 +98,7 @@ namespace CoProService
                         callback = entry.Value.GetCallbackChannel<ICoProServiceCallback>();
                         if (content == "click")
                         {
-                            callback.ChangedCaret(file, position, id);
+                            callback.ChangedCaret(file, position, id,seqId);
                         }
                         else if (content.Contains("DELETE"))
                         {

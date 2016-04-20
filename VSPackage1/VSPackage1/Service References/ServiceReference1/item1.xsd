@@ -114,6 +114,7 @@
         <xs:element minOccurs="0" name="file" nillable="true" type="xs:string" />
         <xs:element minOccurs="0" name="position" type="xs:int" />
         <xs:element minOccurs="0" name="editor" nillable="true" type="xs:string" />
+        <xs:element minOccurs="0" name="seq" type="xs:int" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -140,6 +141,7 @@
         <xs:element minOccurs="0" name="file" nillable="true" type="xs:string" />
         <xs:element minOccurs="0" name="position" type="xs:int" />
         <xs:element minOccurs="0" name="editor" nillable="true" type="xs:string" />
+        <xs:element minOccurs="0" name="seq" type="xs:int" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>

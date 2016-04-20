@@ -17,8 +17,8 @@ namespace Company.VSPackage1
     public delegate void NewTextEventHandler(object sender, EditedTextEventArgs e);
     public delegate void EditorDisconnectedEventHandler(object sender, EditorDisEventArgs e);
     public delegate void AddCurrentEditorsEventHandler(object sender, AddEditorsEventArgs e);
-    public delegate void NewCaretEventHandler(object sender, ChangeCaretEventArgs e);
-    public delegate void ChangeCaretEventHandler(object sender, ChangeCaretEventArgs e);
+    public delegate void NewCaretEventHandler(object sender, EditedTextEventArgs e);
+    public delegate void ChangeCaretEventHandler(object sender, EditedTextEventArgs e);
     public delegate void SaveEventHandler(object sender, ChangeCaretEventArgs e);
     /*TODO: define event for that delegate*/
 
@@ -108,18 +108,18 @@ namespace Company.VSPackage1
                 AddAllEditors(this, new AddEditorsEventArgs(editors, locations));
             }
         }
-        public void NewEditorAdded(string file, int position, string editor)
+        public void NewEditorAdded(string file, int position, string editor,int seq)
         {
             if (NewCaret != null)
             {
-                NewCaret(this, new ChangeCaretEventArgs(editor, position, file, " "));
+                NewCaret(this, new EditedTextEventArgs(editor, position, file, " ",seq));
             }
         }
-        public void ChangedCaret(string file, int position, string editor)
+        public void ChangedCaret(string file, int position, string editor,int seq)
         {
             if (ChangeCaret != null)
             {
-                ChangeCaret(this, new ChangeCaretEventArgs(editor, position, file, " "));
+                ChangeCaret(this, new EditedTextEventArgs(editor, position, file, " ",seq));
             }
         }
         public void EditorDisconnected(string editor)
@@ -190,6 +190,7 @@ namespace Company.VSPackage1
         {
             wcfclient.Abort();
         }
+
     }
     public class ChangeCaretEventArgs : EventArgs
     {

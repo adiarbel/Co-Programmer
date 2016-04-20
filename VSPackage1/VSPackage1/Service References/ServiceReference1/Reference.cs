@@ -65,13 +65,13 @@ namespace Company.VSPackage1.ServiceReference1 {
         void AddCurrentEditors(string[] editors, string[] locations);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICoProService/NewEditorAdded", ReplyAction="http://tempuri.org/ICoProService/NewEditorAddedResponse")]
-        void NewEditorAdded(string file, int position, string editor);
+        void NewEditorAdded(string file, int position, string editor, int seq);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICoProService/EditorDisconnected", ReplyAction="http://tempuri.org/ICoProService/EditorDisconnectedResponse")]
         void EditorDisconnected(string editor);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICoProService/ChangedCaret", ReplyAction="http://tempuri.org/ICoProService/ChangedCaretResponse")]
-        void ChangedCaret(string file, int position, string editor);
+        void ChangedCaret(string file, int position, string editor, int seq);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICoProService/NewAddedText", ReplyAction="http://tempuri.org/ICoProService/NewAddedTextResponse")]
         void NewAddedText(string file, int position, string editor, string content, int seq);

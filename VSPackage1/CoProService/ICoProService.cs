@@ -33,11 +33,11 @@ namespace CoProService
         [OperationContract]
         void AddCurrentEditors(string[] editors,string[] locations);
         [OperationContract]
-        void NewEditorAdded(string file,int position,string editor);
+        void NewEditorAdded(string file, int position, string editor, int seq);
         [OperationContract]
         void EditorDisconnected(string editor);
         [OperationContract]
-        void ChangedCaret(string file, int position, string editor);
+        void ChangedCaret(string file, int position, string editor, int seq);
         [OperationContract]
         void NewAddedText(string file, int position, string editor, string content,int seq);
         [OperationContract]

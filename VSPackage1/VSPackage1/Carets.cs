@@ -24,6 +24,8 @@ using System.Xaml;
 using System.ComponentModel.Design;
 using System.Threading;
 using System.IO;
+using System.Xml.Linq;
+using System.Xml;
 using Microsoft.Win32;
 
 
@@ -66,7 +68,7 @@ namespace Company.VSPackage1
 
             }
         }
-        
+
         IWpfTextViewHost GetTextViewHost()
         {
             return iwpf;
@@ -78,22 +80,27 @@ namespace Company.VSPackage1
         private void ShutDown()
         {
 
-            
+
             if (cb != null)
             {
-                FileStream fs = File.Create(cb.ProjPath + "\\CoProFiles\\timestamps.txt");
-                fs.Close();
-                StreamWriter sw = new StreamWriter(cb.ProjPath + "\\CoProFiles\\timestamps.txt");
-                sw.Write(TimeStampDirectory(cb.ProjPath, 1, cb.ProjPath.Substring(cb.ProjPath.LastIndexOf('\\'))));
-                sw.Close();
+                //FileStream fs = File.Create(cb.ProjPath + "\\CoProFiles\\timestamps.txt");
+                //fs.Close();
+                //StreamWriter sw = new StreamWriter(cb.ProjPath + "\\CoProFiles\\timestamps.txt");
+                //sw.Write(TimeStampDirectory(cb.ProjPath, 1, cb.ProjPath.Substring(cb.ProjPath.LastIndexOf('\\'))));
+                //sw.Close();
+                XElement xe = CreateFileSystemXmlTree(cb.ProjPath,1);
+                XmlTextWriter xwr = new XmlTextWriter(cb.ProjPath + "\\CoProFiles\\timestamps.xml", System.Text.Encoding.UTF8);
+                xwr.Formatting = Formatting.Indented;
+                xe.WriteTo(xwr);
+                xwr.Close();
                 cb.Abort();
-            } 
+            }
             if (VSPackage1Package.service != null)
             {
                 VSPackage1Package.service.Close();
             }
         }
-        private  string TimeStampDirectory(string target_dir, int lev, string relPath)
+        private string TimeStampDirectory(string target_dir, int lev, string relPath)
         {
             string[] files = Directory.GetFiles(target_dir);
             string[] dirs = Directory.GetDirectories(target_dir);
@@ -112,6 +119,24 @@ namespace Company.VSPackage1
             }
 
             return filesInfo;
+        }
+        private XElement CreateFileSystemXmlTree(string source,int level)
+        {
+            DirectoryInfo dir = new DirectoryInfo(source);
+            var info = new XElement("Directory",
+                   new XAttribute("Name", dir.Name), new XAttribute("Level", level));
+
+            foreach (var file in dir.GetFiles())
+                info.Add(new XElement("File",
+                             new XAttribute("Name", file.Name), new XAttribute("TimeChanged", file.LastWriteTimeUtc)));
+
+            foreach (var subDir in dir.GetDirectories())
+            {
+                if (!(subDir.FullName.Contains("bin") || subDir.FullName.Contains("obj") || subDir.FullName.Contains("CoProFiles")))
+                    info.Add(CreateFileSystemXmlTree(subDir.FullName,level+1));
+            }
+
+            return info;
         }
     }
 }

@@ -106,7 +106,7 @@ namespace Company.VSPackage1
                 mySide = false;
             }
         }
-        private void my_NewCaret(object sender, ChangeCaretEventArgs e)
+        private void my_NewCaret(object sender, EditedTextEventArgs e)
         {
             //ITextDocument textDoc;
             //var rc = m_textView.TextBuffer.Properties.TryGetProperty<ITextDocument>(
@@ -115,14 +115,22 @@ namespace Company.VSPackage1
             //if (rc == true)
             //    if (e.File == textDoc.FilePath.Substring(textDoc.FilePath.LastIndexOf('\\') + 1))
             //        crts.my_CaretChange(sender, e);//helps me to find which file the caret is in
-            if (e.File == filename)
+            lock (MyCallBack.locker)
             {
-                var curTrackPoint = m_textView.TextSnapshot.CreateTrackingPoint(e.Location,
-                PointTrackingMode.Positive);
-                trackDict[e.Editor] = curTrackPoint;
+                while (e.Seq != cb.ExpectedSequence)//if excpected id is the id i got
+                {
+                    System.Threading.Monitor.Wait(MyCallBack.locker);
+                }
+                if (e.File == filename)
+                {
+                    var curTrackPoint = m_textView.TextSnapshot.CreateTrackingPoint(e.Location,
+                    PointTrackingMode.Positive);
+                    trackDict[e.Editor] = curTrackPoint;
+                }
+                System.Threading.Monitor.PulseAll(MyCallBack.locker);
             }
         }
-        private void my_ChangedCaret(object sender, ChangeCaretEventArgs e)
+        private void my_ChangedCaret(object sender, EditedTextEventArgs e)
         {
             //ITextDocument textDoc;
             //var rc = m_textView.TextBuffer.Properties.TryGetProperty<ITextDocument>(
@@ -131,23 +139,30 @@ namespace Company.VSPackage1
             //if (rc == true)
             //    if (e.File == textDoc.FilePath.Substring(textDoc.FilePath.LastIndexOf('\\') + 1))
             //        crts.my_CaretChange(sender, e);//helps me to find which file the caret is in
-
-            if (e.File == filename)
+            lock (MyCallBack.locker)
             {
-                if (e.Location == 1 || e.Location == -1)
+                while (e.Seq != cb.ExpectedSequence)//if excpected id is the id i got
                 {
-                    trackDict[e.Editor] = m_textView.TextSnapshot.CreateTrackingPoint(e.Location + trackDict[e.Editor].GetPosition(m_textView.TextSnapshot),
-                    PointTrackingMode.Positive);
+                    System.Threading.Monitor.Wait(MyCallBack.locker);
+                }
+                if (e.File == filename)
+                {
+                    if (e.Location == 1 || e.Location == -1)
+                    {
+                        trackDict[e.Editor] = m_textView.TextSnapshot.CreateTrackingPoint(e.Location + trackDict[e.Editor].GetPosition(m_textView.TextSnapshot),
+                        PointTrackingMode.Positive);
+                    }
+                    else
+                    {
+                        trackDict[e.Editor] = m_textView.TextSnapshot.CreateTrackingPoint(e.Location,
+                        PointTrackingMode.Positive);
+                    }
                 }
                 else
                 {
-                    trackDict[e.Editor] = m_textView.TextSnapshot.CreateTrackingPoint(e.Location,
-                    PointTrackingMode.Positive);
+                    trackDict[e.Editor] = null;
                 }
-            }
-            else
-            {
-                trackDict[e.Editor] = null;
+                System.Threading.Monitor.PulseAll(MyCallBack.locker);
             }
 
         }
