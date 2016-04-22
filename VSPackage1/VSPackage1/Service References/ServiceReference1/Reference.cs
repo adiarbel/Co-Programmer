@@ -56,6 +56,18 @@ namespace Company.VSPackage1.ServiceReference1 {
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICoProService/GetExpectedSeq", ReplyAction="http://tempuri.org/ICoProService/GetExpectedSeqResponse")]
         System.Threading.Tasks.Task<int> GetExpectedSeqAsync();
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICoProService/SetProjectDir", ReplyAction="http://tempuri.org/ICoProService/SetProjectDirResponse")]
+        bool SetProjectDir(string dir);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICoProService/SetProjectDir", ReplyAction="http://tempuri.org/ICoProService/SetProjectDirResponse")]
+        System.Threading.Tasks.Task<bool> SetProjectDirAsync(string dir);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICoProService/UpdateProject", ReplyAction="http://tempuri.org/ICoProService/UpdateProjectResponse")]
+        void UpdateProject();
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICoProService/UpdateProject", ReplyAction="http://tempuri.org/ICoProService/UpdateProjectResponse")]
+        System.Threading.Tasks.Task UpdateProjectAsync();
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
@@ -87,6 +99,12 @@ namespace Company.VSPackage1.ServiceReference1 {
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICoProService/ApproveCloning", ReplyAction="http://tempuri.org/ICoProService/ApproveCloningResponse")]
         void ApproveCloning(string[] idsToApprove);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICoProService/UpdateProjFilesCallback", ReplyAction="http://tempuri.org/ICoProService/UpdateProjFilesCallbackResponse")]
+        string[] UpdateProjFilesCallback(string file);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICoProService/UpdateProjFilesContents", ReplyAction="http://tempuri.org/ICoProService/UpdateProjFilesContentsResponse")]
+        void UpdateProjFilesContents(string[] files, byte[][] contents);
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
@@ -171,6 +189,22 @@ namespace Company.VSPackage1.ServiceReference1 {
         
         public System.Threading.Tasks.Task<int> GetExpectedSeqAsync() {
             return base.Channel.GetExpectedSeqAsync();
+        }
+        
+        public bool SetProjectDir(string dir) {
+            return base.Channel.SetProjectDir(dir);
+        }
+        
+        public System.Threading.Tasks.Task<bool> SetProjectDirAsync(string dir) {
+            return base.Channel.SetProjectDirAsync(dir);
+        }
+        
+        public void UpdateProject() {
+            base.Channel.UpdateProject();
+        }
+        
+        public System.Threading.Tasks.Task UpdateProjectAsync() {
+            return base.Channel.UpdateProjectAsync();
         }
     }
 }

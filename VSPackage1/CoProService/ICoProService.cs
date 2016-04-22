@@ -14,9 +14,9 @@ namespace CoProService
         [OperationContract]
         bool IntializePosition(string file, int position);
         [OperationContract]
-        bool SendCaretPosition(string file, int position,string content);
+        bool SendCaretPosition(string file, int position, string content);
         [OperationContract]
-        int ShareProject(string path,string projName);
+        int ShareProject(string path, string projName);
         [OperationContract]
         void GetProject();
 
@@ -26,12 +26,18 @@ namespace CoProService
         bool IsConnected();
         [OperationContract]
         int GetExpectedSeq();
+        [OperationContract]
+        bool SetProjectDir(string dir);
+        [OperationContract]
+        void UpdateProject();
+
+
     }
 
     public interface ICoProServiceCallback
     {
         [OperationContract]
-        void AddCurrentEditors(string[] editors,string[] locations);
+        void AddCurrentEditors(string[] editors, string[] locations);
         [OperationContract]
         void NewEditorAdded(string file, int position, string editor, int seq);
         [OperationContract]
@@ -39,7 +45,7 @@ namespace CoProService
         [OperationContract]
         void ChangedCaret(string file, int position, string editor, int seq);
         [OperationContract]
-        void NewAddedText(string file, int position, string editor, string content,int seq);
+        void NewAddedText(string file, int position, string editor, string content, int seq);
         [OperationContract]
         void NewRemovedText(string file, int position, string editor, string instruc, int seq);
         [OperationContract]
@@ -48,5 +54,10 @@ namespace CoProService
         void CloneProject(string fileName, byte[] zipFile);
         [OperationContract]
         void ApproveCloning(string[] idsToApprove);
+        [OperationContract]
+        string[] UpdateProjFilesCallback(string file);
+
+        [OperationContract]
+        void UpdateProjFilesContents(string[] files, byte[][] contents);
     }
 }

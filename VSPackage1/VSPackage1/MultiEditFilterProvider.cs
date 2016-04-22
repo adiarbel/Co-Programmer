@@ -67,10 +67,11 @@ namespace Company.VSPackage1
                     if (setAdmin)
                     {
                         cb.SetAdmin(true);
+                        cb.SetProjectDir(slnName.Substring(0, slnName.LastIndexOf('\\')));
                     }
                     else
                     {
-
+                        cb.UpdateProject();
                     }
                     IWpfTextView textView = editorFactory.GetWpfTextView(textViewAdapter);//gets the text view
                     if (textView == null)

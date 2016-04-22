@@ -8,6 +8,8 @@ using System.ServiceModel;
 using Microsoft.VisualStudio.Text;
 using System.IO;
 using System.IO.Compression;
+using System.Xml;
+using System.Xml.Linq;
 
 namespace CoProService
 {
@@ -19,6 +21,7 @@ namespace CoProService
         static Dictionary<string, string> carets = new Dictionary<string, string>();
         static List<string> ShareProjectIDs = new List<string>();
         static int seqId = 0;
+        static string projPath;
         int place;
         string id;
         Object locker = new Object();
@@ -48,6 +51,29 @@ namespace CoProService
             }
             return true;
         }
+        public bool SetProjectDir(string dir)
+        {
+            if (isAdmin)
+            {
+                projPath = dir;
+                return true;
+            }
+            return false;
+        }
+        public void UpdateProject()
+        {
+            XDocument xd = XDocument.Load(projPath + "\\CoProFiles\\timestamps.xml");
+            string content = xd.ToString();
+            string[] filesToSend = OperationContext.Current.GetCallbackChannel<ICoProServiceCallback>().UpdateProjFilesCallback(content);
+            string absolutePath = projPath.Substring(0, projPath.LastIndexOf('\\'));
+            byte[][] filesContents = new byte[filesToSend.Length][];
+            for (int i = 0; i < filesToSend.Length; i++)
+            {
+                filesContents[i] = File.ReadAllBytes(absolutePath + '\\' + filesToSend[i]);
+            }
+            OperationContext.Current.GetCallbackChannel<ICoProServiceCallback>().UpdateProjFilesContents(filesToSend,filesContents);
+
+        }
         public bool IntializePosition(string file, int position)
         {
             string[] assa = carets.Keys.ToArray<string>();
@@ -70,7 +96,7 @@ namespace CoProService
                         try
                         {
                             callback = entry.Value.GetCallbackChannel<ICoProServiceCallback>();
-                            callback.NewEditorAdded(file, position, id,seqId);
+                            callback.NewEditorAdded(file, position, id, seqId);
                         }
                         catch
                         {
@@ -98,7 +124,7 @@ namespace CoProService
                         callback = entry.Value.GetCallbackChannel<ICoProServiceCallback>();
                         if (content == "click")
                         {
-                            callback.ChangedCaret(file, position, id,seqId);
+                            callback.ChangedCaret(file, position, id, seqId);
                         }
                         else if (content.Contains("DELETE"))
                         {
@@ -181,7 +207,7 @@ namespace CoProService
         public int GetExpectedSeq()
         {
             int seq;
-            lock(locker)
+            lock (locker)
             {
                 seq = seqId;
             }

@@ -54,7 +54,6 @@ namespace Company.VSPackage1
                 //te.LineChanged += new _dispTextEditorEvents_LineChangedEventHandler(EnterFix);
                 //te.LineChanged += new _dispTextEditorEvents_LineChangedEventHandler(IntelisenseFix);
                 this.cb = cb;
-                DTE2.Events.SolutionEvents.BeforeClosing += ShutDown;
                 ((Events2)DTE2.Events).ProjectItemsEvents.ItemAdded += ItemAdded;
                 //cb = new MyCallBack();
                 //cb.ChangeCaret += new ChangeCaretEventHandler(my_CaretChange);
@@ -80,64 +79,7 @@ namespace Company.VSPackage1
         {
             iwpf = h;
         }
-        private void ShutDown()
-        {
-            if (cb != null)
-            {
-                //FileStream fs = File.Create(cb.ProjPath + "\\CoProFiles\\timestamps.txt");
-                //fs.Close();
-                //StreamWriter sw = new StreamWriter(cb.ProjPath + "\\CoProFiles\\timestamps.txt");
-                //sw.Write(TimeStampDirectory(cb.ProjPath, 1, cb.ProjPath.Substring(cb.ProjPath.LastIndexOf('\\'))));
-                //sw.Close();
-                XElement xe = CreateFileSystemXmlTree(cb.ProjPath,1);
-                XmlTextWriter xwr = new XmlTextWriter(cb.ProjPath + "\\CoProFiles\\timestamps.xml", System.Text.Encoding.UTF8);
-                xwr.Formatting = Formatting.Indented;
-                xe.WriteTo(xwr);
-                xwr.Close();
-                cb.Abort();
-            }
-            if (VSPackage1Package.service != null)
-            {
-                VSPackage1Package.service.Close();
-            }
-        }
-        private string TimeStampDirectory(string target_dir, int lev, string relPath)
-        {
-            string[] files = Directory.GetFiles(target_dir);
-            string[] dirs = Directory.GetDirectories(target_dir);
-            string filesInfo = "";
-            string currDir;
-            foreach (string dir in dirs)
-            {
-                currDir = dir.Substring(dir.LastIndexOf('\\'));
-                if (currDir != "\\bin" && currDir != "\\obj" && currDir != "\\CoProFiles")
-                    filesInfo += lev + relPath + ' ' + TimeStampDirectory(dir, lev + 1, relPath + currDir);
-            }
-
-            foreach (string file in files)
-            {
-                filesInfo += ";" + file.Substring(file.LastIndexOf('\\')) + "," + File.GetLastWriteTimeUtc(file) + "," + relPath;
-            }
-
-            return filesInfo;
-        }
-        private XElement CreateFileSystemXmlTree(string source,int level)
-        {
-            DirectoryInfo dir = new DirectoryInfo(source);
-            var info = new XElement("Directory",
-                   new XAttribute("Name", dir.Name), new XAttribute("Level", level));
-            foreach (var file in dir.GetFiles())
-                info.Add(new XElement("File",
-                             new XAttribute("Name", file.Name), new XAttribute("TimeChanged", file.LastWriteTimeUtc)));
-
-            foreach (var subDir in dir.GetDirectories())
-            {
-                if (!(subDir.FullName.Contains("bin") || subDir.FullName.Contains("obj") || subDir.FullName.Contains("CoProFiles")))
-                    info.Add(CreateFileSystemXmlTree(subDir.FullName,level+1));
-            }
-
-            return info;
-        }
+        
     }
 }
 

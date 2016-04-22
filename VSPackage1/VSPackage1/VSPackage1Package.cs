@@ -21,6 +21,8 @@ using Microsoft.VisualStudio.Text;
 using System.Windows.Forms;
 using System.Windows.Markup;
 using System.Xaml;
+using System.Xml;
+using System.Xml.Linq;
 
 
 namespace Company.VSPackage1
@@ -46,7 +48,6 @@ namespace Company.VSPackage1
     [Guid(GuidList.guidVSPackage1PkgString)]
     [ProvideAutoLoad("ADFC4E64-0397-11D1-9F4E-00A0C911004F")]
 
-
     public sealed class VSPackage1Package : Package
     {
 
@@ -54,6 +55,7 @@ namespace Company.VSPackage1
         private IWpfTextViewHost iwpf;
         public static Service service=null;
         int place = 0;
+        List<object> events = new List<object>();
         public static MyCallBack cb =null;
         static Dictionary<string, MenuCommand> cmds = new Dictionary<string, MenuCommand>();
         private DTE2 DTE2
@@ -117,6 +119,12 @@ namespace Company.VSPackage1
         {
             Debug.WriteLine(string.Format(CultureInfo.CurrentCulture, "Entering Initialize() of: {0}", this.ToString()));
             base.Initialize();
+            var openEv = DTE2.Events.SolutionEvents;
+            var openEv2 = ((Events2)(DTE2.Events)).WindowEvents;
+
+            events.Add(openEv);
+            openEv.Opened += SolutionOpened;
+            openEv.AfterClosing += ShutDown; 
             // Add our command handlers for menu (commands must exist in the .vsct file)
             OleMenuCommandService mcs = GetService(typeof(IMenuCommandService)) as OleMenuCommandService;
             if (null != mcs)
@@ -140,7 +148,10 @@ namespace Company.VSPackage1
             }
         }
         #endregion
-
+        public void SolutionOpened()
+        {
+            MessageBox.Show("Test");
+        }
         /// <summary>
         /// This function is the callback used to execute a command when the a menu item is clicked.
         /// See the Initialize method to see how the menu item is associated to this function using
@@ -166,7 +177,44 @@ namespace Company.VSPackage1
             hpw.Show();
             //service = new Service();
         }
+        private void ShutDown()
+        {
+            if (cb != null)
+            {
+                //FileStream fs = File.Create(cb.ProjPath + "\\CoProFiles\\timestamps.txt");
+                //fs.Close();
+                //StreamWriter sw = new StreamWriter(cb.ProjPath + "\\CoProFiles\\timestamps.txt");
+                //sw.Write(TimeStampDirectory(cb.ProjPath, 1, cb.ProjPath.Substring(cb.ProjPath.LastIndexOf('\\'))));
+                //sw.Close();
+                XElement xe = CreateFileSystemXmlTree(cb.ProjPath, 1, cb.ProjPath.Substring(cb.ProjPath.LastIndexOf('\\') + 1));
+                XmlTextWriter xwr = new XmlTextWriter(cb.ProjPath + "\\CoProFiles\\timestamps.xml", System.Text.Encoding.UTF8);
+                xwr.Formatting = Formatting.Indented;
+                xe.WriteTo(xwr);
+                xwr.Close();
+                cb.Abort();
+            }
+            if (VSPackage1Package.service != null)
+            {
+                VSPackage1Package.service.Close();
+            }
+        }
+        private XElement CreateFileSystemXmlTree(string source, int level, string relPath)
+        {
+            DirectoryInfo dir = new DirectoryInfo(source);
+            var info = new XElement("Directory",
+                   new XAttribute("Name", dir.Name), new XAttribute("Level", level));
+            foreach (var file in dir.GetFiles())
+                info.Add(new XElement("File",
+                             new XAttribute("Name", file.Name), new XAttribute("TimeChanged", file.LastWriteTimeUtc), new XAttribute("RelativePath", relPath)));
 
+            foreach (var subDir in dir.GetDirectories())
+            {
+                if (!(subDir.FullName.Contains("bin") || subDir.FullName.Contains("obj") || subDir.FullName.Contains("CoProFiles")))
+                    info.Add(CreateFileSystemXmlTree(subDir.FullName, level + 1, relPath + '\\' + subDir.FullName.Substring(subDir.FullName.LastIndexOf('\\') + 1)));
+            }
+
+            return info;
+        }
         
 
 

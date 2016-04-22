@@ -9,6 +9,8 @@ using Microsoft.VisualStudio.Text;
 using NetFwTypeLib;
 using System.IO;
 using System.IO.Compression;
+using System.Xml;
+
 
 namespace Company.VSPackage1
 {
@@ -23,7 +25,7 @@ namespace Company.VSPackage1
     /*TODO: define event for that delegate*/
 
     /*TODO: define the above for each event that might come from the server's callbacks*/
-    [CallbackBehavior(UseSynchronizationContext = false, ConcurrencyMode=ConcurrencyMode.Reentrant)]
+    [CallbackBehavior(UseSynchronizationContext = false, ConcurrencyMode = ConcurrencyMode.Reentrant)]
     public class MyCallBack : ICoProServiceCallback, IDisposable
     {
         public event NewCaretEventHandler NewCaret;
@@ -68,6 +70,10 @@ namespace Company.VSPackage1
         {
             return wcfclient.SetAdmin(adm);
         }
+        public void SetProjectDir(string dir)
+        {
+            wcfclient.SetProjectDir(dir);
+        }
         public void SetIpPort(string ip, string port)
         {
             iport[0] = ip;
@@ -79,14 +85,14 @@ namespace Company.VSPackage1
             wcfclient = new ServiceReference1.CoProServiceClient(context, mybinding, myEndPoint);
             try
             {
-                ExpectedSequence = wcfclient.GetExpectedSeq()-1; //insert function that gets the id
+                ExpectedSequence = wcfclient.GetExpectedSeq() - 1; //insert function that gets the id
                 return wcfclient.IsConnected();
             }
             catch
             {
                 return false;
             }
-           
+
         }
         public void IntializePosition(string file, int position)
         {
@@ -108,18 +114,18 @@ namespace Company.VSPackage1
                 AddAllEditors(this, new AddEditorsEventArgs(editors, locations));
             }
         }
-        public void NewEditorAdded(string file, int position, string editor,int seq)
+        public void NewEditorAdded(string file, int position, string editor, int seq)
         {
             if (NewCaret != null)
             {
-                NewCaret(this, new EditedTextEventArgs(editor, position, file, " ",seq));
+                NewCaret(this, new EditedTextEventArgs(editor, position, file, " ", seq));
             }
         }
-        public void ChangedCaret(string file, int position, string editor,int seq)
+        public void ChangedCaret(string file, int position, string editor, int seq)
         {
             if (ChangeCaret != null)
             {
-                ChangeCaret(this, new EditedTextEventArgs(editor, position, file, " ",seq));
+                ChangeCaret(this, new EditedTextEventArgs(editor, position, file, " ", seq));
             }
         }
         public void EditorDisconnected(string editor)
@@ -129,19 +135,19 @@ namespace Company.VSPackage1
                 EditorDisc(this, new EditorDisEventArgs(editor));
             }
         }
-        public void NewAddedText(string file, int position, string editor, string content,int seq)
+        public void NewAddedText(string file, int position, string editor, string content, int seq)
         {
             if (NewText != null)
             {
-                NewText(this, new EditedTextEventArgs(editor, position, file, content,seq)); //timeout exception
+                NewText(this, new EditedTextEventArgs(editor, position, file, content, seq)); //timeout exception
             }
         }
-        public void NewRemovedText(string file, int position, string editor, string instruc,int seq)
+        public void NewRemovedText(string file, int position, string editor, string instruc, int seq)
         {
             if (RemovedText != null)
             {
 
-                RemovedText(this, new EditedTextEventArgs(editor, position, file, instruc,seq));
+                RemovedText(this, new EditedTextEventArgs(editor, position, file, instruc, seq));
 
             }
         }
@@ -164,33 +170,87 @@ namespace Company.VSPackage1
             File.WriteAllBytes(proj + "\\proj.zip", zipFile);
             ZipFile.ExtractToDirectory(proj + "\\proj.zip", proj + "\\" + fileName);
             File.Delete(proj + "\\proj.zip");
-            if(!Directory.Exists(proj +"\\"+ fileName+"CoProFiles"))
+            if (!Directory.Exists(proj + "\\" + fileName + "CoProFiles"))
             {
                 Directory.CreateDirectory(proj + "\\" + fileName + "CoProFiles");
             }
             FileStream fs = File.Create(proj + "\\" + fileName + "CoProFiles" + "\\client.txt");
-            fs.Write(Encoding.ASCII.GetBytes(iport[0]+':'+iport[1]),0,(iport[0]+':'+iport[1]).Length);
+            fs.Write(Encoding.ASCII.GetBytes(iport[0] + ':' + iport[1]), 0, (iport[0] + ':' + iport[1]).Length);
             fs.Close();
         }
         public void ApproveCloning(string[] idsToApprove)
         {
-            string st="";
+            string st = "";
             for (int i = 0; i < idsToApprove.Length; i++)
             {
                 st += idsToApprove[i] + '\n';
             }
-            System.Windows.Forms.DialogResult result = System.Windows.Forms.MessageBox.Show("Do you want to approve cloning for the following?:\n"+st, "Confirmation", System.Windows.Forms.MessageBoxButtons.YesNoCancel);
+            System.Windows.Forms.DialogResult result = System.Windows.Forms.MessageBox.Show("Do you want to approve cloning for the following?:\n" + st, "Confirmation", System.Windows.Forms.MessageBoxButtons.YesNoCancel);
             if (result == System.Windows.Forms.DialogResult.Yes)
             {
-                wcfclient.ShareProject(proj, proj.Substring(proj.LastIndexOf('\\')+1));
+                wcfclient.ShareProject(proj, proj.Substring(proj.LastIndexOf('\\') + 1));
             }
-            
+
         }
         public void Abort()
         {
             wcfclient.Abort();
         }
+        public void UpdateProject()
+        {
+            wcfclient.UpdateProject();
+        }
+        public string[] UpdateProjFilesCallback(string file)
+        {
+            List<string> filesToRequest = new List<string>();
+            XmlTextReader xr = new XmlTextReader(new System.IO.StringReader(file));
+            Dictionary<string, string[]> serverDictionary = new Dictionary<string, string[]>();
+            while (xr.Read())
+            {
+                xr.MoveToContent();
+                if (xr.NodeType == System.Xml.XmlNodeType.Element && xr.Name == "File")
+                {
+                    serverDictionary[xr.GetAttribute(0)] = new string[2];
+                    serverDictionary[xr.GetAttribute(0)][0] = xr.GetAttribute(1);
+                    serverDictionary[xr.GetAttribute(0)][1] = xr.GetAttribute(2);
+                }
+            }
+            xr = new XmlTextReader(ProjPath + "\\CoProFiles\\timestamps.xml");
+            Dictionary<string, string[]> myDictionary = new Dictionary<string, string[]>();
+            while (xr.Read())
+            {
+                xr.MoveToContent();
+                if (xr.NodeType == System.Xml.XmlNodeType.Element && xr.Name == "File")
+                {
+                    serverDictionary[xr.GetAttribute(0)] = new string[2];
+                    serverDictionary[xr.GetAttribute(0)][0] = xr.GetAttribute(1);
+                    serverDictionary[xr.GetAttribute(0)][1] = xr.GetAttribute(2);
+                }
+            }
+            for (int i = 0; i < serverDictionary.Keys.Count; i++)
+            {
+                string tempKey = serverDictionary.Keys.ElementAt(i);
+                if(!myDictionary.ContainsKey(tempKey))
+                {
+                    filesToRequest.Add(serverDictionary[tempKey][1] + "\\" + tempKey);
+                }
+                else if (myDictionary[tempKey][1]!=serverDictionary[tempKey][1])
+                {
+                    filesToRequest.Add(serverDictionary[tempKey][1] + "\\" + tempKey);
+                }
+            }
+            return filesToRequest.ToArray();
+        }
 
+
+        public void UpdateProjFilesContents(string[] files, byte[][] contents)
+        {
+            string absolutePath = ProjPath.Substring(0, ProjPath.LastIndexOf('\\'));
+            for (int i = 0; i < files.Length; i++)
+            {
+                File.WriteAllBytes(absolutePath +"\\"+ files[i], contents[i]);
+            }
+        }
     }
     public class ChangeCaretEventArgs : EventArgs
     {
@@ -232,12 +292,13 @@ namespace Company.VSPackage1
         // Fields
         private int m_seq = -1;
         // Constructor
-        public EditedTextEventArgs(string editor, int location, string file, string command,int seq):base(editor,location,file,command)
+        public EditedTextEventArgs(string editor, int location, string file, string command, int seq)
+            : base(editor, location, file, command)
         {
             m_seq = seq;
         }
         // Properties (read-only)
-        
+
         public int Seq
         {
             get { return m_seq; }

@@ -57,6 +57,18 @@
   <wsdl:message name="ICoProService_GetExpectedSeq_OutputMessage">
     <wsdl:part name="parameters" element="tns:GetExpectedSeqResponse" />
   </wsdl:message>
+  <wsdl:message name="ICoProService_SetProjectDir_InputMessage">
+    <wsdl:part name="parameters" element="tns:SetProjectDir" />
+  </wsdl:message>
+  <wsdl:message name="ICoProService_SetProjectDir_OutputMessage">
+    <wsdl:part name="parameters" element="tns:SetProjectDirResponse" />
+  </wsdl:message>
+  <wsdl:message name="ICoProService_UpdateProject_InputMessage">
+    <wsdl:part name="parameters" element="tns:UpdateProject" />
+  </wsdl:message>
+  <wsdl:message name="ICoProService_UpdateProject_OutputMessage">
+    <wsdl:part name="parameters" element="tns:UpdateProjectResponse" />
+  </wsdl:message>
   <wsdl:message name="ICoProService_AddCurrentEditors_OutputCallbackMessage">
     <wsdl:part name="parameters" element="tns:AddCurrentEditors" />
   </wsdl:message>
@@ -111,6 +123,18 @@
   <wsdl:message name="ICoProService_ApproveCloning_InputCallbackMessage">
     <wsdl:part name="parameters" element="tns:ApproveCloningResponse" />
   </wsdl:message>
+  <wsdl:message name="ICoProService_UpdateProjFilesCallback_OutputCallbackMessage">
+    <wsdl:part name="parameters" element="tns:UpdateProjFilesCallback" />
+  </wsdl:message>
+  <wsdl:message name="ICoProService_UpdateProjFilesCallback_InputCallbackMessage">
+    <wsdl:part name="parameters" element="tns:UpdateProjFilesCallbackResponse" />
+  </wsdl:message>
+  <wsdl:message name="ICoProService_UpdateProjFilesContents_OutputCallbackMessage">
+    <wsdl:part name="parameters" element="tns:UpdateProjFilesContents" />
+  </wsdl:message>
+  <wsdl:message name="ICoProService_UpdateProjFilesContents_InputCallbackMessage">
+    <wsdl:part name="parameters" element="tns:UpdateProjFilesContentsResponse" />
+  </wsdl:message>
   <wsdl:portType name="ICoProService">
     <wsdl:operation name="IntializePosition">
       <wsdl:input wsaw:Action="http://tempuri.org/ICoProService/IntializePosition" message="tns:ICoProService_IntializePosition_InputMessage" />
@@ -139,6 +163,14 @@
     <wsdl:operation name="GetExpectedSeq">
       <wsdl:input wsaw:Action="http://tempuri.org/ICoProService/GetExpectedSeq" message="tns:ICoProService_GetExpectedSeq_InputMessage" />
       <wsdl:output wsaw:Action="http://tempuri.org/ICoProService/GetExpectedSeqResponse" message="tns:ICoProService_GetExpectedSeq_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="SetProjectDir">
+      <wsdl:input wsaw:Action="http://tempuri.org/ICoProService/SetProjectDir" message="tns:ICoProService_SetProjectDir_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/ICoProService/SetProjectDirResponse" message="tns:ICoProService_SetProjectDir_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="UpdateProject">
+      <wsdl:input wsaw:Action="http://tempuri.org/ICoProService/UpdateProject" message="tns:ICoProService_UpdateProject_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/ICoProService/UpdateProjectResponse" message="tns:ICoProService_UpdateProject_OutputMessage" />
     </wsdl:operation>
     <wsdl:operation name="AddCurrentEditors">
       <wsdl:output wsaw:Action="http://tempuri.org/ICoProService/AddCurrentEditors" message="tns:ICoProService_AddCurrentEditors_OutputCallbackMessage" />
@@ -175,6 +207,14 @@
     <wsdl:operation name="ApproveCloning">
       <wsdl:output wsaw:Action="http://tempuri.org/ICoProService/ApproveCloning" message="tns:ICoProService_ApproveCloning_OutputCallbackMessage" />
       <wsdl:input wsaw:Action="http://tempuri.org/ICoProService/ApproveCloningResponse" message="tns:ICoProService_ApproveCloning_InputCallbackMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="UpdateProjFilesCallback">
+      <wsdl:output wsaw:Action="http://tempuri.org/ICoProService/UpdateProjFilesCallback" message="tns:ICoProService_UpdateProjFilesCallback_OutputCallbackMessage" />
+      <wsdl:input wsaw:Action="http://tempuri.org/ICoProService/UpdateProjFilesCallbackResponse" message="tns:ICoProService_UpdateProjFilesCallback_InputCallbackMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="UpdateProjFilesContents">
+      <wsdl:output wsaw:Action="http://tempuri.org/ICoProService/UpdateProjFilesContents" message="tns:ICoProService_UpdateProjFilesContents_OutputCallbackMessage" />
+      <wsdl:input wsaw:Action="http://tempuri.org/ICoProService/UpdateProjFilesContentsResponse" message="tns:ICoProService_UpdateProjFilesContents_InputCallbackMessage" />
     </wsdl:operation>
   </wsdl:portType>
   <wsdl:binding name="NetTcpBinding_ICoProService" type="tns:ICoProService">
@@ -236,6 +276,24 @@
     </wsdl:operation>
     <wsdl:operation name="GetExpectedSeq">
       <soap12:operation soapAction="http://tempuri.org/ICoProService/GetExpectedSeq" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="SetProjectDir">
+      <soap12:operation soapAction="http://tempuri.org/ICoProService/SetProjectDir" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="UpdateProject">
+      <soap12:operation soapAction="http://tempuri.org/ICoProService/UpdateProject" style="document" />
       <wsdl:input>
         <soap12:body use="literal" />
       </wsdl:input>
@@ -317,6 +375,24 @@
     </wsdl:operation>
     <wsdl:operation name="ApproveCloning">
       <soap12:operation soapAction="http://tempuri.org/ICoProService/ApproveCloning" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="UpdateProjFilesCallback">
+      <soap12:operation soapAction="http://tempuri.org/ICoProService/UpdateProjFilesCallback" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="UpdateProjFilesContents">
+      <soap12:operation soapAction="http://tempuri.org/ICoProService/UpdateProjFilesContents" style="document" />
       <wsdl:input>
         <soap12:body use="literal" />
       </wsdl:input>
