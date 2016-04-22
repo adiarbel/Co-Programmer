@@ -79,7 +79,7 @@ namespace Company.VSPackage1
             wcfclient = new ServiceReference1.CoProServiceClient(context, mybinding, myEndPoint);
             try
             {
-                ExpectedSequence = wcfclient.GetExpectedSeq(); //insert function that gets the id
+                ExpectedSequence = wcfclient.GetExpectedSeq()-1; //insert function that gets the id
                 return wcfclient.IsConnected();
             }
             catch
@@ -133,7 +133,7 @@ namespace Company.VSPackage1
         {
             if (NewText != null)
             {
-                NewText(this, new EditedTextEventArgs(editor, position, file, content,seq));
+                NewText(this, new EditedTextEventArgs(editor, position, file, content,seq)); //timeout exception
             }
         }
         public void NewRemovedText(string file, int position, string editor, string instruc,int seq)

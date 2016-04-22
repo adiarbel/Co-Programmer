@@ -55,6 +55,7 @@ namespace Company.VSPackage1
                 //te.LineChanged += new _dispTextEditorEvents_LineChangedEventHandler(IntelisenseFix);
                 this.cb = cb;
                 DTE2.Events.SolutionEvents.BeforeClosing += ShutDown;
+                ((Events2)DTE2.Events).ProjectItemsEvents.ItemAdded += ItemAdded;
                 //cb = new MyCallBack();
                 //cb.ChangeCaret += new ChangeCaretEventHandler(my_CaretChange);
                 //twice = false;
@@ -68,7 +69,9 @@ namespace Company.VSPackage1
 
             }
         }
-
+        private void ItemAdded(ProjectItem pi)
+        {
+        }
         IWpfTextViewHost GetTextViewHost()
         {
             return iwpf;
@@ -79,8 +82,6 @@ namespace Company.VSPackage1
         }
         private void ShutDown()
         {
-
-
             if (cb != null)
             {
                 //FileStream fs = File.Create(cb.ProjPath + "\\CoProFiles\\timestamps.txt");
@@ -125,7 +126,6 @@ namespace Company.VSPackage1
             DirectoryInfo dir = new DirectoryInfo(source);
             var info = new XElement("Directory",
                    new XAttribute("Name", dir.Name), new XAttribute("Level", level));
-
             foreach (var file in dir.GetFiles())
                 info.Add(new XElement("File",
                              new XAttribute("Name", file.Name), new XAttribute("TimeChanged", file.LastWriteTimeUtc)));
