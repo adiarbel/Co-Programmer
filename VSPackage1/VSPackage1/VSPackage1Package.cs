@@ -53,10 +53,10 @@ namespace Company.VSPackage1
 
         private DTE2 dte;
         private IWpfTextViewHost iwpf;
-        public static Service service=null;
+        public static Service service = null;
         int place = 0;
         List<object> events = new List<object>();
-        public static MyCallBack cb =null;
+        public static MyCallBack cb = null;
         static Dictionary<string, MenuCommand> cmds = new Dictionary<string, MenuCommand>();
         private DTE2 DTE2
         {
@@ -124,7 +124,7 @@ namespace Company.VSPackage1
 
             events.Add(openEv);
             openEv.Opened += SolutionOpened;
-            openEv.AfterClosing += ShutDown; 
+            openEv.AfterClosing += ShutDown;
             // Add our command handlers for menu (commands must exist in the .vsct file)
             OleMenuCommandService mcs = GetService(typeof(IMenuCommandService)) as OleMenuCommandService;
             if (null != mcs)
@@ -133,7 +133,7 @@ namespace Company.VSPackage1
 
                 CommandID menuCommandID = new CommandID(GuidList.guidTopLevelMenuCmdSet, (int)PkgCmdIDList.connectToServer);
                 MenuCommand menuItem = new MenuCommand(ConnectCallback, menuCommandID);
-                cmds["connectToServer"]=menuItem;
+                cmds["connectToServer"] = menuItem;
                 mcs.AddCommand(menuItem);
                 menuCommandID = new CommandID(GuidList.guidTopLevelMenuCmdSet, (int)PkgCmdIDList.cloneProject);
                 menuItem = new MenuCommand(CloneCallback, menuCommandID);
@@ -204,9 +204,13 @@ namespace Company.VSPackage1
             var info = new XElement("Directory",
                    new XAttribute("Name", dir.Name), new XAttribute("Level", level));
             foreach (var file in dir.GetFiles())
-                info.Add(new XElement("File",
-                             new XAttribute("Name", file.Name), new XAttribute("TimeChanged", file.LastWriteTimeUtc), new XAttribute("RelativePath", relPath)));
-
+            {
+                if (!file.FullName.ToLower().EndsWith(".suo"))
+                {
+                    info.Add(new XElement("File",
+                                 new XAttribute("Name", file.Name), new XAttribute("TimeChanged", file.LastWriteTimeUtc), new XAttribute("RelativePath", relPath)));
+                }
+            }
             foreach (var subDir in dir.GetDirectories())
             {
                 if (!(subDir.FullName.Contains("bin") || subDir.FullName.Contains("obj") || subDir.FullName.Contains("CoProFiles")))
@@ -215,7 +219,7 @@ namespace Company.VSPackage1
 
             return info;
         }
-        
+
 
 
     }

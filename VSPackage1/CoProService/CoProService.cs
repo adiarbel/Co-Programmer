@@ -66,11 +66,12 @@ namespace CoProService
             string content = xd.ToString();
             string[] filesToSend = OperationContext.Current.GetCallbackChannel<ICoProServiceCallback>().UpdateProjFilesCallback(content);
             string absolutePath = projPath.Substring(0, projPath.LastIndexOf('\\'));
-            byte[][] filesContents = new byte[filesToSend.Length][];
+            byte[][] filesContents = new byte[filesToSend.Length+1][];
             for (int i = 0; i < filesToSend.Length; i++)
             {
                 filesContents[i] = File.ReadAllBytes(absolutePath + '\\' + filesToSend[i]);
             }
+            filesContents[filesToSend.Length] = File.ReadAllBytes(projPath + "\\CoProFiles\\timestamps.xml");
             OperationContext.Current.GetCallbackChannel<ICoProServiceCallback>().UpdateProjFilesContents(filesToSend,filesContents);
 
         }

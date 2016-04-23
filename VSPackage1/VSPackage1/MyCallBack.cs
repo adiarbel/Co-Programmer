@@ -10,6 +10,8 @@ using NetFwTypeLib;
 using System.IO;
 using System.IO.Compression;
 using System.Xml;
+using System.Xml.Linq;
+
 
 
 namespace Company.VSPackage1
@@ -41,12 +43,18 @@ namespace Company.VSPackage1
         NetTcpBinding mybinding;
         CoProServiceClient wcfclient;
         int expecSeq;
+        bool isAdmin;
         string proj;
         string[] iport = new string[2];
         public int ExpectedSequence
         {
             get { return expecSeq; }
             set { expecSeq = value; }
+        }
+        public bool IsAdmin
+        {
+            get { return isAdmin; }
+            set { isAdmin = value; }
         }
         public MyCallBack()
         {
@@ -203,40 +211,46 @@ namespace Company.VSPackage1
         public string[] UpdateProjFilesCallback(string file)
         {
             List<string> filesToRequest = new List<string>();
-            XmlTextReader xr = new XmlTextReader(new System.IO.StringReader(file));
-            Dictionary<string, string[]> serverDictionary = new Dictionary<string, string[]>();
-            while (xr.Read())
+            XDocument xd = XDocument.Load(ProjPath + "\\CoProFiles\\timestamps.xml");
+            if (xd.ToString() != file)
             {
-                xr.MoveToContent();
-                if (xr.NodeType == System.Xml.XmlNodeType.Element && xr.Name == "File")
+                XmlTextReader xr = new XmlTextReader(new System.IO.StringReader(file));
+                Dictionary<string, string[]> serverDictionary = new Dictionary<string, string[]>();
+                while (xr.Read())
                 {
-                    serverDictionary[xr.GetAttribute(0)] = new string[2];
-                    serverDictionary[xr.GetAttribute(0)][0] = xr.GetAttribute(1);
-                    serverDictionary[xr.GetAttribute(0)][1] = xr.GetAttribute(2);
+                    xr.MoveToContent();
+                    if (xr.NodeType == System.Xml.XmlNodeType.Element && xr.Name == "File")
+                    {
+                        serverDictionary[xr.GetAttribute(0)] = new string[2];
+                        serverDictionary[xr.GetAttribute(0)][0] = xr.GetAttribute(1);
+                        serverDictionary[xr.GetAttribute(0)][1] = xr.GetAttribute(2);
+                    }
                 }
-            }
-            xr = new XmlTextReader(ProjPath + "\\CoProFiles\\timestamps.xml");
-            Dictionary<string, string[]> myDictionary = new Dictionary<string, string[]>();
-            while (xr.Read())
-            {
-                xr.MoveToContent();
-                if (xr.NodeType == System.Xml.XmlNodeType.Element && xr.Name == "File")
+                xr.Close();
+                xr = new XmlTextReader(ProjPath + "\\CoProFiles\\timestamps.xml");
+                Dictionary<string, string[]> myDictionary = new Dictionary<string, string[]>();
+                while (xr.Read())
                 {
-                    serverDictionary[xr.GetAttribute(0)] = new string[2];
-                    serverDictionary[xr.GetAttribute(0)][0] = xr.GetAttribute(1);
-                    serverDictionary[xr.GetAttribute(0)][1] = xr.GetAttribute(2);
+                    xr.MoveToContent();
+                    if (xr.NodeType == System.Xml.XmlNodeType.Element && xr.Name == "File")
+                    {
+                        serverDictionary[xr.GetAttribute(0)] = new string[2];
+                        serverDictionary[xr.GetAttribute(0)][0] = xr.GetAttribute(1);
+                        serverDictionary[xr.GetAttribute(0)][1] = xr.GetAttribute(2);
+                    }
                 }
-            }
-            for (int i = 0; i < serverDictionary.Keys.Count; i++)
-            {
-                string tempKey = serverDictionary.Keys.ElementAt(i);
-                if(!myDictionary.ContainsKey(tempKey))
+                xr.Close();
+                for (int i = 0; i < serverDictionary.Keys.Count; i++)
                 {
-                    filesToRequest.Add(serverDictionary[tempKey][1] + "\\" + tempKey);
-                }
-                else if (myDictionary[tempKey][1]!=serverDictionary[tempKey][1])
-                {
-                    filesToRequest.Add(serverDictionary[tempKey][1] + "\\" + tempKey);
+                    string tempKey = serverDictionary.Keys.ElementAt(i);
+                    if (!myDictionary.ContainsKey(tempKey))
+                    {
+                        filesToRequest.Add(serverDictionary[tempKey][1] + "\\" + tempKey);
+                    }
+                    else if (myDictionary[tempKey][1] != serverDictionary[tempKey][1])
+                    {
+                        filesToRequest.Add(serverDictionary[tempKey][1] + "\\" + tempKey);
+                    }
                 }
             }
             return filesToRequest.ToArray();
@@ -248,8 +262,22 @@ namespace Company.VSPackage1
             string absolutePath = ProjPath.Substring(0, ProjPath.LastIndexOf('\\'));
             for (int i = 0; i < files.Length; i++)
             {
-                File.WriteAllBytes(absolutePath +"\\"+ files[i], contents[i]);
+                if (File.Exists(absolutePath + "\\" + files[i]))
+                {
+                    using (StreamWriter sr = new StreamWriter(absolutePath + "\\" + files[i], false))
+                    {
+                        sr.Write(System.Text.Encoding.UTF8.GetString(contents[i]));
+                        sr.Flush();
+                    }
+                }
+                else
+                {
+                    File.WriteAllBytes(absolutePath + "\\" + files[i], contents[i]);
+                }
+
             }
+            File.WriteAllBytes(ProjPath + "\\CoProFiles\\timestamps.xml", contents[files.Length]);
+            ExpectedSequence++;
         }
     }
     public class ChangeCaretEventArgs : EventArgs

@@ -120,6 +120,7 @@ namespace Company.VSPackage1
                 while (e.Seq != cb.ExpectedSequence)//if excpected id is the id i got
                 {
                     System.Threading.Monitor.Wait(MyCallBack.locker);
+                    Debug.WriteLine("Recieved seq : "+e.Seq +" Expected seq : "+ cb.ExpectedSequence);
                 }
                 if (e.File == filename)
                 {
@@ -144,6 +145,7 @@ namespace Company.VSPackage1
                 while (e.Seq != cb.ExpectedSequence)//if excpected id is the id i got
                 {
                     System.Threading.Monitor.Wait(MyCallBack.locker);
+                    Debug.WriteLine("Recieved seq : " + e.Seq + " Expected seq : " + cb.ExpectedSequence);
                 }
                 if (e.File == filename)
                 {
@@ -189,6 +191,7 @@ namespace Company.VSPackage1
                 while (e.Seq != cb.ExpectedSequence)//if excpected id is the id i got
                 {
                     System.Threading.Monitor.Wait(MyCallBack.locker);
+                    Debug.WriteLine("Recieved seq : " + e.Seq + " Expected seq : " + cb.ExpectedSequence);
                 }
                 if (e.File == filename)
                 {
@@ -220,6 +223,7 @@ namespace Company.VSPackage1
                 while (e.Seq != cb.ExpectedSequence)//if excpected id is the id i got
                 {
                     System.Threading.Monitor.Wait(MyCallBack.locker);
+                    Debug.WriteLine("Recieved seq : " + e.Seq + " Expected seq : " + cb.ExpectedSequence);
                 }
 
                 if (e.File == filename)
