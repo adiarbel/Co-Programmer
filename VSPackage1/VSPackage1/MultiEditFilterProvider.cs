@@ -26,6 +26,7 @@ namespace Company.VSPackage1
         internal IVsEditorAdaptersFactoryService editorFactory = null;
         static MyCallBack cb = VSPackage1Package.cb;
         Carets cs;
+        static bool isFirst = true;
         public void VsTextViewCreated(IVsTextView textViewAdapter)
         {
             if (cb == null)
@@ -33,65 +34,71 @@ namespace Company.VSPackage1
                 cb = new MyCallBack();
                 VSPackage1Package.cb = cb;
             }
-            bool setAdminConfiguraions = false;
             cs = new Carets(GetCurrentViewHost(textViewAdapter), cb);
-            var slnName = cs.DTE2.Solution.FullName;
-            var adminFile = slnName.Substring(0, slnName.Substring(0, slnName.LastIndexOf('\\')).LastIndexOf('\\')) + "\\admin.txt";
-            if (File.Exists(adminFile))
+            if (isFirst)
             {
-                StreamReader sr = new StreamReader(adminFile);
-                string dir = sr.ReadToEnd();
-                if (dir == slnName.Substring(0, slnName.LastIndexOf('\\')))
+               
+                bool setAdminConfiguraions = false;
+                var slnName = cs.DTE2.Solution.FullName;
+                var adminFile = slnName.Substring(0, slnName.Substring(0, slnName.LastIndexOf('\\')).LastIndexOf('\\')) + "\\admin.txt";
+                if (File.Exists(adminFile))
                 {
-                    VSPackage1Package.service = new Service();
-                    string filesDir = slnName.Substring(0, slnName.LastIndexOf('\\')) + "\\CoProFiles";
-                    if (!Directory.Exists(filesDir))
+                    StreamReader sr = new StreamReader(adminFile);
+                    string dir = sr.ReadToEnd();
+                    if (dir == slnName.Substring(0, slnName.LastIndexOf('\\')))
                     {
-                        Directory.CreateDirectory(slnName.Substring(0, slnName.LastIndexOf('\\')) + "\\CoProFiles");
-                    }
-                    FileStream fs = File.Create(slnName.Substring(0, slnName.LastIndexOf('\\')) + "\\CoProFiles\\client.txt");
-                    string ipPort = "localhost:" + (VSPackage1Package.service.PortOfService() + 10).ToString();
-                    fs.Write(Encoding.ASCII.GetBytes(ipPort), 0, ipPort.Length);
-                    fs.Close();
-                    setAdminConfiguraions = true;
-                }
-            }
-            if (File.Exists(slnName.Substring(0, slnName.LastIndexOf('\\')) + "\\CoProFiles\\client.txt"))
-            {
-                StreamReader sr = new StreamReader(slnName.Substring(0, slnName.LastIndexOf('\\')) + "\\CoProFiles\\client.txt");
-                string iport = sr.ReadToEnd();
-                cb.SetIpPort(iport.Split(':')[0], iport.Split(':')[1]);
-                if (cb.Connect())
-                {
-                    cb.ProjPath = slnName.Substring(0, slnName.LastIndexOf('\\'));
-                    if (setAdminConfiguraions)
-                    {
-                        if (cb.SetAdmin(true))
+                        VSPackage1Package.service = new Service();
+                        string filesDir = slnName.Substring(0, slnName.LastIndexOf('\\')) + "\\CoProFiles";
+                        if (!Directory.Exists(filesDir))
                         {
-                            cb.IsAdmin = true;
-                            cb.SetProjectDir(slnName.Substring(0, slnName.LastIndexOf('\\')));
+                            Directory.CreateDirectory(slnName.Substring(0, slnName.LastIndexOf('\\')) + "\\CoProFiles");
                         }
+                        FileStream fs = File.Create(slnName.Substring(0, slnName.LastIndexOf('\\')) + "\\CoProFiles\\client.txt");
+                        string ipPort = "localhost:" + (VSPackage1Package.service.PortOfService() + 10).ToString();
+                        fs.Write(Encoding.ASCII.GetBytes(ipPort), 0, ipPort.Length);
+                        fs.Close();
+                        setAdminConfiguraions = true;
                     }
-                    else
-                    {
-                        cb.IsAdmin = false;
-                        cb.UpdateProject();
-                    }
-                    if(cb.IsAdmin)
-                    {
-                        cb.ExpectedSequence++;
-                    }
-                    IWpfTextView textView = editorFactory.GetWpfTextView(textViewAdapter);//gets the text view
-                    if (textView == null)
-                        return;
-                    AddCommandFilter(textViewAdapter, new MultiEditCommandFilter(textView, cb, cs));//adds an instance of our command filter to the text view
                 }
+                if (File.Exists(slnName.Substring(0, slnName.LastIndexOf('\\')) + "\\CoProFiles\\client.txt"))
+                {
+                    StreamReader sr = new StreamReader(slnName.Substring(0, slnName.LastIndexOf('\\')) + "\\CoProFiles\\client.txt");
+                    string iport = sr.ReadToEnd();
+                    cb.SetIpPort(iport.Split(':')[0], iport.Split(':')[1]);
+                    if (cb.Connect())
+                    {
+                        cb.ProjPath = slnName.Substring(0, slnName.LastIndexOf('\\'));
+                        if (setAdminConfiguraions)
+                        {
+                            if (cb.SetAdmin(true))
+                            {
+                                cb.IsAdmin = true;
+                                cb.SetProjectDir(slnName.Substring(0, slnName.LastIndexOf('\\')));
+                            }
+                        }
+                        else
+                        {
+                            cb.IsAdmin = false;
+                            cb.UpdateProject();
+                        }
+                        if (cb.IsAdmin)
+                        {
+                            cb.ExpectedSequence++;
+                        }
+
+                    }
+                }
+                else
+                {
+                    cb = null;
+                    cs = null;
+                }
+                isFirst = false;
             }
-            else
-            {
-                cb = null;
-                cs = null;
-            }
+            IWpfTextView textView = editorFactory.GetWpfTextView(textViewAdapter);//gets the text view
+            if (textView == null)
+                return;
+            AddCommandFilter(textViewAdapter, new MultiEditCommandFilter(textView, cb, cs));//adds an instance of our command filter to the text view
         }
         IWpfTextViewHost GetCurrentViewHost(IVsTextView vTextView)
         {

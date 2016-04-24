@@ -119,6 +119,18 @@
       <xs:sequence />
     </xs:complexType>
   </xs:element>
+  <xs:element name="UpdateSpecificFile">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="relPath" nillable="true" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="UpdateSpecificFileResponse">
+    <xs:complexType>
+      <xs:sequence />
+    </xs:complexType>
+  </xs:element>
   <xs:element name="AddCurrentEditors">
     <xs:complexType>
       <xs:sequence>
@@ -266,6 +278,19 @@
     </xs:complexType>
   </xs:element>
   <xs:element name="UpdateProjFilesContentsResponse">
+    <xs:complexType>
+      <xs:sequence />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="UpdateSpecificFileCallback">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" name="content" nillable="true" type="xs:base64Binary" />
+        <xs:element minOccurs="0" name="relPath" nillable="true" type="xs:string" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="UpdateSpecificFileCallbackResponse">
     <xs:complexType>
       <xs:sequence />
     </xs:complexType>

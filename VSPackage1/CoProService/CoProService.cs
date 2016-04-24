@@ -188,6 +188,13 @@ namespace CoProService
             }
             return 0;
         }
+
+        public void UpdateSpecificFile(string relPath)
+        {
+            var filePath = projPath + relPath.Substring(relPath.IndexOf('\\'));
+            byte[] content = File.ReadAllBytes(filePath);
+            OperationContext.Current.GetCallbackChannel<ICoProServiceCallback>().UpdateSpecificFileCallback(content, relPath);
+        }
         private void ZipProject(string path)
         {
             try
@@ -243,5 +250,6 @@ namespace CoProService
                 }
             }
         }
+
     }
 }

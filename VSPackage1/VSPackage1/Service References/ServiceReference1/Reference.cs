@@ -68,6 +68,12 @@ namespace Company.VSPackage1.ServiceReference1 {
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICoProService/UpdateProject", ReplyAction="http://tempuri.org/ICoProService/UpdateProjectResponse")]
         System.Threading.Tasks.Task UpdateProjectAsync();
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICoProService/UpdateSpecificFile", ReplyAction="http://tempuri.org/ICoProService/UpdateSpecificFileResponse")]
+        void UpdateSpecificFile(string relPath);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICoProService/UpdateSpecificFile", ReplyAction="http://tempuri.org/ICoProService/UpdateSpecificFileResponse")]
+        System.Threading.Tasks.Task UpdateSpecificFileAsync(string relPath);
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
@@ -105,6 +111,9 @@ namespace Company.VSPackage1.ServiceReference1 {
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICoProService/UpdateProjFilesContents", ReplyAction="http://tempuri.org/ICoProService/UpdateProjFilesContentsResponse")]
         void UpdateProjFilesContents(string[] files, byte[][] contents);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICoProService/UpdateSpecificFileCallback", ReplyAction="http://tempuri.org/ICoProService/UpdateSpecificFileCallbackResponse")]
+        void UpdateSpecificFileCallback(byte[] content, string relPath);
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
@@ -205,6 +214,14 @@ namespace Company.VSPackage1.ServiceReference1 {
         
         public System.Threading.Tasks.Task UpdateProjectAsync() {
             return base.Channel.UpdateProjectAsync();
+        }
+        
+        public void UpdateSpecificFile(string relPath) {
+            base.Channel.UpdateSpecificFile(relPath);
+        }
+        
+        public System.Threading.Tasks.Task UpdateSpecificFileAsync(string relPath) {
+            return base.Channel.UpdateSpecificFileAsync(relPath);
         }
     }
 }

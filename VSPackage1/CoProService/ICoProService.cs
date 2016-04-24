@@ -30,7 +30,8 @@ namespace CoProService
         bool SetProjectDir(string dir);
         [OperationContract]
         void UpdateProject();
-
+        [OperationContract]
+        void UpdateSpecificFile(string relPath);
 
     }
 
@@ -56,8 +57,9 @@ namespace CoProService
         void ApproveCloning(string[] idsToApprove);
         [OperationContract]
         string[] UpdateProjFilesCallback(string file);
-
         [OperationContract]
         void UpdateProjFilesContents(string[] files, byte[][] contents);
+        [OperationContract]
+        void UpdateSpecificFileCallback(byte[] content,string relPath);
     }
 }

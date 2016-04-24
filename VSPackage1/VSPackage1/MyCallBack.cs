@@ -178,11 +178,11 @@ namespace Company.VSPackage1
             File.WriteAllBytes(proj + "\\proj.zip", zipFile);
             ZipFile.ExtractToDirectory(proj + "\\proj.zip", proj + "\\" + fileName);
             File.Delete(proj + "\\proj.zip");
-            if (!Directory.Exists(proj + "\\" + fileName + "CoProFiles"))
+            if (!Directory.Exists(proj + "\\" + fileName + "\\CoProFiles"))
             {
-                Directory.CreateDirectory(proj + "\\" + fileName + "CoProFiles");
+                Directory.CreateDirectory(proj + "\\" + fileName + "\\CoProFiles");
             }
-            FileStream fs = File.Create(proj + "\\" + fileName + "CoProFiles" + "\\client.txt");
+            FileStream fs = File.Create(proj + "\\" + fileName + "\\CoProFiles" + "\\client.txt");
             fs.Write(Encoding.ASCII.GetBytes(iport[0] + ':' + iport[1]), 0, (iport[0] + ':' + iport[1]).Length);
             fs.Close();
         }
@@ -234,9 +234,9 @@ namespace Company.VSPackage1
                     xr.MoveToContent();
                     if (xr.NodeType == System.Xml.XmlNodeType.Element && xr.Name == "File")
                     {
-                        serverDictionary[xr.GetAttribute(0)] = new string[2];
-                        serverDictionary[xr.GetAttribute(0)][0] = xr.GetAttribute(1);
-                        serverDictionary[xr.GetAttribute(0)][1] = xr.GetAttribute(2);
+                        myDictionary[xr.GetAttribute(0)] = new string[2];
+                        myDictionary[xr.GetAttribute(0)][0] = xr.GetAttribute(1);
+                        myDictionary[xr.GetAttribute(0)][1] = xr.GetAttribute(2);
                     }
                 }
                 xr.Close();
@@ -255,7 +255,10 @@ namespace Company.VSPackage1
             }
             return filesToRequest.ToArray();
         }
-
+        public void UpdateSpecificFile(string relPath)
+        {
+            wcfclient.UpdateSpecificFile(relPath);
+        }
 
         public void UpdateProjFilesContents(string[] files, byte[][] contents)
         {
@@ -278,6 +281,10 @@ namespace Company.VSPackage1
             }
             File.WriteAllBytes(ProjPath + "\\CoProFiles\\timestamps.xml", contents[files.Length]);
             ExpectedSequence++;
+        }
+        public void UpdateSpecificFileCallback(byte[] content, string relPath)
+        {
+            File.WriteAllBytes(ProjPath + relPath.Substring(relPath.IndexOf('\\')), content);
         }
     }
     public class ChangeCaretEventArgs : EventArgs

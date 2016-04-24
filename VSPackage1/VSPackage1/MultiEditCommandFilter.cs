@@ -42,17 +42,14 @@ namespace Company.VSPackage1
             cb = mcb;
             crts = cs;
             //crts.DTE2.Events.TextEditorEvents.LineChanged += new _dispTextEditorEvents_LineChangedEventHandler();
-            if (isFirst)
-            {
-                cb.AddAllEditors += new AddCurrentEditorsEventHandler(my_AddEditors);
-                isFirst = false;
-            }
+
             cb.NewCaret += new NewCaretEventHandler(my_NewCaret);
             cb.ChangeCaret += new ChangeCaretEventHandler(my_ChangedCaret);
             cb.EditorDisc += new EditorDisconnectedEventHandler(my_EditorDisc);
             cb.NewText += new NewTextEventHandler(my_AddedText);
             cb.RemovedText += new RemovedTextEventHandler(my_RemovedText);
             cb.save += new SaveEventHandler(my_Save);
+            cb.AddAllEditors += new AddCurrentEditorsEventHandler(my_AddEditors);
             textView.TextBuffer.Changed += TextBuffer_Changed;
             InitBrushes();
             uiDisp = Dispatcher.CurrentDispatcher;
@@ -63,6 +60,18 @@ namespace Company.VSPackage1
             filename = filename.Substring(filename.LastIndexOf('\\') + 1);
             filename = filename.Split('.')[0];
             filename = textDoc.FilePath.Substring(textDoc.FilePath.IndexOf(filename));
+            if (isFirst)
+            {
+                isFirst = false;
+            }
+            else
+            {
+                //TODO: ask for specific file from the server;
+                if (!cb.IsAdmin)
+                {
+                    cb.UpdateSpecificFile(filename);
+                }
+            }
             filename = filename.Substring(filename.LastIndexOf('\\') + 1);
             cb.IntializePosition(filename, m_textView.Caret.Position.BufferPosition.Position);
 
@@ -87,7 +96,7 @@ namespace Company.VSPackage1
             }
             mySide = true;
         }
-        public void my_Save(object sender, ChangeCaretEventArgs e)
+        void my_Save(object sender, ChangeCaretEventArgs e)
         {
             if (e.File == filename)
             {
@@ -106,7 +115,7 @@ namespace Company.VSPackage1
                 mySide = false;
             }
         }
-        private void my_NewCaret(object sender, EditedTextEventArgs e)
+        void my_NewCaret(object sender, EditedTextEventArgs e)
         {
             //ITextDocument textDoc;
             //var rc = m_textView.TextBuffer.Properties.TryGetProperty<ITextDocument>(
@@ -120,7 +129,7 @@ namespace Company.VSPackage1
                 while (e.Seq != cb.ExpectedSequence)//if excpected id is the id i got
                 {
                     System.Threading.Monitor.Wait(MyCallBack.locker);
-                    Debug.WriteLine("Recieved seq : "+e.Seq +" Expected seq : "+ cb.ExpectedSequence);
+                    Debug.WriteLine("Recieved seq : " + e.Seq + " Expected seq : " + cb.ExpectedSequence);
                 }
                 if (e.File == filename)
                 {
@@ -131,7 +140,7 @@ namespace Company.VSPackage1
                 System.Threading.Monitor.PulseAll(MyCallBack.locker);
             }
         }
-        private void my_ChangedCaret(object sender, EditedTextEventArgs e)
+        void my_ChangedCaret(object sender, EditedTextEventArgs e)
         {
             //ITextDocument textDoc;
             //var rc = m_textView.TextBuffer.Properties.TryGetProperty<ITextDocument>(
@@ -168,23 +177,26 @@ namespace Company.VSPackage1
             }
 
         }
-        private void my_AddEditors(object sender, AddEditorsEventArgs e)
+        void my_AddEditors(object sender, AddEditorsEventArgs e)
         {
             string s;
             for (int i = 0; i < e.Editors.Length; i++)
             {
                 s = crts.DTE2.ActiveDocument.FullName;
                 s = e.Locations[i].Split(' ')[1];
-                trackDict[e.Editors[i]] = m_textView.TextSnapshot.CreateTrackingPoint(int.Parse(s),
-                PointTrackingMode.Positive);//Have to change textview when it is another file!!!
+                if (e.Locations[i].Split(' ')[0] == filename)
+                {
+                    trackDict[e.Editors[i]] = m_textView.TextSnapshot.CreateTrackingPoint(int.Parse(s),
+                    PointTrackingMode.Positive);//Have to change textview when it is another file!!!
+                }
             }
         }
-        private void my_EditorDisc(object sender, EditorDisEventArgs e)
+        void my_EditorDisc(object sender, EditorDisEventArgs e)
         {
             trackDict.Remove(e.Editor);
             RedrawScreen();
         }
-        private void my_AddedText(object sender, EditedTextEventArgs e)
+        void my_AddedText(object sender, EditedTextEventArgs e)
         {
             lock (MyCallBack.locker)
             {
@@ -216,7 +228,7 @@ namespace Company.VSPackage1
                 }
             }
         }
-        private void my_RemovedText(object sender, EditedTextEventArgs e)
+        void my_RemovedText(object sender, EditedTextEventArgs e)
         {
             lock (MyCallBack.locker)
             {

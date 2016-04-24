@@ -69,6 +69,12 @@
   <wsdl:message name="ICoProService_UpdateProject_OutputMessage">
     <wsdl:part name="parameters" element="tns:UpdateProjectResponse" />
   </wsdl:message>
+  <wsdl:message name="ICoProService_UpdateSpecificFile_InputMessage">
+    <wsdl:part name="parameters" element="tns:UpdateSpecificFile" />
+  </wsdl:message>
+  <wsdl:message name="ICoProService_UpdateSpecificFile_OutputMessage">
+    <wsdl:part name="parameters" element="tns:UpdateSpecificFileResponse" />
+  </wsdl:message>
   <wsdl:message name="ICoProService_AddCurrentEditors_OutputCallbackMessage">
     <wsdl:part name="parameters" element="tns:AddCurrentEditors" />
   </wsdl:message>
@@ -135,6 +141,12 @@
   <wsdl:message name="ICoProService_UpdateProjFilesContents_InputCallbackMessage">
     <wsdl:part name="parameters" element="tns:UpdateProjFilesContentsResponse" />
   </wsdl:message>
+  <wsdl:message name="ICoProService_UpdateSpecificFileCallback_OutputCallbackMessage">
+    <wsdl:part name="parameters" element="tns:UpdateSpecificFileCallback" />
+  </wsdl:message>
+  <wsdl:message name="ICoProService_UpdateSpecificFileCallback_InputCallbackMessage">
+    <wsdl:part name="parameters" element="tns:UpdateSpecificFileCallbackResponse" />
+  </wsdl:message>
   <wsdl:portType name="ICoProService">
     <wsdl:operation name="IntializePosition">
       <wsdl:input wsaw:Action="http://tempuri.org/ICoProService/IntializePosition" message="tns:ICoProService_IntializePosition_InputMessage" />
@@ -171,6 +183,10 @@
     <wsdl:operation name="UpdateProject">
       <wsdl:input wsaw:Action="http://tempuri.org/ICoProService/UpdateProject" message="tns:ICoProService_UpdateProject_InputMessage" />
       <wsdl:output wsaw:Action="http://tempuri.org/ICoProService/UpdateProjectResponse" message="tns:ICoProService_UpdateProject_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="UpdateSpecificFile">
+      <wsdl:input wsaw:Action="http://tempuri.org/ICoProService/UpdateSpecificFile" message="tns:ICoProService_UpdateSpecificFile_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/ICoProService/UpdateSpecificFileResponse" message="tns:ICoProService_UpdateSpecificFile_OutputMessage" />
     </wsdl:operation>
     <wsdl:operation name="AddCurrentEditors">
       <wsdl:output wsaw:Action="http://tempuri.org/ICoProService/AddCurrentEditors" message="tns:ICoProService_AddCurrentEditors_OutputCallbackMessage" />
@@ -215,6 +231,10 @@
     <wsdl:operation name="UpdateProjFilesContents">
       <wsdl:output wsaw:Action="http://tempuri.org/ICoProService/UpdateProjFilesContents" message="tns:ICoProService_UpdateProjFilesContents_OutputCallbackMessage" />
       <wsdl:input wsaw:Action="http://tempuri.org/ICoProService/UpdateProjFilesContentsResponse" message="tns:ICoProService_UpdateProjFilesContents_InputCallbackMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="UpdateSpecificFileCallback">
+      <wsdl:output wsaw:Action="http://tempuri.org/ICoProService/UpdateSpecificFileCallback" message="tns:ICoProService_UpdateSpecificFileCallback_OutputCallbackMessage" />
+      <wsdl:input wsaw:Action="http://tempuri.org/ICoProService/UpdateSpecificFileCallbackResponse" message="tns:ICoProService_UpdateSpecificFileCallback_InputCallbackMessage" />
     </wsdl:operation>
   </wsdl:portType>
   <wsdl:binding name="NetTcpBinding_ICoProService" type="tns:ICoProService">
@@ -294,6 +314,15 @@
     </wsdl:operation>
     <wsdl:operation name="UpdateProject">
       <soap12:operation soapAction="http://tempuri.org/ICoProService/UpdateProject" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="UpdateSpecificFile">
+      <soap12:operation soapAction="http://tempuri.org/ICoProService/UpdateSpecificFile" style="document" />
       <wsdl:input>
         <soap12:body use="literal" />
       </wsdl:input>
@@ -393,6 +422,15 @@
     </wsdl:operation>
     <wsdl:operation name="UpdateProjFilesContents">
       <soap12:operation soapAction="http://tempuri.org/ICoProService/UpdateProjFilesContents" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="UpdateSpecificFileCallback">
+      <soap12:operation soapAction="http://tempuri.org/ICoProService/UpdateSpecificFileCallback" style="document" />
       <wsdl:input>
         <soap12:body use="literal" />
       </wsdl:input>
