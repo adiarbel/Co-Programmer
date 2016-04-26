@@ -121,7 +121,6 @@ namespace Company.VSPackage1
             base.Initialize();
             var openEv = DTE2.Events.SolutionEvents;
             var openEv2 = ((Events2)(DTE2.Events)).WindowEvents;
-
             events.Add(openEv);
             openEv.Opened += SolutionOpened;
             openEv.AfterClosing += ShutDown;
@@ -130,7 +129,6 @@ namespace Company.VSPackage1
             if (null != mcs)
             {
                 // Create the command for the menu item.
-
                 CommandID menuCommandID = new CommandID(GuidList.guidTopLevelMenuCmdSet, (int)PkgCmdIDList.connectToServer);
                 MenuCommand menuItem = new MenuCommand(ConnectCallback, menuCommandID);
                 cmds["connectToServer"] = menuItem;

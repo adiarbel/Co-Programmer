@@ -114,6 +114,9 @@ namespace Company.VSPackage1.ServiceReference1 {
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICoProService/UpdateSpecificFileCallback", ReplyAction="http://tempuri.org/ICoProService/UpdateSpecificFileCallbackResponse")]
         void UpdateSpecificFileCallback(byte[] content, string relPath);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICoProService/AdminFileOpen", ReplyAction="http://tempuri.org/ICoProService/AdminFileOpenResponse")]
+        void AdminFileOpen(string file);
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]

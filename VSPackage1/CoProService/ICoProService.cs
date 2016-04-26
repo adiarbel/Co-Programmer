@@ -61,5 +61,7 @@ namespace CoProService
         void UpdateProjFilesContents(string[] files, byte[][] contents);
         [OperationContract]
         void UpdateSpecificFileCallback(byte[] content,string relPath);
+        [OperationContract]
+        void AdminFileOpen(string file);
     }
 }

@@ -24,6 +24,7 @@ namespace Company.VSPackage1
     public delegate void NewCaretEventHandler(object sender, EditedTextEventArgs e);
     public delegate void ChangeCaretEventHandler(object sender, EditedTextEventArgs e);
     public delegate void SaveEventHandler(object sender, ChangeCaretEventArgs e);
+    public delegate void AdminEventHandler(object sender, AdminEventArgs e);
     /*TODO: define event for that delegate*/
 
     /*TODO: define the above for each event that might come from the server's callbacks*/
@@ -37,6 +38,8 @@ namespace Company.VSPackage1
         public event EditorDisconnectedEventHandler EditorDisc;
         public event NewTextEventHandler NewText;
         public event SaveEventHandler save;
+        public event AdminEventHandler AdminEvent;
+
         public static Object locker = new Object();
         InstanceContext context;
         EndpointAddress myEndPoint;
@@ -163,9 +166,7 @@ namespace Company.VSPackage1
         {
             if (save != null)
             {
-
                 save(this, new ChangeCaretEventArgs(" ", 0, file, " "));
-
             }
         }
         void IDisposable.Dispose()
@@ -369,6 +370,18 @@ namespace Company.VSPackage1
         public string Editor
         {
             get { return m_editor; }
+        }
+    }
+    public class AdminEventArgs : EventArgs
+    {
+        private string m_file = string.Empty;
+        public AdminEventArgs(string file)
+        {
+            m_file = file;
+        }
+        public string File
+        {
+            get { return m_file; }
         }
     }
 }

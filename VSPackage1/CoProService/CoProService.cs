@@ -66,13 +66,13 @@ namespace CoProService
             string content = xd.ToString();
             string[] filesToSend = OperationContext.Current.GetCallbackChannel<ICoProServiceCallback>().UpdateProjFilesCallback(content);
             string absolutePath = projPath.Substring(0, projPath.LastIndexOf('\\'));
-            byte[][] filesContents = new byte[filesToSend.Length+1][];
+            byte[][] filesContents = new byte[filesToSend.Length + 1][];
             for (int i = 0; i < filesToSend.Length; i++)
             {
                 filesContents[i] = File.ReadAllBytes(absolutePath + '\\' + filesToSend[i]);
             }
             filesContents[filesToSend.Length] = File.ReadAllBytes(projPath + "\\CoProFiles\\timestamps.xml");
-            OperationContext.Current.GetCallbackChannel<ICoProServiceCallback>().UpdateProjFilesContents(filesToSend,filesContents);
+            OperationContext.Current.GetCallbackChannel<ICoProServiceCallback>().UpdateProjFilesContents(filesToSend, filesContents);
 
         }
         public bool IntializePosition(string file, int position)
@@ -90,13 +90,15 @@ namespace CoProService
                 {
                     carets[id] = "" + file + " " + position;
                 }
-                foreach (KeyValuePair<string, OperationContext> entry in ids)
+                OperationContext[] idsArr = ids.Values.ToArray();
+                ids[admin].GetCallbackChannel<ICoProServiceCallback>().AdminFileOpen(file);
+                for (int i = 0; i < idsArr.Length; i++)
                 {
-                    if (entry.Value.SessionId != id)
+                    if (idsArr[i].SessionId != id)
                     {
                         try
                         {
-                            callback = entry.Value.GetCallbackChannel<ICoProServiceCallback>();
+                            callback = idsArr[i].GetCallbackChannel<ICoProServiceCallback>();
                             callback.NewEditorAdded(file, position, id, seqId);
                         }
                         catch
@@ -113,16 +115,19 @@ namespace CoProService
         public bool SendCaretPosition(string file, int position, string content)
         {
             ICoProServiceCallback callback;
-
-            carets[id] = "" + file + " " + position;
-
-            foreach (KeyValuePair<string, OperationContext> entry in ids)
+            lock (carets)
             {
-                if (entry.Value.SessionId != id)
+                carets[id] = "" + file + " " + position;
+            }
+            OperationContext[] idsArr = ids.Values.ToArray();
+
+            for (int i = 0; i < idsArr.Length; i++)
+            {
+                if (idsArr[i].SessionId != id)
                 {
                     try
                     {
-                        callback = entry.Value.GetCallbackChannel<ICoProServiceCallback>();
+                        callback = idsArr[i].GetCallbackChannel<ICoProServiceCallback>();
                         if (content == "click")
                         {
                             callback.ChangedCaret(file, position, id, seqId);

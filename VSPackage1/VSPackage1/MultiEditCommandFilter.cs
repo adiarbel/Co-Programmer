@@ -60,13 +60,19 @@ namespace Company.VSPackage1
             filename = filename.Substring(filename.LastIndexOf('\\') + 1);
             filename = filename.Split('.')[0];
             filename = textDoc.FilePath.Substring(textDoc.FilePath.IndexOf(filename));
+            if (cb.IsAdmin)
+            {
+                cb.AdminEvent += my_AdminCallback;
+            }
             if (isFirst)
             {
                 isFirst = false;
+
             }
             else
             {
                 //TODO: ask for specific file from the server;
+                //TODO: what about admin?
                 if (!cb.IsAdmin)
                 {
                     cb.UpdateSpecificFile(filename);
@@ -76,6 +82,13 @@ namespace Company.VSPackage1
             cb.IntializePosition(filename, m_textView.Caret.Position.BufferPosition.Position);
 
             currSizeBuffer = m_textView.TextSnapshot.Length;
+        }
+        void my_AdminCallback(object sender, AdminEventArgs e)
+        {
+            if (!crts.DTE2.IsOpenFile[e.File, EnvDTE.Constants.vsViewKindTextView])
+            {
+                crts.DTE2.Solution.Open(e.File);
+            }
         }
         void TextBuffer_Changed(object sender, TextContentChangedEventArgs e)
         {
@@ -124,20 +137,25 @@ namespace Company.VSPackage1
             //if (rc == true)
             //    if (e.File == textDoc.FilePath.Substring(textDoc.FilePath.LastIndexOf('\\') + 1))
             //        crts.my_CaretChange(sender, e);//helps me to find which file the caret is in
-            lock (MyCallBack.locker)
+            if (e.File == filename)
             {
-                while (e.Seq != cb.ExpectedSequence)//if excpected id is the id i got
+                lock (MyCallBack.locker)
                 {
-                    System.Threading.Monitor.Wait(MyCallBack.locker);
-                    Debug.WriteLine("Recieved seq : " + e.Seq + " Expected seq : " + cb.ExpectedSequence);
-                }
-                if (e.File == filename)
-                {
+                    while (e.Seq != cb.ExpectedSequence)//if excpected id is the id i got
+                    {
+                        System.Threading.Monitor.Wait(MyCallBack.locker);
+                        Debug.WriteLine("Recieved seq : " + e.Seq + " Expected seq : " + cb.ExpectedSequence);
+                    }
                     var curTrackPoint = m_textView.TextSnapshot.CreateTrackingPoint(e.Location,
                     PointTrackingMode.Positive);
                     trackDict[e.Editor] = curTrackPoint;
+                    cb.ExpectedSequence++;
+                    System.Threading.Monitor.PulseAll(MyCallBack.locker);
                 }
-                System.Threading.Monitor.PulseAll(MyCallBack.locker);
+            }
+            else
+            {
+                trackDict[e.Editor] = null;
             }
         }
         void my_ChangedCaret(object sender, EditedTextEventArgs e)
@@ -149,15 +167,16 @@ namespace Company.VSPackage1
             //if (rc == true)
             //    if (e.File == textDoc.FilePath.Substring(textDoc.FilePath.LastIndexOf('\\') + 1))
             //        crts.my_CaretChange(sender, e);//helps me to find which file the caret is in
-            lock (MyCallBack.locker)
+            if (e.File == filename)//TODO : change location of statement
             {
-                while (e.Seq != cb.ExpectedSequence)//if excpected id is the id i got
+                lock (MyCallBack.locker)
                 {
-                    System.Threading.Monitor.Wait(MyCallBack.locker);
-                    Debug.WriteLine("Recieved seq : " + e.Seq + " Expected seq : " + cb.ExpectedSequence);
-                }
-                if (e.File == filename)
-                {
+                    while (e.Seq != cb.ExpectedSequence)//if excpected id is the id i got
+                    {
+                        System.Threading.Monitor.Wait(MyCallBack.locker);
+                        Debug.WriteLine("Recieved seq : " + e.Seq + " Expected seq : " + cb.ExpectedSequence);
+                    }
+
                     if (e.Location == 1 || e.Location == -1)
                     {
                         trackDict[e.Editor] = m_textView.TextSnapshot.CreateTrackingPoint(e.Location + trackDict[e.Editor].GetPosition(m_textView.TextSnapshot),
@@ -168,12 +187,13 @@ namespace Company.VSPackage1
                         trackDict[e.Editor] = m_textView.TextSnapshot.CreateTrackingPoint(e.Location,
                         PointTrackingMode.Positive);
                     }
+
+                    System.Threading.Monitor.PulseAll(MyCallBack.locker);
                 }
-                else
-                {
-                    trackDict[e.Editor] = null;
-                }
-                System.Threading.Monitor.PulseAll(MyCallBack.locker);
+            }
+            else
+            {
+                trackDict[e.Editor] = null;
             }
 
         }
@@ -198,16 +218,18 @@ namespace Company.VSPackage1
         }
         void my_AddedText(object sender, EditedTextEventArgs e)
         {
-            lock (MyCallBack.locker)
+            if (e.File == filename)
             {
-                while (e.Seq != cb.ExpectedSequence)//if excpected id is the id i got
+                lock (MyCallBack.locker)
                 {
-                    System.Threading.Monitor.Wait(MyCallBack.locker);
-                    Debug.WriteLine("Recieved seq : " + e.Seq + " Expected seq : " + cb.ExpectedSequence);
-                }
-                if (e.File == filename)
-                {
-                    my_ChangedCaret(sender, e);
+                    while (e.Seq != cb.ExpectedSequence)//if excpected id is the id i got
+                    {
+                        System.Threading.Monitor.Wait(MyCallBack.locker);
+                        Debug.WriteLine("Recieved seq : " + e.Seq + " Expected seq : " + cb.ExpectedSequence);
+                    }
+
+                    trackDict[e.Editor] = m_textView.TextSnapshot.CreateTrackingPoint(e.Location,
+                                            PointTrackingMode.Positive);
                     uiDisp.Invoke(new Action(() =>
                         {
                             ITextEdit edit = m_textView.TextBuffer.CreateEdit();
@@ -230,17 +252,19 @@ namespace Company.VSPackage1
         }
         void my_RemovedText(object sender, EditedTextEventArgs e)
         {
-            lock (MyCallBack.locker)
+            if (e.File == filename)
             {
-                while (e.Seq != cb.ExpectedSequence)//if excpected id is the id i got
+                lock (MyCallBack.locker)
                 {
-                    System.Threading.Monitor.Wait(MyCallBack.locker);
-                    Debug.WriteLine("Recieved seq : " + e.Seq + " Expected seq : " + cb.ExpectedSequence);
-                }
+                    while (e.Seq != cb.ExpectedSequence)//if excpected id is the id i got
+                    {
+                        System.Threading.Monitor.Wait(MyCallBack.locker);
+                        Debug.WriteLine("Recieved seq : " + e.Seq + " Expected seq : " + cb.ExpectedSequence);
+                    }
 
-                if (e.File == filename)
-                {
-                    my_ChangedCaret(sender, e);
+
+                    trackDict[e.Editor] = m_textView.TextSnapshot.CreateTrackingPoint(e.Location,
+                                            PointTrackingMode.Positive);
                     uiDisp.Invoke(new Action(() =>
                     {
                         ITextEdit edit = m_textView.TextBuffer.CreateEdit();
