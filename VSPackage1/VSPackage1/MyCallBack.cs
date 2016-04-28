@@ -287,6 +287,15 @@ namespace Company.VSPackage1
         {
             File.WriteAllBytes(ProjPath + relPath.Substring(relPath.IndexOf('\\')), content);
         }
+
+
+        public void AdminFileOpen(string file)
+        {
+            if (AdminEvent != null)
+            {
+                AdminEvent(this, new AdminEventArgs(file));
+            }
+        }
     }
     public class ChangeCaretEventArgs : EventArgs
     {
