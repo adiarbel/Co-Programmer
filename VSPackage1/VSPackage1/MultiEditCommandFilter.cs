@@ -85,9 +85,12 @@ namespace Company.VSPackage1
         }
         void my_AdminCallback(object sender, AdminEventArgs e)
         {
-            if (!crts.DTE2.IsOpenFile[e.File, EnvDTE.Constants.vsViewKindTextView])
+            if (!crts.DTE2.Solution.Projects.Item(1).ProjectItems.Item(e.File).IsOpen)
             {
-                crts.DTE2.Solution.Open(e.File);
+                uiDisp.Invoke(new Action(() =>
+                        {
+                            crts.DTE2.Solution.Projects.Item(1).ProjectItems.Item(e.File).Open(EnvDTE.Constants.vsViewKindTextView).Activate();
+                        }));
             }
         }
         void TextBuffer_Changed(object sender, TextContentChangedEventArgs e)
@@ -100,10 +103,12 @@ namespace Company.VSPackage1
                     if (e.Changes[i].OldText != "")
                     {
                         cb.SendCaretPosition(filename, e.Changes[i].OldPosition, "DELETE;" + e.Changes[i].OldSpan.Length + ";");
+                        cb.ExpectedSequence++;
                     }
                     if (e.Changes[i].NewText != "")
                     {
                         cb.SendCaretPosition(filename, e.Changes[i].OldPosition, e.Changes[i].NewText);
+                        cb.ExpectedSequence++;
                     }
                 }
             }
@@ -149,7 +154,6 @@ namespace Company.VSPackage1
                     var curTrackPoint = m_textView.TextSnapshot.CreateTrackingPoint(e.Location,
                     PointTrackingMode.Positive);
                     trackDict[e.Editor] = curTrackPoint;
-                    cb.ExpectedSequence++;
                     System.Threading.Monitor.PulseAll(MyCallBack.locker);
                 }
             }
@@ -245,7 +249,6 @@ namespace Company.VSPackage1
 
 
                         }));
-                    cb.ExpectedSequence++;
                     System.Threading.Monitor.PulseAll(MyCallBack.locker);
                 }
             }
@@ -277,7 +280,6 @@ namespace Company.VSPackage1
                         edit.Apply();
                         edit.Dispose();
                     }));
-                    cb.ExpectedSequence++;
                     System.Threading.Monitor.PulseAll(MyCallBack.locker);
                 }
             }
@@ -292,6 +294,7 @@ namespace Company.VSPackage1
             if (delayFixer)
             {
                 cb.SendCaretPosition(filename, m_textView.Caret.Position.BufferPosition.Position, "click");
+                cb.ExpectedSequence++;
                 delayFixer = false;
             }
             if (pguidCmdGroup == VSConstants.VSStd2K && nCmdID == (uint)VSConstants.VSStd2KCmdID.ECMD_LEFTCLICK)
@@ -300,6 +303,7 @@ namespace Company.VSPackage1
                 RedrawScreen();
 
                 cb.SendCaretPosition(filename, m_textView.Caret.Position.BufferPosition.Position, "click");
+                cb.ExpectedSequence++;
 
             }
             else if (pguidCmdGroup == VSConstants.VSStd2K &&
@@ -313,14 +317,18 @@ namespace Company.VSPackage1
             else if (nCmdID == (uint)VSConstants.VSStd97CmdID.SaveProjectItem)
             {
                 if (mySide)
+                {
                     cb.SendCaretPosition(filename, 0, "save");
+                }
                 mySide = true;
 
             }
             else if (nCmdID == (uint)VSConstants.VSStd97CmdID.SaveSolution)
             {
                 if (mySide)
+                {
                     cb.SendCaretPosition(filename, 0, "saveS");
+                }
                 mySide = true;
 
             }

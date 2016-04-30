@@ -123,6 +123,7 @@ namespace Company.VSPackage1
             if (AddAllEditors != null)
             {
                 AddAllEditors(this, new AddEditorsEventArgs(editors, locations));
+                ExpectedSequence++;
             }
         }
         public void NewEditorAdded(string file, int position, string editor, int seq)
@@ -130,6 +131,7 @@ namespace Company.VSPackage1
             if (NewCaret != null)
             {
                 NewCaret(this, new EditedTextEventArgs(editor, position, file, " ", seq));
+                ExpectedSequence++;
             }
         }
         public void ChangedCaret(string file, int position, string editor, int seq)
@@ -137,6 +139,7 @@ namespace Company.VSPackage1
             if (ChangeCaret != null)
             {
                 ChangeCaret(this, new EditedTextEventArgs(editor, position, file, " ", seq));
+                ExpectedSequence++;
             }
         }
         public void EditorDisconnected(string editor)
@@ -151,7 +154,9 @@ namespace Company.VSPackage1
             if (NewText != null)
             {
                 NewText(this, new EditedTextEventArgs(editor, position, file, content, seq)); //timeout exception
+                ExpectedSequence++;
             }
+
         }
         public void NewRemovedText(string file, int position, string editor, string instruc, int seq)
         {
@@ -159,8 +164,9 @@ namespace Company.VSPackage1
             {
 
                 RemovedText(this, new EditedTextEventArgs(editor, position, file, instruc, seq));
-
+                ExpectedSequence++;
             }
+
         }
         public void Save(string file)
         {

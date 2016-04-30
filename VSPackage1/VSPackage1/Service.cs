@@ -26,9 +26,11 @@ namespace Company.VSPackage1
                 mybinding = new NetTcpBinding();
                 mybinding.PortSharingEnabled = true;
                 mybinding.Security.Mode = SecurityMode.None;
-                TimeSpan minutes10 = new TimeSpan(0, 10, 0);
+                TimeSpan minutes10 = new TimeSpan(0,10, 0);
                 mybinding.SendTimeout = minutes10;
                 mybinding.ReceiveTimeout = minutes10;
+                mybinding.CloseTimeout = minutes10;
+                mybinding.OpenTimeout = minutes10;
 
                 // Step 3 Add a service endpoint.
                 host.AddServiceEndpoint(typeof(CoProService.ICoProService), mybinding, "CoProService");

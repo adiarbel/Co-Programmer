@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Runtime.Serialization;
 using System.ServiceModel;
+using System.ServiceModel.Channels;
 using Microsoft.VisualStudio.Text;
 using System.IO;
 using System.IO.Compression;
@@ -20,6 +21,7 @@ namespace CoProService
         static Dictionary<string, OperationContext> ids = new Dictionary<string, OperationContext>();
         static Dictionary<string, string> carets = new Dictionary<string, string>();
         static List<string> ShareProjectIDs = new List<string>();
+        static List<string> ShareProjectIPs = new List<string>();
         static int seqId = 0;
         static string projPath;
         int place;
@@ -29,6 +31,7 @@ namespace CoProService
         static string admin = "";
         public CoProService()
         {
+            
             id = OperationContext.Current.SessionId;
             ids[id] = OperationContext.Current;
             //PrintIds();
@@ -79,27 +82,57 @@ namespace CoProService
         {
             string[] assa = carets.Keys.ToArray<string>();
             ICoProServiceCallback callback;
-            OperationContext.Current.GetCallbackChannel<ICoProServiceCallback>().AddCurrentEditors(carets.Keys.ToArray<string>(), carets.Values.ToArray<string>());
             if (carets.ContainsKey(id))
             {
+                List<string> keys = new List<string>();
+                List<string> vals = new List<string>();
+                for (int i = 0; i < carets.Values.Count; i++)
+                {
+                    string t_key = carets.Keys.ElementAt(i);
+                    string t_val = carets.Values.ElementAt(i);
+
+                    if(t_key!=id)
+                    {
+                        if (t_val.Contains(file))
+                        {
+                            keys.Add(t_key);
+                            vals.Add(t_val);
+                        }
+                    }
+                }
+                OperationContext.Current.GetCallbackChannel<ICoProServiceCallback>().AddCurrentEditors(keys.ToArray<string>(), vals.ToArray<string>());
                 SendCaretPosition(file, position, "click");
+                if (!isAdmin)
+                {
+                    ids[admin].GetCallbackChannel<ICoProServiceCallback>().AdminFileOpen(file);
+                }
+
             }
             else
             {
+                OperationContext.Current.GetCallbackChannel<ICoProServiceCallback>().AddCurrentEditors(carets.Keys.ToArray<string>(), carets.Values.ToArray<string>());
                 lock (carets)
                 {
                     carets[id] = "" + file + " " + position;
                 }
                 OperationContext[] idsArr = ids.Values.ToArray();
-                ids[admin].GetCallbackChannel<ICoProServiceCallback>().AdminFileOpen(file);
+                string[] idsKeys = ids.Keys.ToArray(); 
+                if (!isAdmin)
+                {
+                    ids[admin].GetCallbackChannel<ICoProServiceCallback>().AdminFileOpen(file);
+                }
                 for (int i = 0; i < idsArr.Length; i++)
                 {
-                    if (idsArr[i].SessionId != id)
+                    if (idsKeys[i] != id)
                     {
                         try
                         {
                             callback = idsArr[i].GetCallbackChannel<ICoProServiceCallback>();
-                            callback.NewEditorAdded(file, position, id, seqId);
+                            lock (locker)
+                            {
+                                callback.NewEditorAdded(file, position, id, seqId);
+                            }
+
                         }
                         catch
                         {
@@ -109,6 +142,7 @@ namespace CoProService
                     }
 
                 }
+                seqId++;
             }
             return true;
         }
@@ -120,17 +154,21 @@ namespace CoProService
                 carets[id] = "" + file + " " + position;
             }
             OperationContext[] idsArr = ids.Values.ToArray();
-
+            string[] idsKeys = ids.Keys.ToArray(); 
             for (int i = 0; i < idsArr.Length; i++)
             {
-                if (idsArr[i].SessionId != id)
+                if (idsKeys[i] != id)
                 {
                     try
                     {
                         callback = idsArr[i].GetCallbackChannel<ICoProServiceCallback>();
                         if (content == "click")
                         {
-                            callback.ChangedCaret(file, position, id, seqId);
+                            lock (locker)
+                            {
+                                callback.ChangedCaret(file, position, id, seqId);
+                                seqId++;
+                            }
                         }
                         else if (content.Contains("DELETE"))
                         {
@@ -175,7 +213,22 @@ namespace CoProService
             {
                 ShareProjectIDs.Add(id);
             }
-            ids[admin].GetCallbackChannel<ICoProServiceCallback>().ApproveCloning(ShareProjectIDs.ToArray());
+            lock (ShareProjectIPs)
+            {
+                string ip="";
+                var prop = OperationContext.Current.IncomingMessageProperties;
+                if (OperationContext.Current.IncomingMessageProperties.ContainsKey(System.ServiceModel.Channels.RemoteEndpointMessageProperty.Name))
+                {
+                    var endpoint = prop[System.ServiceModel.Channels.RemoteEndpointMessageProperty.Name]
+                        as System.ServiceModel.Channels.RemoteEndpointMessageProperty;
+                    if (endpoint != null)
+                    {
+                        ip = endpoint.Address;
+                    }
+                }
+                ShareProjectIPs.Add(ip);
+            }
+            ids[admin].GetCallbackChannel<ICoProServiceCallback>().ApproveCloning(ShareProjectIPs.ToArray());
         }
         public int ShareProject(string path, string projName)
         {

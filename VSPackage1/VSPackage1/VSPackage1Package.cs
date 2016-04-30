@@ -119,11 +119,7 @@ namespace Company.VSPackage1
         {
             Debug.WriteLine(string.Format(CultureInfo.CurrentCulture, "Entering Initialize() of: {0}", this.ToString()));
             base.Initialize();
-            var openEv = DTE2.Events.SolutionEvents;
-            var openEv2 = ((Events2)(DTE2.Events)).WindowEvents;
-            events.Add(openEv);
-            openEv.Opened += SolutionOpened;
-            openEv.AfterClosing += ShutDown;
+            
             // Add our command handlers for menu (commands must exist in the .vsct file)
             OleMenuCommandService mcs = GetService(typeof(IMenuCommandService)) as OleMenuCommandService;
             if (null != mcs)
