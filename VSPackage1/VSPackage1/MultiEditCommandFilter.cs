@@ -42,7 +42,8 @@ namespace Company.VSPackage1
             cb = mcb;
             crts = cs;
             //crts.DTE2.Events.TextEditorEvents.LineChanged += new _dispTextEditorEvents_LineChangedEventHandler();
-
+            var saveEvent = crts.DTE2.Events.DocumentEvents;
+            saveEvent.DocumentSaved += new _dispDocumentEvents_DocumentSavedEventHandler(my_DocWasSaved);
             cb.NewCaret += new NewCaretEventHandler(my_NewCaret);
             cb.ChangeCaret += new ChangeCaretEventHandler(my_ChangedCaret);
             cb.EditorDisc += new EditorDisconnectedEventHandler(my_EditorDisc);
@@ -50,6 +51,7 @@ namespace Company.VSPackage1
             cb.RemovedText += new RemovedTextEventHandler(my_RemovedText);
             cb.save += new SaveEventHandler(my_Save);
             cb.AddAllEditors += new AddCurrentEditorsEventHandler(my_AddEditors);
+            textView.Caret.PositionChanged += new EventHandler<CaretPositionChangedEventArgs>(my_PositionChanged);
             textView.TextBuffer.Changed += TextBuffer_Changed;
             InitBrushes();
             uiDisp = Dispatcher.CurrentDispatcher;
@@ -82,6 +84,21 @@ namespace Company.VSPackage1
             cb.IntializePosition(filename, m_textView.Caret.Position.BufferPosition.Position);
 
             currSizeBuffer = m_textView.TextSnapshot.Length;
+        }
+        void my_PositionChanged(object sender,CaretPositionChangedEventArgs e)
+        {
+            RedrawScreen();
+            //https://msdn.microsoft.com/en-us/library/microsoft.visualstudio.text.editor.itextcaret.positionchanged.aspx
+            cb.SendCaretPosition(filename, e.NewPosition.BufferPosition.Position, "click");
+            cb.ExpectedSequence++;
+        }
+        void my_DocWasSaved(Document target)
+        {
+            if (mySide)
+            {
+                cb.SendCaretPosition(filename, 0, "save");
+            }
+            mySide = true;
         }
         void my_AdminCallback(object sender, AdminEventArgs e)
         {
@@ -164,6 +181,7 @@ namespace Company.VSPackage1
         }
         void my_ChangedCaret(object sender, EditedTextEventArgs e)
         {
+            RedrawScreen();
             //ITextDocument textDoc;
             //var rc = m_textView.TextBuffer.Properties.TryGetProperty<ITextDocument>(
             //  typeof(ITextDocument), out textDoc);
@@ -291,47 +309,47 @@ namespace Company.VSPackage1
             // When Alt Clicking, we need to add Edit points.
             Debug.WriteLine("=====" + nCmdID + " " + pguidCmdGroup.ToString() + nCmdexecopt + " " + pvaIn.ToString() + " " + pvaOut.ToString(), "adi");
             Debug.WriteLine((uint)VSConstants.VSStd97CmdID.SaveProjectItem);
-            if (delayFixer)
-            {
-                cb.SendCaretPosition(filename, m_textView.Caret.Position.BufferPosition.Position, "click");
-                cb.ExpectedSequence++;
-                delayFixer = false;
-            }
-            if (pguidCmdGroup == VSConstants.VSStd2K && nCmdID == (uint)VSConstants.VSStd2KCmdID.ECMD_LEFTCLICK)
-            {
-                requiresHandling = true;
-                RedrawScreen();
+            //if (delayFixer)
+            //{
+            //    cb.SendCaretPosition(filename, m_textView.Caret.Position.BufferPosition.Position, "click");
+            //    cb.ExpectedSequence++;
+            //    delayFixer = false;
+            //}
+            //if (pguidCmdGroup == VSConstants.VSStd2K && nCmdID == (uint)VSConstants.VSStd2KCmdID.ECMD_LEFTCLICK)
+            //{
+            //    requiresHandling = true;
+            //    RedrawScreen();
+            //    //https://msdn.microsoft.com/en-us/library/microsoft.visualstudio.text.editor.itextcaret.positionchanged.aspx
+            //    cb.SendCaretPosition(filename, m_textView.Caret.Position.BufferPosition.Position, "click");
+            //    cb.ExpectedSequence++;
 
-                cb.SendCaretPosition(filename, m_textView.Caret.Position.BufferPosition.Position, "click");
-                cb.ExpectedSequence++;
+            //}
+            //else if (pguidCmdGroup == VSConstants.VSStd2K &&
+            //        nCmdID == (uint)VSConstants.VSStd2KCmdID.UP ||
+            //        nCmdID == (uint)VSConstants.VSStd2KCmdID.DOWN ||
+            //        nCmdID == (uint)VSConstants.VSStd2KCmdID.LEFT ||
+            //        nCmdID == (uint)VSConstants.VSStd2KCmdID.RIGHT)
+            //{
+            //    delayFixer = true;
+            //}
+            //if (nCmdID == (uint)VSConstants.VSStd97CmdID.SaveProjectItem)
+            //{
+            //    if (mySide)
+            //    {
+            //        cb.SendCaretPosition(filename, 0, "save");//http://stackoverflow.com/questions/9844900/visual-studio-sdk-handle-file-save-event
+            //    }
+            //    mySide = true;
 
-            }
-            else if (pguidCmdGroup == VSConstants.VSStd2K &&
-                    nCmdID == (uint)VSConstants.VSStd2KCmdID.UP ||
-                    nCmdID == (uint)VSConstants.VSStd2KCmdID.DOWN ||
-                    nCmdID == (uint)VSConstants.VSStd2KCmdID.LEFT ||
-                    nCmdID == (uint)VSConstants.VSStd2KCmdID.RIGHT)
-            {
-                delayFixer = true;
-            }
-            else if (nCmdID == (uint)VSConstants.VSStd97CmdID.SaveProjectItem)
-            {
-                if (mySide)
-                {
-                    cb.SendCaretPosition(filename, 0, "save");
-                }
-                mySide = true;
+            //}
+            //else if (nCmdID == (uint)VSConstants.VSStd97CmdID.SaveSolution)
+            //{
+            //    if (mySide)
+            //    {
+            //        cb.SendCaretPosition(filename, 0, "saveS");
+            //    }
+            //    mySide = true;
 
-            }
-            else if (nCmdID == (uint)VSConstants.VSStd97CmdID.SaveSolution)
-            {
-                if (mySide)
-                {
-                    cb.SendCaretPosition(filename, 0, "saveS");
-                }
-                mySide = true;
-
-            }
+            //}
             //else if (pguidCmdGroup == VSConstants.VSStd2K && trackDict.Count > 0 && (nCmdID == (uint)VSConstants.VSStd2KCmdID.TYPECHAR ||
             //        nCmdID == (uint)VSConstants.VSStd2KCmdID.BACKSPACE ||
             //        nCmdID == (uint)VSConstants.VSStd2KCmdID.TAB ||
