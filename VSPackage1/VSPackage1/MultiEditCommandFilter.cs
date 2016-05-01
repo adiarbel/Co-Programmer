@@ -33,6 +33,8 @@ namespace Company.VSPackage1
         bool delayFixer = false;
         int currSizeBuffer;
         string filename;
+        Events events;
+        DocumentEvents saveEvent;
         public MultiEditCommandFilter(IWpfTextView textView, MyCallBack mcb, Carets cs)
         {
             m_textView = textView;
@@ -42,7 +44,8 @@ namespace Company.VSPackage1
             cb = mcb;
             crts = cs;
             //crts.DTE2.Events.TextEditorEvents.LineChanged += new _dispTextEditorEvents_LineChangedEventHandler();
-            var saveEvent = crts.DTE2.Events.DocumentEvents;
+            events = crts.DTE2.Events;
+            saveEvent = events.DocumentEvents;
             saveEvent.DocumentSaved += new _dispDocumentEvents_DocumentSavedEventHandler(my_DocWasSaved);
             cb.NewCaret += new NewCaretEventHandler(my_NewCaret);
             cb.ChangeCaret += new ChangeCaretEventHandler(my_ChangedCaret);
@@ -85,7 +88,7 @@ namespace Company.VSPackage1
 
             currSizeBuffer = m_textView.TextSnapshot.Length;
         }
-        void my_PositionChanged(object sender,CaretPositionChangedEventArgs e)
+        void my_PositionChanged(object sender, CaretPositionChangedEventArgs e)
         {
             RedrawScreen();
             //https://msdn.microsoft.com/en-us/library/microsoft.visualstudio.text.editor.itextcaret.positionchanged.aspx
@@ -104,10 +107,12 @@ namespace Company.VSPackage1
         {
             if (!crts.DTE2.Solution.Projects.Item(1).ProjectItems.Item(e.File).IsOpen)
             {
+                Window w = null;
                 uiDisp.Invoke(new Action(() =>
                         {
-                            crts.DTE2.Solution.Projects.Item(1).ProjectItems.Item(e.File).Open(EnvDTE.Constants.vsViewKindTextView).Activate();
+                            w = crts.DTE2.Solution.Projects.Item(1).ProjectItems.Item(e.File).Open(EnvDTE.Constants.vsViewKindTextView);
                         }));
+                w.Activate();
             }
         }
         void TextBuffer_Changed(object sender, TextContentChangedEventArgs e)
@@ -181,7 +186,6 @@ namespace Company.VSPackage1
         }
         void my_ChangedCaret(object sender, EditedTextEventArgs e)
         {
-            RedrawScreen();
             //ITextDocument textDoc;
             //var rc = m_textView.TextBuffer.Properties.TryGetProperty<ITextDocument>(
             //  typeof(ITextDocument), out textDoc);
@@ -464,27 +468,28 @@ namespace Company.VSPackage1
         {
             SnapshotSpan span;
             SnapshotPoint tempSnapPoint = curTrackPoint.GetPoint(m_textView.TextSnapshot);
-            if (tempSnapPoint.Position == m_textView.TextSnapshot.Length)
+            if (tempSnapPoint.Position != m_textView.TextSnapshot.Length)
             {
-                m_textView.TextSnapshot.TextBuffer.Insert(tempSnapPoint.Position, " ");
-                tempSnapPoint = tempSnapPoint.Subtract(1);
+                //m_textView.TextSnapshot.TextBuffer.Insert(tempSnapPoint.Position, " ");
+                //tempSnapPoint = tempSnapPoint.Subtract(1);
+                span = new SnapshotSpan(tempSnapPoint, 1);
+                var g = m_textView.TextViewLines.GetLineMarkerGeometry(span);
+                GeometryDrawing drawing = new GeometryDrawing(brush, null, g);
+                if (drawing.Bounds.IsEmpty)
+                    return;
+
+                System.Windows.Shapes.Rectangle r = new System.Windows.Shapes.Rectangle()
+                {
+                    Fill = brush,
+                    Width = drawing.Bounds.Width / 4,
+                    Height = drawing.Bounds.Height
+                };
+                Canvas.SetLeft(r, g.Bounds.Left);
+                Canvas.SetTop(r, g.Bounds.Top);
+                m_adornmentLayer.AddAdornment(AdornmentPositioningBehavior.TextRelative, span, "MultiEditLayer", r, null);
             }
 
-            span = new SnapshotSpan(tempSnapPoint, 1);
-            var g = m_textView.TextViewLines.GetLineMarkerGeometry(span);
-            GeometryDrawing drawing = new GeometryDrawing(brush, null, g);
-            if (drawing.Bounds.IsEmpty)
-                return;
-
-            System.Windows.Shapes.Rectangle r = new System.Windows.Shapes.Rectangle()
-            {
-                Fill = brush,
-                Width = drawing.Bounds.Width / 4,
-                Height = drawing.Bounds.Height
-            };
-            Canvas.SetLeft(r, g.Bounds.Left);
-            Canvas.SetTop(r, g.Bounds.Top);
-            m_adornmentLayer.AddAdornment(AdornmentPositioningBehavior.TextRelative, span, "MultiEditLayer", r, null);
+            
 
         }
         private void m_textView_LayoutChanged(object sender, TextViewLayoutChangedEventArgs e)

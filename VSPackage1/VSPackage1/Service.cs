@@ -26,7 +26,8 @@ namespace Company.VSPackage1
                 mybinding = new NetTcpBinding();
                 mybinding.PortSharingEnabled = true;
                 mybinding.Security.Mode = SecurityMode.None;
-                TimeSpan minutes10 = new TimeSpan(0,10, 0);
+                TimeSpan minutes10 = new TimeSpan(0, 10, 0);
+                mybinding.ReliableSession.InactivityTimeout = minutes10;
                 mybinding.SendTimeout = minutes10;
                 mybinding.ReceiveTimeout = minutes10;
                 mybinding.CloseTimeout = minutes10;

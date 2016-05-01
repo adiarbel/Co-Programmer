@@ -28,7 +28,7 @@ namespace Company.VSPackage1
     /*TODO: define event for that delegate*/
 
     /*TODO: define the above for each event that might come from the server's callbacks*/
-    [CallbackBehavior(UseSynchronizationContext = false, ConcurrencyMode = ConcurrencyMode.Reentrant)]
+    [CallbackBehavior(UseSynchronizationContext = false, ConcurrencyMode = ConcurrencyMode.Multiple)]
     public class MyCallBack : ICoProServiceCallback, IDisposable
     {
         public event NewCaretEventHandler NewCaret;
@@ -64,6 +64,8 @@ namespace Company.VSPackage1
             context = new InstanceContext(this);
             mybinding = new NetTcpBinding();
             mybinding.PortSharingEnabled = true;
+            //mybinding.ReceiveTimeout = new TimeSpan(0, 10, 0);
+            //mybinding.SendTimeout = new TimeSpan(0, 10, 0);
             mybinding.Security.Mode = SecurityMode.None;
         }
         public string ProjPath
