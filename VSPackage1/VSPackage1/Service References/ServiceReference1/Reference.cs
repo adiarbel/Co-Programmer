@@ -16,10 +16,10 @@ namespace Company.VSPackage1.ServiceReference1 {
     public interface ICoProService {
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICoProService/IntializePosition", ReplyAction="http://tempuri.org/ICoProService/IntializePositionResponse")]
-        bool IntializePosition(string file, int position);
+        bool IntializePosition(string file, int position, string name);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICoProService/IntializePosition", ReplyAction="http://tempuri.org/ICoProService/IntializePositionResponse")]
-        System.Threading.Tasks.Task<bool> IntializePositionAsync(string file, int position);
+        System.Threading.Tasks.Task<bool> IntializePositionAsync(string file, int position, string name);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICoProService/SendCaretPosition", ReplyAction="http://tempuri.org/ICoProService/SendCaretPositionResponse")]
         bool SendCaretPosition(string file, int position, string content);
@@ -34,10 +34,10 @@ namespace Company.VSPackage1.ServiceReference1 {
         System.Threading.Tasks.Task<int> ShareProjectAsync(string path, string projName);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICoProService/GetProject", ReplyAction="http://tempuri.org/ICoProService/GetProjectResponse")]
-        void GetProject();
+        void GetProject(string name);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICoProService/GetProject", ReplyAction="http://tempuri.org/ICoProService/GetProjectResponse")]
-        System.Threading.Tasks.Task GetProjectAsync();
+        System.Threading.Tasks.Task GetProjectAsync(string name);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICoProService/SetAdmin", ReplyAction="http://tempuri.org/ICoProService/SetAdminResponse")]
         bool SetAdmin(bool adm);
@@ -80,10 +80,10 @@ namespace Company.VSPackage1.ServiceReference1 {
     public interface ICoProServiceCallback {
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICoProService/AddCurrentEditors", ReplyAction="http://tempuri.org/ICoProService/AddCurrentEditorsResponse")]
-        void AddCurrentEditors(string[] editors, string[] locations);
+        void AddCurrentEditors(string[] editors, string[] locations, string[] names);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICoProService/NewEditorAdded", ReplyAction="http://tempuri.org/ICoProService/NewEditorAddedResponse")]
-        void NewEditorAdded(string file, int position, string editor, int seq);
+        void NewEditorAdded(string file, int position, string editor, int seq, string name);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICoProService/EditorDisconnected", ReplyAction="http://tempuri.org/ICoProService/EditorDisconnectedResponse")]
         void EditorDisconnected(string editor);
@@ -147,12 +147,12 @@ namespace Company.VSPackage1.ServiceReference1 {
                 base(callbackInstance, binding, remoteAddress) {
         }
         
-        public bool IntializePosition(string file, int position) {
-            return base.Channel.IntializePosition(file, position);
+        public bool IntializePosition(string file, int position, string name) {
+            return base.Channel.IntializePosition(file, position, name);
         }
         
-        public System.Threading.Tasks.Task<bool> IntializePositionAsync(string file, int position) {
-            return base.Channel.IntializePositionAsync(file, position);
+        public System.Threading.Tasks.Task<bool> IntializePositionAsync(string file, int position, string name) {
+            return base.Channel.IntializePositionAsync(file, position, name);
         }
         
         public bool SendCaretPosition(string file, int position, string content) {
@@ -171,12 +171,12 @@ namespace Company.VSPackage1.ServiceReference1 {
             return base.Channel.ShareProjectAsync(path, projName);
         }
         
-        public void GetProject() {
-            base.Channel.GetProject();
+        public void GetProject(string name) {
+            base.Channel.GetProject(name);
         }
         
-        public System.Threading.Tasks.Task GetProjectAsync() {
-            return base.Channel.GetProjectAsync();
+        public System.Threading.Tasks.Task GetProjectAsync(string name) {
+            return base.Channel.GetProjectAsync(name);
         }
         
         public bool SetAdmin(bool adm) {

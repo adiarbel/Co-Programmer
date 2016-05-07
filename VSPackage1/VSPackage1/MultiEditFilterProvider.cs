@@ -10,6 +10,8 @@ using Microsoft.VisualStudio.TextManager.Interop;
 using Microsoft.VisualStudio.Text;
 using System.IO;
 using System.Text;
+using System.Xml;
+using System.Xml.Linq;
 
 namespace Company.VSPackage1
 {
@@ -45,7 +47,7 @@ namespace Company.VSPackage1
                 {
                     StreamReader sr = new StreamReader(adminFile);
                     string dir = sr.ReadToEnd();
-                    if (dir == slnName.Substring(0, slnName.LastIndexOf('\\')))
+                    if (dir.Split('\n')[0] == slnName.Substring(0, slnName.LastIndexOf('\\')))
                     {
                         VSPackage1Package.service = new Service();
                         string filesDir = slnName.Substring(0, slnName.LastIndexOf('\\')) + "\\CoProFiles";
@@ -53,8 +55,14 @@ namespace Company.VSPackage1
                         {
                             Directory.CreateDirectory(slnName.Substring(0, slnName.LastIndexOf('\\')) + "\\CoProFiles");
                         }
+                        string path = slnName.Substring(0, slnName.LastIndexOf('\\'));
+                        XElement xe = VSPackage1Package.CreateFileSystemXmlTree(path, 1, path.Substring(path.LastIndexOf('\\') + 1));
+                        XmlTextWriter xwr = new XmlTextWriter(path + "\\CoProFiles\\timestamps.xml", System.Text.Encoding.UTF8);
+                        xwr.Formatting = Formatting.Indented;
+                        xe.WriteTo(xwr);
+                        xwr.Close();
                         FileStream fs = File.Create(slnName.Substring(0, slnName.LastIndexOf('\\')) + "\\CoProFiles\\client.txt");
-                        string ipPort = "localhost:" + (VSPackage1Package.service.PortOfService() + 10).ToString();
+                        string ipPort = "localhost:" + (VSPackage1Package.service.PortOfService() + 10).ToString() + ":" + dir.Split('\n')[1];
                         fs.Write(Encoding.ASCII.GetBytes(ipPort), 0, ipPort.Length);
                         fs.Close();
                         setAdminConfiguraions = true;
@@ -63,8 +71,9 @@ namespace Company.VSPackage1
                 if (File.Exists(slnName.Substring(0, slnName.LastIndexOf('\\')) + "\\CoProFiles\\client.txt"))
                 {
                     StreamReader sr = new StreamReader(slnName.Substring(0, slnName.LastIndexOf('\\')) + "\\CoProFiles\\client.txt");
-                    string iport = sr.ReadToEnd();
-                    cb.SetIpPort(iport.Split(':')[0], iport.Split(':')[1]);
+                    string iportName = sr.ReadToEnd();
+                    cb.SetIpPort(iportName.Split(':')[0], iportName.Split(':')[1]);
+                    cb.Name = iportName.Split(':')[2];
                     if (cb.Connect())
                     {
                         cb.ProjPath = slnName.Substring(0, slnName.LastIndexOf('\\'));

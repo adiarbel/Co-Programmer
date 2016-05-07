@@ -159,6 +159,15 @@
     <Compile Include="MultiEditCommandFilter.cs" />
     <Compile Include="MultiEditFilterProvider.cs" />
     <Compile Include="MyCallBack.cs" />
+    <Compile Include="CoProExplorer.xaml.cs">
+      <DependentUpon>CoProExplorer.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="MyToolWindow.cs" />
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
     <Compile Include="Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -189,6 +198,10 @@
   <ItemGroup>
     <None Include="App.config">
       <SubType>Designer</SubType>
+    </None>
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
     <None Include="Service References\ServiceReference1\CoProService.wsdl" />
     <None Include="Service References\ServiceReference1\item.xsd">
@@ -238,6 +251,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="HostProjectWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="CoProExplorer.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

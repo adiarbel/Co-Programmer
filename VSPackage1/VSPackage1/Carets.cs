@@ -70,6 +70,7 @@ namespace Company.VSPackage1
         }
         private void ItemAdded(ProjectItem pi)
         {
+            //ADD CODE OF ITEM ADDED AS WELL AS FUNTIONS TO SYNC
         }
         IWpfTextViewHost GetTextViewHost()
         {

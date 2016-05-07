@@ -27,15 +27,24 @@ namespace Company.VSPackage1
         }
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            cb.SetIpPort(ip.Text,port.Text);
-            if(!cb.Connect())
+            if (name.Text != "" && ip.Text != "" && port.Text != "")
             {
-                System.Windows.MessageBox.Show("Try again connection failed...");
+                cb.SetIpPort(ip.Text, port.Text);
+                if (!cb.Connect())
+                {
+                    System.Windows.MessageBox.Show("Try again connection failed...");
+                }
+                else
+                {
+                    cb.Name = name.Text;
+                    System.Windows.MessageBox.Show("You are now connected!");
+                    this.Close();
+                    new CloneWindow(cb,name.Text).Show();
+                }
             }
             else
             {
-                System.Windows.MessageBox.Show("You are now connected!");
-                this.Close();
+                System.Windows.MessageBox.Show("Try again, one of the fields is empty...");
             }
         }
     }

@@ -44,6 +44,7 @@ namespace Company.VSPackage1
     // in the Help/About dialog of Visual Studio.
     [InstalledProductRegistration("#110", "#112", "1.0", IconResourceID = 400)]
     // This attribute is needed to let the shell know that this package exposes some menus.
+    [ProvideToolWindow(typeof(MyToolWindow))]
     [ProvideMenuResource("Menus.ctmenu", 1)]
     [Guid(GuidList.guidVSPackage1PkgString)]
     [ProvideAutoLoad("ADFC4E64-0397-11D1-9F4E-00A0C911004F")]
@@ -125,14 +126,12 @@ namespace Company.VSPackage1
             if (null != mcs)
             {
                 // Create the command for the menu item.
+                CommandID toolwndCommandID = new CommandID(GuidList.guidVSPackage1CmdSet, (int)PkgCmdIDList.cmdidMyTool);
+                MenuCommand menuToolWin = new MenuCommand(ShowToolWindow, toolwndCommandID);
+                mcs.AddCommand(menuToolWin);
                 CommandID menuCommandID = new CommandID(GuidList.guidTopLevelMenuCmdSet, (int)PkgCmdIDList.connectToServer);
                 MenuCommand menuItem = new MenuCommand(ConnectCallback, menuCommandID);
                 cmds["connectToServer"] = menuItem;
-                mcs.AddCommand(menuItem);
-                menuCommandID = new CommandID(GuidList.guidTopLevelMenuCmdSet, (int)PkgCmdIDList.cloneProject);
-                menuItem = new MenuCommand(CloneCallback, menuCommandID);
-                menuItem.Visible = true;
-                cmds["cloneProject"] = menuItem;
                 mcs.AddCommand(menuItem);
                 menuCommandID = new CommandID(GuidList.guidTopLevelMenuCmdSet, (int)PkgCmdIDList.hostProject);
                 menuItem = new MenuCommand(HostCallback, menuCommandID);
@@ -140,6 +139,19 @@ namespace Company.VSPackage1
                 cmds["hostProject"] = menuItem;
                 mcs.AddCommand(menuItem);
             }
+        }
+        private void ShowToolWindow(object sender, EventArgs e)
+        {
+            // Get the instance number 0 of this tool window. This window is single instance so this instance
+            // is actually the only one.
+            // The last flag is set to true so that if the tool window does not exists it will be created.
+            ToolWindowPane window = this.FindToolWindow(typeof(MyToolWindow), 0, true);
+            if ((null == window) || (null == window.Frame))
+            {
+                throw new NotSupportedException(Resources.CanNotCreateWindow);
+            }
+            IVsWindowFrame windowFrame = (IVsWindowFrame)window.Frame;
+            Microsoft.VisualStudio.ErrorHandler.ThrowOnFailure(windowFrame.Show());
         }
         #endregion
         public void SolutionOpened()
@@ -160,15 +172,10 @@ namespace Company.VSPackage1
 
 
         }
-        private void CloneCallback(object sender, EventArgs e)
-        {
-            CloneWindow c = new CloneWindow(cb);
-            c.Show();
-        }
         private void HostCallback(object sender, EventArgs e)
         {
             HostProjectWindow hpw = new HostProjectWindow(DTE2);
-            hpw.Show();
+            hpw.ShowDialog();
             //service = new Service();
         }
         private void ShutDown()
@@ -192,7 +199,7 @@ namespace Company.VSPackage1
                 VSPackage1Package.service.Close();
             }
         }
-        private XElement CreateFileSystemXmlTree(string source, int level, string relPath)
+        public static XElement CreateFileSystemXmlTree(string source, int level, string relPath)
         {
             DirectoryInfo dir = new DirectoryInfo(source);
             var info = new XElement("Directory",

@@ -40,11 +40,19 @@ namespace Company.VSPackage1
         }
         private void Done_Click(object sender, RoutedEventArgs e)
         {
-            FileStream fs = File.Create(dirBlock.Text.Substring(0, dirBlock.Text.LastIndexOf('\\'))+"\\admin.txt");
-            fs.Write(Encoding.ASCII.GetBytes(dirBlock.Text), 0, dirBlock.Text.Length);
-            //File.GetLastWriteTime();
-            fs.Close();
-            this.Close();
+            if(name.Text!="")
+            {
+
+                FileStream fs = File.Create(dirBlock.Text.Substring(0, dirBlock.Text.LastIndexOf('\\')) + "\\admin.txt");
+                fs.Write(Encoding.ASCII.GetBytes(dirBlock.Text + "\n" + name.Text), 0, (dirBlock.Text + "\n" + name.Text).Length);
+                //File.GetLastWriteTime();
+                fs.Close();
+                this.Close();
+            }
+            else
+            {
+                System.Windows.Forms.MessageBox.Show("Pleases enter a name and try again");
+            }
         }
     }
 }

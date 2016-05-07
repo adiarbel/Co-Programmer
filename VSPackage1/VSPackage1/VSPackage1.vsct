@@ -82,14 +82,6 @@
           <ButtonText>Connect</ButtonText>
         </Strings>
       </Button>
-      <Button guid="guidTopLevelMenuCmdSet" id="cloneProject" priority="0x0101" type="Button">
-        <Parent guid="guidButtonGroupCmdSet" id="MyMenuGroup" />
-        <Icon guid="guidImages" id="bmpPicArrows" />
-        <Strings>
-          <CommandName>Clone</CommandName>
-          <ButtonText>Clone</ButtonText>
-        </Strings>
-      </Button>
       <Button guid="guidTopLevelMenuCmdSet" id="hostProject" priority="0x0102" type="Button">
         <Parent guid="guidButtonGroupCmdSet" id="MyMenuGroup" />
         <Icon guid="guidImages" id="bmpPicArrows" />
@@ -98,7 +90,13 @@
           <ButtonText>Start your own project</ButtonText>
         </Strings>
       </Button>
-
+      <Button guid="guidVSPackage1CmdSet" id="cmdidMyTool" priority="0x0103" type="Button">
+        <Parent guid="guidButtonGroupCmdSet" id="MyMenuGroup"/>
+        <Icon guid="guidImages" id="bmpPic2" />
+        <Strings>
+          <ButtonText>CoPro Explorer</ButtonText>
+        </Strings>
+      </Button>
 
     </Buttons>
    
@@ -127,6 +125,7 @@
     <GuidSymbol name="guidVSPackage1CmdSet" value="{43891a24-d81c-4e70-98b1-386c3957f6cd}">
       <IDSymbol name="MyMenuGroup" value="0x1020" />
       <IDSymbol name="cmdidMyCommand" value="0x0100" />
+      <IDSymbol name="cmdidMyTool" value="0x0103" />
     </GuidSymbol>
 
     <GuidSymbol name="guidButtonGroupCmdSet" value="{f69209e9-975a-4543-821d-1f4a2c52d737}">
@@ -137,7 +136,6 @@
     <GuidSymbol name="guidTopLevelMenuCmdSet" value="{2feb817a-40d9-4779-bf51-9bf22725b04d}">
       <IDSymbol name="TopLevelMenu" value="0x1020" />
       <IDSymbol name="connectToServer" value="0x0100" />
-      <IDSymbol name="cloneProject" value="0x0101" />
       <IDSymbol name="hostProject" value="0x0102" />
     </GuidSymbol>
 

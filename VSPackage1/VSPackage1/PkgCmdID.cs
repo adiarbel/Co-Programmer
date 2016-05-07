@@ -9,6 +9,7 @@ namespace Company.VSPackage1
         public const uint connectToServer = 0x100;
         public const uint cloneProject = 0x101;
         public const uint hostProject = 0x102;
+        public const uint cmdidMyTool = 0x103;
         
 
     };

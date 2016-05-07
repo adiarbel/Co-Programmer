@@ -52,7 +52,7 @@ namespace Company.VSPackage1
             cb.EditorDisc += new EditorDisconnectedEventHandler(my_EditorDisc);
             cb.NewText += new NewTextEventHandler(my_AddedText);
             cb.RemovedText += new RemovedTextEventHandler(my_RemovedText);
-            cb.save += new SaveEventHandler(my_Save);
+            cb.SaveEvent += new SaveEventHandler(my_Save);
             cb.AddAllEditors += new AddCurrentEditorsEventHandler(my_AddEditors);
             textView.Caret.PositionChanged += new EventHandler<CaretPositionChangedEventArgs>(my_PositionChanged);
             textView.TextBuffer.Changed += TextBuffer_Changed;
@@ -84,7 +84,7 @@ namespace Company.VSPackage1
                 }
             }
             filename = filename.Substring(filename.LastIndexOf('\\') + 1);
-            cb.IntializePosition(filename, m_textView.Caret.Position.BufferPosition.Position);
+            cb.IntializePosition(filename, m_textView.Caret.Position.BufferPosition.Position, cb.Name);
 
             currSizeBuffer = m_textView.TextSnapshot.Length;
         }
@@ -110,9 +110,11 @@ namespace Company.VSPackage1
                 Window w = null;
                 uiDisp.Invoke(new Action(() =>
                         {
-                            w = crts.DTE2.Solution.Projects.Item(1).ProjectItems.Item(e.File).Open(EnvDTE.Constants.vsViewKindTextView);
+                            w = crts.DTE2.Solution.Projects.Item(crts.DTE2.ActiveDocument.ProjectItem.ContainingProject.UniqueName).ProjectItems.Item(e.File).Open(EnvDTE.Constants.vsViewKindTextView);
+
                         }));
                 w.Activate();
+                w.Visible = false;
             }
         }
         void TextBuffer_Changed(object sender, TextContentChangedEventArgs e)
@@ -447,21 +449,27 @@ namespace Company.VSPackage1
 
         private void RedrawScreen()
         {
-            uiDisp.Invoke(new Action(() =>
-                {
-                    m_adornmentLayer.RemoveAllAdornments();
-                    int i = 0;
-                    foreach (KeyValuePair<string, ITrackingPoint> entry in trackDict)
+            try
+            {
+                uiDisp.Invoke(new Action(() =>
                     {
-                        var curTrackPoint = trackDict[entry.Key];
-                        if (curTrackPoint != null)
+                        m_adornmentLayer.RemoveAllAdornments();
+                        int i = 0;
+                        foreach (KeyValuePair<string, ITrackingPoint> entry in trackDict)
                         {
-                            DrawSingleSyncPoint(curTrackPoint, brushes[i]);
-                            i++;
+                            var curTrackPoint = trackDict[entry.Key];
+                            if (curTrackPoint != null)
+                            {
+                                DrawSingleSyncPoint(curTrackPoint, brushes[i]);
+                                i++;
+                            }
                         }
-                    }
-                }));
-
+                    }));
+            }
+            catch (Exception e)
+            {
+                System.Windows.Forms.MessageBox.Show(e.Message);
+            }
         }
 
         private void DrawSingleSyncPoint(ITrackingPoint curTrackPoint, SolidColorBrush brush)
@@ -489,7 +497,7 @@ namespace Company.VSPackage1
                 m_adornmentLayer.AddAdornment(AdornmentPositioningBehavior.TextRelative, span, "MultiEditLayer", r, null);
             }
 
-            
+
 
         }
         private void m_textView_LayoutChanged(object sender, TextViewLayoutChangedEventArgs e)

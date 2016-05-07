@@ -21,11 +21,12 @@ namespace Company.VSPackage1
     public partial class CloneWindow : Window
     {
         MyCallBack cb;
-
-        public CloneWindow(MyCallBack calb)
+        string m_name;
+        public CloneWindow(MyCallBack calb,string name)
         {
             InitializeComponent();
             cb = calb;
+            m_name = name;
         }
 
         private void ChooseDirectory_Click(object sender, RoutedEventArgs e)
@@ -44,7 +45,7 @@ namespace Company.VSPackage1
 
         private void Done_Click(object sender, RoutedEventArgs e)
         {
-            cb.GetProject();
+            cb.GetProject(m_name);
             this.Close();
         }
     }

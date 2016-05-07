@@ -13,5 +13,7 @@
             <TextBlock Name="dirBlock" HorizontalAlignment="Left" Margin="-1,-1,-1,0" TextWrapping="Wrap" VerticalAlignment="Top" Background="#FF302D2D" Foreground="White" Height="55" Width="235" />
         </Border>
         <Button Content="OK" HorizontalAlignment="Left" BorderBrush="#FF404040" Margin="110,234,0,0" VerticalAlignment="Top" Width="63" Height="25" Click="Done_Click" Background="#FF302D2D" Foreground="White"/>
+        <TextBox x:Name="name" FontSize="16"  Margin="80,36,28,193" Background="#FF4D4848" Foreground="#FFFBFBFB" BorderBrush="#FF393A3C" BorderThickness="1" TextAlignment="Center" Padding="5,5,5,5" />
+        <Label Content="name :" HorizontalAlignment="Left" Margin="16,36,0,0" VerticalAlignment="Top" Foreground="White" RenderTransformOrigin="0.553,1.346"/>
     </Grid>
 </Window>

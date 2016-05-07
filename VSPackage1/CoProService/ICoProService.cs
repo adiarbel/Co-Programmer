@@ -12,14 +12,13 @@ namespace CoProService
     public interface ICoProService
     {
         [OperationContract]
-        bool IntializePosition(string file, int position);
+        bool IntializePosition(string file, int position,string name);
         [OperationContract]
         bool SendCaretPosition(string file, int position, string content);
         [OperationContract]
         int ShareProject(string path, string projName);
         [OperationContract]
-        void GetProject();
-
+        void GetProject(string name);
         [OperationContract]
         bool SetAdmin(bool adm);
         [OperationContract]
@@ -38,9 +37,9 @@ namespace CoProService
     public interface ICoProServiceCallback
     {
         [OperationContract]
-        void AddCurrentEditors(string[] editors, string[] locations);
+        void AddCurrentEditors(string[] editors, string[] locations, string[] names);
         [OperationContract]
-        void NewEditorAdded(string file, int position, string editor, int seq);
+        void NewEditorAdded(string file, int position, string editor, int seq,string name);
         [OperationContract]
         void EditorDisconnected(string editor);
         [OperationContract]

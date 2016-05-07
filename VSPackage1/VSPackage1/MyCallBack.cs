@@ -25,6 +25,7 @@ namespace Company.VSPackage1
     public delegate void ChangeCaretEventHandler(object sender, EditedTextEventArgs e);
     public delegate void SaveEventHandler(object sender, ChangeCaretEventArgs e);
     public delegate void AdminEventHandler(object sender, AdminEventArgs e);
+    public delegate void ExplorerInfoEventHandler(object sender, ExplorerInfoEventArgs e);
     /*TODO: define event for that delegate*/
 
     /*TODO: define the above for each event that might come from the server's callbacks*/
@@ -37,8 +38,9 @@ namespace Company.VSPackage1
         public event AddCurrentEditorsEventHandler AddAllEditors;
         public event EditorDisconnectedEventHandler EditorDisc;
         public event NewTextEventHandler NewText;
-        public event SaveEventHandler save;
+        public event SaveEventHandler SaveEvent;
         public event AdminEventHandler AdminEvent;
+        public event ExplorerInfoEventHandler ExplorerInfoEvent;
 
         public static Object locker = new Object();
         InstanceContext context;
@@ -47,6 +49,7 @@ namespace Company.VSPackage1
         CoProServiceClient wcfclient;
         int expecSeq;
         bool isAdmin;
+        string name;
         string proj;
         string[] iport = new string[2];
         public int ExpectedSequence
@@ -58,6 +61,11 @@ namespace Company.VSPackage1
         {
             get { return isAdmin; }
             set { isAdmin = value; }
+        }
+        public string Name
+        {
+            get { return name; }
+            set { name = value; }
         }
         public MyCallBack()
         {
@@ -107,33 +115,41 @@ namespace Company.VSPackage1
             }
 
         }
-        public void IntializePosition(string file, int position)
+        public void IntializePosition(string file, int position, string name)
         {
-            wcfclient.IntializePosition(file, position);
+            wcfclient.IntializePosition(file, position, name);
         }
         public void SendCaretPosition(string file, int position, string command)
         {
             wcfclient.SendCaretPosition(file, position, command);
         }
-        public void GetProject()
+        public void GetProject(string name)
         {
-            wcfclient.GetProject();
+            wcfclient.GetProject(name);
             wcfclient.Abort();
         }
-        public void AddCurrentEditors(string[] editors, string[] locations)
+        public void AddCurrentEditors(string[] editors, string[] locations, string[] names)
         {
             if (AddAllEditors != null)
             {
                 AddAllEditors(this, new AddEditorsEventArgs(editors, locations));
                 ExpectedSequence++;
             }
+            if (ExplorerInfoEvent != null)
+            {
+                ExplorerInfoEvent(this, new ExplorerInfoEventArgs("", names));
+            }
         }
-        public void NewEditorAdded(string file, int position, string editor, int seq)
+        public void NewEditorAdded(string file, int position, string editor, int seq, string name)
         {
             if (NewCaret != null)
             {
                 NewCaret(this, new EditedTextEventArgs(editor, position, file, " ", seq));
                 ExpectedSequence++;
+            }
+            if (ExplorerInfoEvent != null)
+            {
+                ExplorerInfoEvent(this, new ExplorerInfoEventArgs(name, null));
             }
         }
         public void ChangedCaret(string file, int position, string editor, int seq)
@@ -172,9 +188,9 @@ namespace Company.VSPackage1
         }
         public void Save(string file)
         {
-            if (save != null)
+            if (SaveEvent != null)
             {
-                save(this, new ChangeCaretEventArgs(" ", 0, file, " "));
+                SaveEvent(this, new ChangeCaretEventArgs(" ", 0, file, " "));
             }
         }
         void IDisposable.Dispose()
@@ -192,7 +208,7 @@ namespace Company.VSPackage1
                 Directory.CreateDirectory(proj + "\\" + fileName + "\\CoProFiles");
             }
             FileStream fs = File.Create(proj + "\\" + fileName + "\\CoProFiles" + "\\client.txt");
-            fs.Write(Encoding.ASCII.GetBytes(iport[0] + ':' + iport[1]), 0, (iport[0] + ':' + iport[1]).Length);
+            fs.Write(Encoding.ASCII.GetBytes(iport[0] + ':' + iport[1] + ':' + name), 0, (iport[0] + ':' + iport[1] + ':' + name).Length);
             fs.Close();
         }
         public void ApproveCloning(string[] idsToApprove)
@@ -399,6 +415,25 @@ namespace Company.VSPackage1
         public string File
         {
             get { return m_file; }
+        }
+    }
+    public class ExplorerInfoEventArgs : EventArgs
+    {
+        private string m_name = null;
+        private string[] m_names = null;
+
+        public ExplorerInfoEventArgs(string name, string[] names)
+        {
+            m_name = name;
+            m_names = names;
+        }
+        public string Name
+        {
+            get { return m_name; }
+        }
+        public string[] Names
+        {
+            get { return m_names; }
         }
     }
 }

@@ -1,0 +1,19 @@
+﻿<UserControl x:Class="Company.VSPackage1.CoProExplorer"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             Background="{DynamicResource VsBrush.Window}"
+             Foreground="{DynamicResource VsBrush.WindowText}"
+             mc:Ignorable="d"
+             d:DesignHeight="300" d:DesignWidth="300"
+             Name="MyToolWindow">
+    <Grid>
+        <StackPanel Orientation="Vertical">
+            <TextBlock Margin="10" HorizontalAlignment="Center">CoPro Explorer</TextBlock>
+        </StackPanel>
+        <StackPanel Orientation="Vertical">
+            <TextBlock Margin="50" HorizontalAlignment="Center" TextAlignment="Center">Here information about the service <LineBreak/> and the editors will be displayed. <LineBreak/> Please connect or create team project<LineBreak/> to see more  information</TextBlock>
+        </StackPanel>
+    </Grid>
+</UserControl>

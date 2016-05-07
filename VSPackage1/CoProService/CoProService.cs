@@ -20,18 +20,20 @@ namespace CoProService
         string[] currChanges = new string[10];
         static Dictionary<string, OperationContext> ids = new Dictionary<string, OperationContext>();
         static Dictionary<string, string> carets = new Dictionary<string, string>();
+        static List<string> EditorsNames = new List<string>();
         static List<string> ShareProjectIDs = new List<string>();
-        static List<string> ShareProjectIPs = new List<string>();
+        static List<string> ShareProjectNames = new List<string>();
         static int seqId = 0;
         static string projPath;
         int place;
+        string name;
         string id;
         Object locker = new Object();
         bool isAdmin;
         static string admin = "";
         public CoProService()
         {
-            
+
             id = OperationContext.Current.SessionId;
             ids[id] = OperationContext.Current;
             //PrintIds();
@@ -78,7 +80,7 @@ namespace CoProService
             OperationContext.Current.GetCallbackChannel<ICoProServiceCallback>().UpdateProjFilesContents(filesToSend, filesContents);
 
         }
-        public bool IntializePosition(string file, int position)
+        public bool IntializePosition(string file, int position, string name)
         {
             string[] assa = carets.Keys.ToArray<string>();
             ICoProServiceCallback callback;
@@ -92,7 +94,7 @@ namespace CoProService
                     string t_key = carets.Keys.ElementAt(i);
                     string t_val = carets.Values.ElementAt(i);
 
-                    if(t_key!=id)
+                    if (t_key != id)
                     {
                         if (t_val.Contains(file))
                         {
@@ -101,7 +103,7 @@ namespace CoProService
                         }
                     }
                 }
-                OperationContext.Current.GetCallbackChannel<ICoProServiceCallback>().AddCurrentEditors(keys.ToArray<string>(), vals.ToArray<string>());
+                OperationContext.Current.GetCallbackChannel<ICoProServiceCallback>().AddCurrentEditors(keys.ToArray<string>(), vals.ToArray<string>(),null);
                 if (!isAdmin)
                 {
                     ids[admin].GetCallbackChannel<ICoProServiceCallback>().AdminFileOpen(file);
@@ -110,13 +112,15 @@ namespace CoProService
             }
             else
             {
-                OperationContext.Current.GetCallbackChannel<ICoProServiceCallback>().AddCurrentEditors(carets.Keys.ToArray<string>(), carets.Values.ToArray<string>());
+                this.name = name;
+                EditorsNames.Add(name);
+                OperationContext.Current.GetCallbackChannel<ICoProServiceCallback>().AddCurrentEditors(carets.Keys.ToArray<string>(), carets.Values.ToArray<string>(),EditorsNames.ToArray());
                 lock (carets)
                 {
                     carets[id] = "" + file + " " + position;
                 }
                 OperationContext[] idsArr = ids.Values.ToArray();
-                string[] idsKeys = ids.Keys.ToArray(); 
+                string[] idsKeys = ids.Keys.ToArray();
                 if (!isAdmin)
                 {
                     ids[admin].GetCallbackChannel<ICoProServiceCallback>().AdminFileOpen(file);
@@ -130,7 +134,7 @@ namespace CoProService
                             callback = idsArr[i].GetCallbackChannel<ICoProServiceCallback>();
                             lock (locker)
                             {
-                                callback.NewEditorAdded(file, position, id, seqId);
+                                callback.NewEditorAdded(file, position, id, seqId,name);
                             }
 
                         }
@@ -154,7 +158,7 @@ namespace CoProService
                 carets[id] = "" + file + " " + position;
             }
             OperationContext[] idsArr = ids.Values.ToArray();
-            string[] idsKeys = ids.Keys.ToArray(); 
+            string[] idsKeys = ids.Keys.ToArray();
             for (int i = 0; i < idsArr.Length; i++)
             {
                 if (idsKeys[i] != id)
@@ -207,28 +211,17 @@ namespace CoProService
             }
             return true;
         }
-        public void GetProject()
+        public void GetProject(string name)
         {
             lock (ShareProjectIDs)
             {
                 ShareProjectIDs.Add(id);
             }
-            lock (ShareProjectIPs)
+            lock (ShareProjectNames)
             {
-                string ip="";
-                var prop = OperationContext.Current.IncomingMessageProperties;
-                if (OperationContext.Current.IncomingMessageProperties.ContainsKey(System.ServiceModel.Channels.RemoteEndpointMessageProperty.Name))
-                {
-                    var endpoint = prop[System.ServiceModel.Channels.RemoteEndpointMessageProperty.Name]
-                        as System.ServiceModel.Channels.RemoteEndpointMessageProperty;
-                    if (endpoint != null)
-                    {
-                        ip = endpoint.Address;
-                    }
-                }
-                ShareProjectIPs.Add(ip);
+                ShareProjectNames.Add(name);
             }
-            ids[admin].GetCallbackChannel<ICoProServiceCallback>().ApproveCloning(ShareProjectIPs.ToArray());
+            ids[admin].GetCallbackChannel<ICoProServiceCallback>().ApproveCloning(ShareProjectNames.ToArray());
         }
         public int ShareProject(string path, string projName)
         {
@@ -242,6 +235,7 @@ namespace CoProService
                 }
                 File.Delete(path.Substring(0, path.LastIndexOf('\\') + 1) + "\\proj.zip");
                 ShareProjectIDs.Clear();
+                ShareProjectNames.Clear();
                 return 1;
             }
             return 0;
