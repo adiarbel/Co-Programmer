@@ -35,8 +35,8 @@ namespace Company.VSPackage1
     {
         DTE2 dte;
         IWpfTextViewHost iwpf;
-        TextDocumentKeyPressEvents tde;
-        TextEditorEvents te;
+        ProjectItemsEvents pie;
+        WindowEvents we;
         MyCallBack cb;
         bool twice;
         public DTE2 DTE2
@@ -50,11 +50,14 @@ namespace Company.VSPackage1
                 iwpf = h;
                 //tde = ((Events2)DTE2.Events).TextDocumentKeyPressEvents;
                 //tde.BeforeKeyPress += new _dispTextDocumentKeyPressEvents_BeforeKeyPressEventHandler(KeyPress_EventHandler);
-                te = ((Events2)DTE2.Events).TextEditorEvents;
+                pie = ((Events2)DTE2.Events).ProjectItemsEvents;
+                we = ((Events2)DTE2.Events).WindowEvents;
                 //te.LineChanged += new _dispTextEditorEvents_LineChangedEventHandler(EnterFix);
+                //DTE2.Events.CommandEvents.BeforeExecute+= new _dispCommandEvents_BeforeExecuteEventHandler()
                 //te.LineChanged += new _dispTextEditorEvents_LineChangedEventHandler(IntelisenseFix);
                 this.cb = cb;
-                ((Events2)DTE2.Events).ProjectItemsEvents.ItemAdded += ItemAdded;
+                pie.ItemAdded += ItemAdded;
+                //((Events2)DTE2.Events).WindowEvents.WindowClosing += new _dispWindowEvents_WindowClosingEventHandler(ClosedWindow);
                 //cb = new MyCallBack();
                 //cb.ChangeCaret += new ChangeCaretEventHandler(my_CaretChange);
                 //twice = false;
@@ -68,9 +71,18 @@ namespace Company.VSPackage1
 
             }
         }
+        private void ClosedWindow(Window target)
+        {
+        }
         private void ItemAdded(ProjectItem pi)
         {
-            //ADD CODE OF ITEM ADDED AS WELL AS FUNTIONS TO SYNC
+            string name = pi.FileNames[1];
+            byte[] content = File.ReadAllBytes(name);
+            //dte.Solution.Projects.Item(1).ProjectItems.AddFromFile(name);
+            if(arr.Length>0)
+            {
+                MessageBox.Show(pi.ContainingProject.Name); 
+            }
         }
         IWpfTextViewHost GetTextViewHost()
         {

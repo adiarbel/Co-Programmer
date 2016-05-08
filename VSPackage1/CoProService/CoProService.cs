@@ -86,7 +86,6 @@ namespace CoProService
             ICoProServiceCallback callback;
             if (carets.ContainsKey(id))
             {
-                SendCaretPosition(file, position, "click");
                 List<string> keys = new List<string>();
                 List<string> vals = new List<string>();
                 for (int i = 0; i < carets.Values.Count; i++)
@@ -107,13 +106,19 @@ namespace CoProService
                 if (!isAdmin)
                 {
                     ids[admin].GetCallbackChannel<ICoProServiceCallback>().AdminFileOpen(file);
+                    
                 }
+                SendCaretPosition(file, position, "click");
 
             }
             else
             {
                 this.name = name;
                 EditorsNames.Add(name);
+                if (!isAdmin)
+                {
+                    ids[admin].GetCallbackChannel<ICoProServiceCallback>().AdminFileOpen(file);
+                }
                 OperationContext.Current.GetCallbackChannel<ICoProServiceCallback>().AddCurrentEditors(carets.Keys.ToArray<string>(), carets.Values.ToArray<string>(),EditorsNames.ToArray());
                 lock (carets)
                 {
@@ -121,10 +126,7 @@ namespace CoProService
                 }
                 OperationContext[] idsArr = ids.Values.ToArray();
                 string[] idsKeys = ids.Keys.ToArray();
-                if (!isAdmin)
-                {
-                    ids[admin].GetCallbackChannel<ICoProServiceCallback>().AdminFileOpen(file);
-                }
+                
                 for (int i = 0; i < idsArr.Length; i++)
                 {
                     if (idsKeys[i] != id)

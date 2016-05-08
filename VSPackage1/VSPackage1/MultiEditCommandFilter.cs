@@ -105,7 +105,7 @@ namespace Company.VSPackage1
         }
         void my_AdminCallback(object sender, AdminEventArgs e)
         {
-            if (!crts.DTE2.Solution.Projects.Item(1).ProjectItems.Item(e.File).IsOpen)
+            if (!crts.DTE2.Solution.Projects.Item(crts.DTE2.ActiveDocument.ProjectItem.ContainingProject.UniqueName).ProjectItems.Item(e.File).IsOpen)
             {
                 Window w = null;
                 uiDisp.Invoke(new Action(() =>
