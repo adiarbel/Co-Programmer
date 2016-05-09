@@ -38,7 +38,7 @@ namespace Company.VSPackage1
         ProjectItemsEvents pie;
         WindowEvents we;
         MyCallBack cb;
-        bool twice;
+        bool mySide;
         public DTE2 DTE2
         {
             get { return dte ?? (dte = ServiceProvider.GlobalProvider.GetService(typeof(DTE)) as DTE2); }
@@ -76,13 +76,15 @@ namespace Company.VSPackage1
         }
         private void ItemAdded(ProjectItem pi)
         {
-            string name = pi.FileNames[1];
-            byte[] content = File.ReadAllBytes(name);
-            //dte.Solution.Projects.Item(1).ProjectItems.AddFromFile(name);
-            if(arr.Length>0)
+            if (mySide)
             {
-                MessageBox.Show(pi.ContainingProject.Name); 
+                string name = pi.FileNames[1];
+                byte[] content = File.ReadAllBytes(name);
+                //dte.Solution.Projects.Item(1).ProjectItems.AddFromFile(name);
+                
+                MessageBox.Show(pi.ContainingProject.Name);
             }
+            mySide = true;
         }
         IWpfTextViewHost GetTextViewHost()
         {
@@ -92,7 +94,10 @@ namespace Company.VSPackage1
         {
             iwpf = h;
         }
-        
+        public void NotMySide()
+        {
+            mySide = false;
+        }
     }
 }
 

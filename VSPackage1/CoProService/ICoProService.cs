@@ -31,6 +31,8 @@ namespace CoProService
         void UpdateProject();
         [OperationContract]
         void UpdateSpecificFile(string relPath);
+        [OperationContract]
+        void NewItemAdded(string relpath, byte[] content, string name, string project);
 
     }
 
@@ -62,5 +64,7 @@ namespace CoProService
         void UpdateSpecificFileCallback(byte[] content,string relPath);
         [OperationContract]
         void AdminFileOpen(string file);
+        [OperationContract]
+        void NewItemAddedCallback(string relpath, byte[] content, string name, string project);
     }
 }

@@ -102,11 +102,11 @@ namespace CoProService
                         }
                     }
                 }
-                OperationContext.Current.GetCallbackChannel<ICoProServiceCallback>().AddCurrentEditors(keys.ToArray<string>(), vals.ToArray<string>(),null);
+                OperationContext.Current.GetCallbackChannel<ICoProServiceCallback>().AddCurrentEditors(keys.ToArray<string>(), vals.ToArray<string>(), null);
                 if (!isAdmin)
                 {
                     ids[admin].GetCallbackChannel<ICoProServiceCallback>().AdminFileOpen(file);
-                    
+
                 }
                 SendCaretPosition(file, position, "click");
 
@@ -119,14 +119,14 @@ namespace CoProService
                 {
                     ids[admin].GetCallbackChannel<ICoProServiceCallback>().AdminFileOpen(file);
                 }
-                OperationContext.Current.GetCallbackChannel<ICoProServiceCallback>().AddCurrentEditors(carets.Keys.ToArray<string>(), carets.Values.ToArray<string>(),EditorsNames.ToArray());
+                OperationContext.Current.GetCallbackChannel<ICoProServiceCallback>().AddCurrentEditors(carets.Keys.ToArray<string>(), carets.Values.ToArray<string>(), EditorsNames.ToArray());
                 lock (carets)
                 {
                     carets[id] = "" + file + " " + position;
                 }
                 OperationContext[] idsArr = ids.Values.ToArray();
                 string[] idsKeys = ids.Keys.ToArray();
-                
+
                 for (int i = 0; i < idsArr.Length; i++)
                 {
                     if (idsKeys[i] != id)
@@ -136,7 +136,7 @@ namespace CoProService
                             callback = idsArr[i].GetCallbackChannel<ICoProServiceCallback>();
                             lock (locker)
                             {
-                                callback.NewEditorAdded(file, position, id, seqId,name);
+                                callback.NewEditorAdded(file, position, id, seqId, name);
                             }
 
                         }
@@ -305,5 +305,30 @@ namespace CoProService
             }
         }
 
+        public void NewItemAdded(string relpath, byte[] content, string name, string project)
+        {
+            ICoProServiceCallback callback;
+            string[] idsKeys = ids.Keys.ToArray();
+            OperationContext[] idsArr = ids.Values.ToArray();
+            for (int i = 0; i < idsArr.Length; i++)
+            {
+                if (idsKeys[i] != id)
+                {
+                    try
+                    {
+                        callback = idsArr[i].GetCallbackChannel<ICoProServiceCallback>();
+                        lock (locker)
+                        {
+                            callback.NewItemAddedCallback(relpath, content, name, project);
+                        }
+                    }
+                    catch
+                    {
+
+                    }
+                }
+
+            }
+        }
     }
 }
