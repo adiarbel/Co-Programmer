@@ -74,6 +74,18 @@ namespace Company.VSPackage1.ServiceReference1 {
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICoProService/UpdateSpecificFile", ReplyAction="http://tempuri.org/ICoProService/UpdateSpecificFileResponse")]
         System.Threading.Tasks.Task UpdateSpecificFileAsync(string relPath);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICoProService/NewItemAdded", ReplyAction="http://tempuri.org/ICoProService/NewItemAddedResponse")]
+        void NewItemAdded(string relpath, byte[] content, string name, string project);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICoProService/NewItemAdded", ReplyAction="http://tempuri.org/ICoProService/NewItemAddedResponse")]
+        System.Threading.Tasks.Task NewItemAddedAsync(string relpath, byte[] content, string name, string project);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICoProService/NewItemRemoved", ReplyAction="http://tempuri.org/ICoProService/NewItemRemovedResponse")]
+        void NewItemRemoved(string name, string project);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICoProService/NewItemRemoved", ReplyAction="http://tempuri.org/ICoProService/NewItemRemovedResponse")]
+        System.Threading.Tasks.Task NewItemRemovedAsync(string name, string project);
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
@@ -107,16 +119,22 @@ namespace Company.VSPackage1.ServiceReference1 {
         void ApproveCloning(string[] idsToApprove);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICoProService/UpdateProjFilesCallback", ReplyAction="http://tempuri.org/ICoProService/UpdateProjFilesCallbackResponse")]
-        string[] UpdateProjFilesCallback(string file);
+        string[][] UpdateProjFilesCallback(string file);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICoProService/UpdateProjFilesContents", ReplyAction="http://tempuri.org/ICoProService/UpdateProjFilesContentsResponse")]
-        void UpdateProjFilesContents(string[] files, byte[][] contents);
+        void UpdateProjFilesContents(string[] files, byte[][] contents, string[] newFiles, byte[][] newContents);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICoProService/UpdateSpecificFileCallback", ReplyAction="http://tempuri.org/ICoProService/UpdateSpecificFileCallbackResponse")]
         void UpdateSpecificFileCallback(byte[] content, string relPath);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICoProService/AdminFileOpen", ReplyAction="http://tempuri.org/ICoProService/AdminFileOpenResponse")]
         void AdminFileOpen(string file);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICoProService/NewItemAddedCallback", ReplyAction="http://tempuri.org/ICoProService/NewItemAddedCallbackResponse")]
+        void NewItemAddedCallback(string relpath, byte[] content, string name, string project);
+        
+        [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICoProService/NewItemRemovedCallback", ReplyAction="http://tempuri.org/ICoProService/NewItemRemovedCallbackResponse")]
+        void NewItemRemovedCallback(string name, string project);
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
@@ -225,6 +243,22 @@ namespace Company.VSPackage1.ServiceReference1 {
         
         public System.Threading.Tasks.Task UpdateSpecificFileAsync(string relPath) {
             return base.Channel.UpdateSpecificFileAsync(relPath);
+        }
+        
+        public void NewItemAdded(string relpath, byte[] content, string name, string project) {
+            base.Channel.NewItemAdded(relpath, content, name, project);
+        }
+        
+        public System.Threading.Tasks.Task NewItemAddedAsync(string relpath, byte[] content, string name, string project) {
+            return base.Channel.NewItemAddedAsync(relpath, content, name, project);
+        }
+        
+        public void NewItemRemoved(string name, string project) {
+            base.Channel.NewItemRemoved(name, project);
+        }
+        
+        public System.Threading.Tasks.Task NewItemRemovedAsync(string name, string project) {
+            return base.Channel.NewItemRemovedAsync(name, project);
         }
     }
 }

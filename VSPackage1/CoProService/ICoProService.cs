@@ -33,6 +33,8 @@ namespace CoProService
         void UpdateSpecificFile(string relPath);
         [OperationContract]
         void NewItemAdded(string relpath, byte[] content, string name, string project);
+        [OperationContract]
+        void NewItemRemoved(string name, string project);
 
     }
 
@@ -57,14 +59,16 @@ namespace CoProService
         [OperationContract]
         void ApproveCloning(string[] idsToApprove);
         [OperationContract]
-        string[] UpdateProjFilesCallback(string file);
+        string[][] UpdateProjFilesCallback(string file);
         [OperationContract]
-        void UpdateProjFilesContents(string[] files, byte[][] contents);
+        void UpdateProjFilesContents(string[] files, byte[][] contents, string[] newFiles, byte[][] newContents);
         [OperationContract]
         void UpdateSpecificFileCallback(byte[] content,string relPath);
         [OperationContract]
         void AdminFileOpen(string file);
         [OperationContract]
         void NewItemAddedCallback(string relpath, byte[] content, string name, string project);
+        [OperationContract]
+        void NewItemRemovedCallback(string name,string project);
     }
 }

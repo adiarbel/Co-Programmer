@@ -42,6 +42,7 @@ namespace Company.VSPackage1
         public event AdminEventHandler AdminEvent;
         public event ExplorerInfoEventHandler ExplorerInfoEvent;
 
+
         public static Object locker = new Object();
         InstanceContext context;
         EndpointAddress myEndPoint;
@@ -51,6 +52,7 @@ namespace Company.VSPackage1
         bool isAdmin;
         string name;
         string proj;
+        EnvDTE80.DTE2 dte;
         string[] iport = new string[2];
         public int ExpectedSequence
         {
@@ -66,6 +68,11 @@ namespace Company.VSPackage1
         {
             get { return name; }
             set { name = value; }
+        }
+        public EnvDTE80.DTE2 DTE2
+        {
+            get { return dte; }
+            set { dte = value; }
         }
         public MyCallBack()
         {
@@ -122,6 +129,10 @@ namespace Company.VSPackage1
         public void SendCaretPosition(string file, int position, string command)
         {
             wcfclient.SendCaretPosition(file, position, command);
+        }
+        public void NewItemAdded(string relpath, byte[] content, string name, string project)
+        {
+            wcfclient.NewItemAdded(relpath, content, name, project);
         }
         public void GetProject(string name)
         {
@@ -233,9 +244,10 @@ namespace Company.VSPackage1
         {
             wcfclient.UpdateProject();
         }
-        public string[] UpdateProjFilesCallback(string file)
+        public string[][] UpdateProjFilesCallback(string file)
         {
             List<string> filesToRequest = new List<string>();
+            List<string> newFilesToRequest = new List<string>();
             XDocument xd = XDocument.Load(ProjPath + "\\CoProFiles\\timestamps.xml");
             if (xd.ToString() != file)
             {
@@ -270,7 +282,7 @@ namespace Company.VSPackage1
                     string tempKey = serverDictionary.Keys.ElementAt(i);
                     if (!myDictionary.ContainsKey(tempKey))
                     {
-                        filesToRequest.Add(serverDictionary[tempKey][1] + "\\" + tempKey);
+                        newFilesToRequest.Add(serverDictionary[tempKey][1] + "\\" + tempKey);
                     }
                     else if (myDictionary[tempKey][1] != serverDictionary[tempKey][1])
                     {
@@ -278,16 +290,18 @@ namespace Company.VSPackage1
                     }
                 }
             }
-            return filesToRequest.ToArray();
+            string[][] arrs = { filesToRequest.ToArray(), newFilesToRequest.ToArray() };
+            return arrs;
         }
         public void UpdateSpecificFile(string relPath)
         {
             wcfclient.UpdateSpecificFile(relPath);
         }
 
-        public void UpdateProjFilesContents(string[] files, byte[][] contents)
+        public void UpdateProjFilesContents(string[] files, byte[][] contents, string[] newFiles, byte[][] newContents)
         {
             string absolutePath = ProjPath.Substring(0, ProjPath.LastIndexOf('\\'));
+            string project;
             for (int i = 0; i < files.Length; i++)
             {
                 if (File.Exists(absolutePath + "\\" + files[i]))
@@ -303,6 +317,26 @@ namespace Company.VSPackage1
                     File.WriteAllBytes(absolutePath + "\\" + files[i], contents[i]);
                 }
 
+            } 
+            for (int i = 0; i < newFiles.Length; i++)
+            {
+                if (File.Exists(absolutePath + "\\" + newFiles[i]))
+                {
+                    using (StreamWriter sr = new StreamWriter(absolutePath + "\\" + newFiles[i], false))
+                    {
+                        sr.Write(System.Text.Encoding.UTF8.GetString(newContents[i]));
+                        sr.Flush();
+                    }
+                }
+                else
+                {
+                    File.WriteAllBytes(absolutePath + "\\" + newFiles[i], newContents[i]);
+                }
+                project = newFiles[i].Substring(newFiles[i].IndexOf('\\') + 1);
+                project = newFiles[i].Substring(0,newFiles[i].LastIndexOf('\\'));
+                MultiEditFilterProvider.MySide = false;
+                DTE2.Solution.Projects.Item(project).ProjectItems.AddFromFile(absolutePath + "\\" + newFiles[i]);
+                MultiEditFilterProvider.MySide = true;
             }
             File.WriteAllBytes(ProjPath + "\\CoProFiles\\timestamps.xml", contents[files.Length]);
             ExpectedSequence++;
@@ -312,6 +346,18 @@ namespace Company.VSPackage1
             File.WriteAllBytes(ProjPath + relPath.Substring(relPath.IndexOf('\\')), content);
         }
 
+        public void NewItemRemovedCallback(string name,string project)
+        {
+            DTE2.Solution.Projects.Item(project).ProjectItems.Item(name).Remove();
+        }
+
+        public void NewItemAddedCallback(string relpath, byte[] content, string name, string project)
+        {
+            File.WriteAllBytes(ProjPath + relpath, content);
+            MultiEditFilterProvider.MySide = false;
+            DTE2.Solution.Projects.Item(project).ProjectItems.AddFromFile(name);
+            MultiEditFilterProvider.MySide = true;
+        }
 
         public void AdminFileOpen(string file)
         {
@@ -320,6 +366,8 @@ namespace Company.VSPackage1
                 AdminEvent(this, new AdminEventArgs(file));
             }
         }
+
+
     }
     public class ChangeCaretEventArgs : EventArgs
     {
@@ -436,4 +484,5 @@ namespace Company.VSPackage1
             get { return m_names; }
         }
     }
+
 }

@@ -35,10 +35,8 @@ namespace Company.VSPackage1
     {
         DTE2 dte;
         IWpfTextViewHost iwpf;
-        ProjectItemsEvents pie;
         WindowEvents we;
         MyCallBack cb;
-        bool mySide;
         public DTE2 DTE2
         {
             get { return dte ?? (dte = ServiceProvider.GlobalProvider.GetService(typeof(DTE)) as DTE2); }
@@ -50,13 +48,13 @@ namespace Company.VSPackage1
                 iwpf = h;
                 //tde = ((Events2)DTE2.Events).TextDocumentKeyPressEvents;
                 //tde.BeforeKeyPress += new _dispTextDocumentKeyPressEvents_BeforeKeyPressEventHandler(KeyPress_EventHandler);
-                pie = ((Events2)DTE2.Events).ProjectItemsEvents;
+                
                 we = ((Events2)DTE2.Events).WindowEvents;
                 //te.LineChanged += new _dispTextEditorEvents_LineChangedEventHandler(EnterFix);
                 //DTE2.Events.CommandEvents.BeforeExecute+= new _dispCommandEvents_BeforeExecuteEventHandler()
                 //te.LineChanged += new _dispTextEditorEvents_LineChangedEventHandler(IntelisenseFix);
                 this.cb = cb;
-                pie.ItemAdded += ItemAdded;
+                //pie.ItemAdded += ItemAdded;
                 //((Events2)DTE2.Events).WindowEvents.WindowClosing += new _dispWindowEvents_WindowClosingEventHandler(ClosedWindow);
                 //cb = new MyCallBack();
                 //cb.ChangeCaret += new ChangeCaretEventHandler(my_CaretChange);
@@ -73,19 +71,9 @@ namespace Company.VSPackage1
         }
         private void ClosedWindow(Window target)
         {
+
         }
-        private void ItemAdded(ProjectItem pi)
-        {
-            if (mySide)
-            {
-                string name = pi.FileNames[1];
-                byte[] content = File.ReadAllBytes(name);
-                //dte.Solution.Projects.Item(1).ProjectItems.AddFromFile(name);
-                
-                MessageBox.Show(pi.ContainingProject.Name);
-            }
-            mySide = true;
-        }
+       
         IWpfTextViewHost GetTextViewHost()
         {
             return iwpf;
@@ -94,10 +82,7 @@ namespace Company.VSPackage1
         {
             iwpf = h;
         }
-        public void NotMySide()
-        {
-            mySide = false;
-        }
+        
     }
 }
 

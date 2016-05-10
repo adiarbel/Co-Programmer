@@ -75,6 +75,18 @@
   <wsdl:message name="ICoProService_UpdateSpecificFile_OutputMessage">
     <wsdl:part name="parameters" element="tns:UpdateSpecificFileResponse" />
   </wsdl:message>
+  <wsdl:message name="ICoProService_NewItemAdded_InputMessage">
+    <wsdl:part name="parameters" element="tns:NewItemAdded" />
+  </wsdl:message>
+  <wsdl:message name="ICoProService_NewItemAdded_OutputMessage">
+    <wsdl:part name="parameters" element="tns:NewItemAddedResponse" />
+  </wsdl:message>
+  <wsdl:message name="ICoProService_NewItemRemoved_InputMessage">
+    <wsdl:part name="parameters" element="tns:NewItemRemoved" />
+  </wsdl:message>
+  <wsdl:message name="ICoProService_NewItemRemoved_OutputMessage">
+    <wsdl:part name="parameters" element="tns:NewItemRemovedResponse" />
+  </wsdl:message>
   <wsdl:message name="ICoProService_AddCurrentEditors_OutputCallbackMessage">
     <wsdl:part name="parameters" element="tns:AddCurrentEditors" />
   </wsdl:message>
@@ -153,6 +165,18 @@
   <wsdl:message name="ICoProService_AdminFileOpen_InputCallbackMessage">
     <wsdl:part name="parameters" element="tns:AdminFileOpenResponse" />
   </wsdl:message>
+  <wsdl:message name="ICoProService_NewItemAddedCallback_OutputCallbackMessage">
+    <wsdl:part name="parameters" element="tns:NewItemAddedCallback" />
+  </wsdl:message>
+  <wsdl:message name="ICoProService_NewItemAddedCallback_InputCallbackMessage">
+    <wsdl:part name="parameters" element="tns:NewItemAddedCallbackResponse" />
+  </wsdl:message>
+  <wsdl:message name="ICoProService_NewItemRemovedCallback_OutputCallbackMessage">
+    <wsdl:part name="parameters" element="tns:NewItemRemovedCallback" />
+  </wsdl:message>
+  <wsdl:message name="ICoProService_NewItemRemovedCallback_InputCallbackMessage">
+    <wsdl:part name="parameters" element="tns:NewItemRemovedCallbackResponse" />
+  </wsdl:message>
   <wsdl:portType name="ICoProService">
     <wsdl:operation name="IntializePosition">
       <wsdl:input wsaw:Action="http://tempuri.org/ICoProService/IntializePosition" message="tns:ICoProService_IntializePosition_InputMessage" />
@@ -193,6 +217,14 @@
     <wsdl:operation name="UpdateSpecificFile">
       <wsdl:input wsaw:Action="http://tempuri.org/ICoProService/UpdateSpecificFile" message="tns:ICoProService_UpdateSpecificFile_InputMessage" />
       <wsdl:output wsaw:Action="http://tempuri.org/ICoProService/UpdateSpecificFileResponse" message="tns:ICoProService_UpdateSpecificFile_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="NewItemAdded">
+      <wsdl:input wsaw:Action="http://tempuri.org/ICoProService/NewItemAdded" message="tns:ICoProService_NewItemAdded_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/ICoProService/NewItemAddedResponse" message="tns:ICoProService_NewItemAdded_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="NewItemRemoved">
+      <wsdl:input wsaw:Action="http://tempuri.org/ICoProService/NewItemRemoved" message="tns:ICoProService_NewItemRemoved_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/ICoProService/NewItemRemovedResponse" message="tns:ICoProService_NewItemRemoved_OutputMessage" />
     </wsdl:operation>
     <wsdl:operation name="AddCurrentEditors">
       <wsdl:output wsaw:Action="http://tempuri.org/ICoProService/AddCurrentEditors" message="tns:ICoProService_AddCurrentEditors_OutputCallbackMessage" />
@@ -245,6 +277,14 @@
     <wsdl:operation name="AdminFileOpen">
       <wsdl:output wsaw:Action="http://tempuri.org/ICoProService/AdminFileOpen" message="tns:ICoProService_AdminFileOpen_OutputCallbackMessage" />
       <wsdl:input wsaw:Action="http://tempuri.org/ICoProService/AdminFileOpenResponse" message="tns:ICoProService_AdminFileOpen_InputCallbackMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="NewItemAddedCallback">
+      <wsdl:output wsaw:Action="http://tempuri.org/ICoProService/NewItemAddedCallback" message="tns:ICoProService_NewItemAddedCallback_OutputCallbackMessage" />
+      <wsdl:input wsaw:Action="http://tempuri.org/ICoProService/NewItemAddedCallbackResponse" message="tns:ICoProService_NewItemAddedCallback_InputCallbackMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="NewItemRemovedCallback">
+      <wsdl:output wsaw:Action="http://tempuri.org/ICoProService/NewItemRemovedCallback" message="tns:ICoProService_NewItemRemovedCallback_OutputCallbackMessage" />
+      <wsdl:input wsaw:Action="http://tempuri.org/ICoProService/NewItemRemovedCallbackResponse" message="tns:ICoProService_NewItemRemovedCallback_InputCallbackMessage" />
     </wsdl:operation>
   </wsdl:portType>
   <wsdl:binding name="NetTcpBinding_ICoProService" type="tns:ICoProService">
@@ -333,6 +373,24 @@
     </wsdl:operation>
     <wsdl:operation name="UpdateSpecificFile">
       <soap12:operation soapAction="http://tempuri.org/ICoProService/UpdateSpecificFile" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="NewItemAdded">
+      <soap12:operation soapAction="http://tempuri.org/ICoProService/NewItemAdded" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="NewItemRemoved">
+      <soap12:operation soapAction="http://tempuri.org/ICoProService/NewItemRemoved" style="document" />
       <wsdl:input>
         <soap12:body use="literal" />
       </wsdl:input>
@@ -450,6 +508,24 @@
     </wsdl:operation>
     <wsdl:operation name="AdminFileOpen">
       <soap12:operation soapAction="http://tempuri.org/ICoProService/AdminFileOpen" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="NewItemAddedCallback">
+      <soap12:operation soapAction="http://tempuri.org/ICoProService/NewItemAddedCallback" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="NewItemRemovedCallback">
+      <soap12:operation soapAction="http://tempuri.org/ICoProService/NewItemRemovedCallback" style="document" />
       <wsdl:input>
         <soap12:body use="literal" />
       </wsdl:input>

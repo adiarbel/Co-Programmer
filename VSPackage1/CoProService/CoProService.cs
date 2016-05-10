@@ -69,15 +69,20 @@ namespace CoProService
         {
             XDocument xd = XDocument.Load(projPath + "\\CoProFiles\\timestamps.xml");
             string content = xd.ToString();
-            string[] filesToSend = OperationContext.Current.GetCallbackChannel<ICoProServiceCallback>().UpdateProjFilesCallback(content);
+            string[][] filesToSend = OperationContext.Current.GetCallbackChannel<ICoProServiceCallback>().UpdateProjFilesCallback(content);
             string absolutePath = projPath.Substring(0, projPath.LastIndexOf('\\'));
-            byte[][] filesContents = new byte[filesToSend.Length + 1][];
-            for (int i = 0; i < filesToSend.Length; i++)
+            byte[][] filesContents = new byte[filesToSend[0].Length + 1][];
+            byte[][] newFilesContents = new byte[filesToSend[1].Length][];
+            for (int i = 0; i < filesToSend[0].Length; i++)
             {
                 filesContents[i] = File.ReadAllBytes(absolutePath + '\\' + filesToSend[i]);
             }
+            for (int i = 0; i < filesToSend[1].Length; i++)
+            {
+                newFilesContents[i] = File.ReadAllBytes(absolutePath + '\\' + filesToSend[i]);
+            }
             filesContents[filesToSend.Length] = File.ReadAllBytes(projPath + "\\CoProFiles\\timestamps.xml");
-            OperationContext.Current.GetCallbackChannel<ICoProServiceCallback>().UpdateProjFilesContents(filesToSend, filesContents);
+            OperationContext.Current.GetCallbackChannel<ICoProServiceCallback>().UpdateProjFilesContents(filesToSend[0], filesContents, filesToSend[1], newFilesContents);
 
         }
         public bool IntializePosition(string file, int position, string name)
@@ -246,8 +251,11 @@ namespace CoProService
         public void UpdateSpecificFile(string relPath)
         {
             var filePath = projPath + relPath.Substring(relPath.IndexOf('\\'));
-            byte[] content = File.ReadAllBytes(filePath);
-            OperationContext.Current.GetCallbackChannel<ICoProServiceCallback>().UpdateSpecificFileCallback(content, relPath);
+            if (File.Exists(filePath))
+            {
+                byte[] content = File.ReadAllBytes(filePath);
+                OperationContext.Current.GetCallbackChannel<ICoProServiceCallback>().UpdateSpecificFileCallback(content, relPath);
+            }
         }
         private void ZipProject(string path)
         {
@@ -274,6 +282,58 @@ namespace CoProService
                 seq = seqId;
             }
             return seq;
+        }
+
+        public void NewItemAdded(string relpath, byte[] content, string name, string project)
+        {
+            ICoProServiceCallback callback;
+            string[] idsKeys = ids.Keys.ToArray();
+            OperationContext[] idsArr = ids.Values.ToArray();
+            for (int i = 0; i < idsArr.Length; i++)
+            {
+                if (idsKeys[i] != id)
+                {
+                    try
+                    {
+                        callback = idsArr[i].GetCallbackChannel<ICoProServiceCallback>();
+                        lock (locker)
+                        {
+                            callback.NewItemAddedCallback(relpath, content, name, project);
+                        }
+                    }
+                    catch
+                    {
+
+                    }
+                }
+
+            }
+        }
+
+        public void NewItemRemoved(string name,string project)
+        {
+            ICoProServiceCallback callback;
+            string[] idsKeys = ids.Keys.ToArray();
+            OperationContext[] idsArr = ids.Values.ToArray();
+            for (int i = 0; i < idsArr.Length; i++)
+            {
+                if (idsKeys[i] != id)
+                {
+                    try
+                    {
+                        callback = idsArr[i].GetCallbackChannel<ICoProServiceCallback>();
+                        lock (locker)
+                        {
+                            callback.NewItemRemovedCallback(name,project);
+                        }
+                    }
+                    catch
+                    {
+
+                    }
+                }
+
+            }
         }
         void IDisposable.Dispose()
         {
@@ -305,30 +365,6 @@ namespace CoProService
             }
         }
 
-        public void NewItemAdded(string relpath, byte[] content, string name, string project)
-        {
-            ICoProServiceCallback callback;
-            string[] idsKeys = ids.Keys.ToArray();
-            OperationContext[] idsArr = ids.Values.ToArray();
-            for (int i = 0; i < idsArr.Length; i++)
-            {
-                if (idsKeys[i] != id)
-                {
-                    try
-                    {
-                        callback = idsArr[i].GetCallbackChannel<ICoProServiceCallback>();
-                        lock (locker)
-                        {
-                            callback.NewItemAddedCallback(relpath, content, name, project);
-                        }
-                    }
-                    catch
-                    {
 
-                    }
-                }
-
-            }
-        }
     }
 }

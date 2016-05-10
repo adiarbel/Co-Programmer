@@ -57,6 +57,7 @@ namespace Company.VSPackage1
         public static Service service = null;
         int place = 0;
         List<object> events = new List<object>();
+
         public static MyCallBack cb = null;
         static Dictionary<string, MenuCommand> cmds = new Dictionary<string, MenuCommand>();
         private DTE2 DTE2
@@ -71,7 +72,7 @@ namespace Company.VSPackage1
         {
             get { return cmds; }
         }
-
+        
         /// <summary>
         /// Default constructor of the package.
         /// Inside this method you can place any initialization code that does not require 
@@ -140,6 +141,8 @@ namespace Company.VSPackage1
                 mcs.AddCommand(menuItem);
             }
         }
+        
+        
         private void ShowToolWindow(object sender, EventArgs e)
         {
             // Get the instance number 0 of this tool window. This window is single instance so this instance
@@ -154,15 +157,15 @@ namespace Company.VSPackage1
             Microsoft.VisualStudio.ErrorHandler.ThrowOnFailure(windowFrame.Show());
         }
         #endregion
-        public void SolutionOpened()
-        {
-            MessageBox.Show("Test");
-        }
+        
         /// <summary>
         /// This function is the callback used to execute a command when the a menu item is clicked.
         /// See the Initialize method to see how the menu item is associated to this function using
         /// the OleMenuCommandService service and the MenuCommand class.
         /// </summary>
+        /// 
+       
+        
         private void ConnectCallback(object sender, EventArgs e)
         {
             cb = new MyCallBack();
@@ -220,7 +223,6 @@ namespace Company.VSPackage1
 
             return info;
         }
-
 
 
     }
