@@ -52,7 +52,6 @@ namespace Company.VSPackage1
             {
                 se = ((Events2)cs.DTE2.Events).SolutionEvents;
                 se.Opened += SubscribeGlobalEvents;
-                se.BeforeClosing += UnSubscribeGlobalEvents;
                 bool setAdminConfiguraions = false;
                 var slnName = cs.DTE2.Solution.FullName;
                 var adminFile = slnName.Substring(0, slnName.Substring(0, slnName.LastIndexOf('\\')).LastIndexOf('\\')) + "\\admin.txt";
@@ -81,57 +80,52 @@ namespace Company.VSPackage1
                         setAdminConfiguraions = true;
                     }
                 }
-                //if (File.Exists(slnName.Substring(0, slnName.LastIndexOf('\\')) + "\\CoProFiles\\client.txt"))
-                //{
-                //    StreamReader sr = new StreamReader(slnName.Substring(0, slnName.LastIndexOf('\\')) + "\\CoProFiles\\client.txt");
-                //    string iportName = sr.ReadToEnd();
-                //    cb.SetIpPort(iportName.Split(':')[0], iportName.Split(':')[1]);
-                //    cb.Name = iportName.Split(':')[2];
-                //    if (cb.Connect())
-                //    {
-                //        cb.ProjPath = slnName.Substring(0, slnName.LastIndexOf('\\'));
-                //        if (setAdminConfiguraions)
-                //        {
-                //            if (cb.SetAdmin(true))
-                //            {
-                //                cb.IsAdmin = true;
-                //                cb.SetProjectDir(slnName.Substring(0, slnName.LastIndexOf('\\')));
-                //            }
-                //        }
-                //        else
-                //        {
-                //            cb.IsAdmin = false;
-                //            cb.UpdateProject();
-                //        }
-                //        if (cb.IsAdmin)
-                //        {
-                //            cb.ExpectedSequence++;
-                //        }
+                if (File.Exists(slnName.Substring(0, slnName.LastIndexOf('\\')) + "\\CoProFiles\\client.txt"))
+                {
+                    StreamReader sr = new StreamReader(slnName.Substring(0, slnName.LastIndexOf('\\')) + "\\CoProFiles\\client.txt");
+                    string iportName = sr.ReadToEnd();
+                    cb.SetIpPort(iportName.Split(':')[0], iportName.Split(':')[1]);
+                    cb.Name = iportName.Split(':')[2];
+                    if (cb.Connect())
+                    {
+                        cb.ProjPath = slnName.Substring(0, slnName.LastIndexOf('\\'));
+                        if (setAdminConfiguraions)
+                        {
+                            if (cb.SetAdmin(true))
+                            {
+                                cb.IsAdmin = true;
+                                cb.SetProjectDir(slnName.Substring(0, slnName.LastIndexOf('\\')));
+                            }
+                        }
+                        else
+                        {
+                            cb.IsAdmin = false;
+                            cb.UpdateProject();
+                        }
+                        if (cb.IsAdmin)
+                        {
+                            cb.ExpectedSequence++;
+                        }
 
-                //    }
-                //}
-                //else
-                //{
-                //    cb = null;
-                //    cs = null;
-                //}
-                //isFirst = false;
+                    }
+                }
+                else
+                {
+                    cb = null;
+                    cs = null;
+                }
+                isFirst = false;
             }
-            //IWpfTextView textView = editorFactory.GetWpfTextView(textViewAdapter);//gets the text view
-            //if (textView == null)
-            //    return;
-            //AddCommandFilter(textViewAdapter, new MultiEditCommandFilter(textView, cb, cs));//adds an instance of our command filter to the text view
+            IWpfTextView textView = editorFactory.GetWpfTextView(textViewAdapter);//gets the text view
+            if (textView == null)
+                return;
+            AddCommandFilter(textViewAdapter, new MultiEditCommandFilter(textView, cb, cs));//adds an instance of our command filter to the text view
         }
         private void SubscribeGlobalEvents()
         {
             pie = ((Events2)cs.DTE2.Events).ProjectItemsEvents;
             pie.ItemAdded += ItemAdded;
             pie.ItemRemoved += ItemRemoved;
-        }
-        private void UnSubscribeGlobalEvents()
-        {
-            pie.ItemAdded -= ItemAdded;
-            pie.ItemRemoved -= ItemRemoved;
         }
         private void ItemAdded(ProjectItem pi)
         {

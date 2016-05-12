@@ -249,7 +249,8 @@ namespace Company.VSPackage1
             List<string> filesToRequest = new List<string>();
             List<string> newFilesToRequest = new List<string>();
             XDocument xd = XDocument.Load(ProjPath + "\\CoProFiles\\timestamps.xml");
-            if (xd.ToString() != file)
+            bool cond = xd.ToString() != file;
+            if (cond)
             {
                 XmlTextReader xr = new XmlTextReader(new System.IO.StringReader(file));
                 Dictionary<string, string[]> serverDictionary = new Dictionary<string, string[]>();
@@ -289,6 +290,14 @@ namespace Company.VSPackage1
                         filesToRequest.Add(serverDictionary[tempKey][1] + "\\" + tempKey);
                     }
                 }
+                //for (int i = 0; i < myDictionary.Keys.Count; i++)
+                //{
+                //    string tempKey = myDictionary.Keys.ElementAt(i);
+                //    if (!serverDictionary.ContainsKey(tempKey))
+                //    {
+
+                //    }
+                //}
             }
             string[][] arrs = { filesToRequest.ToArray(), newFilesToRequest.ToArray() };
             return arrs;
@@ -298,10 +307,11 @@ namespace Company.VSPackage1
             wcfclient.UpdateSpecificFile(relPath);
         }
 
-        public void UpdateProjFilesContents(string[] files, byte[][] contents, string[] newFiles, byte[][] newContents)
+        public void UpdateProjFilesContents(string[] files, byte[][] contents, string[] n_files, byte[][] n_contents)
         {
             string absolutePath = ProjPath.Substring(0, ProjPath.LastIndexOf('\\'));
             string project;
+            string name;
             for (int i = 0; i < files.Length; i++)
             {
                 if (File.Exists(absolutePath + "\\" + files[i]))
@@ -317,26 +327,21 @@ namespace Company.VSPackage1
                     File.WriteAllBytes(absolutePath + "\\" + files[i], contents[i]);
                 }
 
-            } 
-            for (int i = 0; i < newFiles.Length; i++)
+            }
+            for (int i = 0; i < n_files.Length; i++)
             {
-                if (File.Exists(absolutePath + "\\" + newFiles[i]))
-                {
-                    using (StreamWriter sr = new StreamWriter(absolutePath + "\\" + newFiles[i], false))
-                    {
-                        sr.Write(System.Text.Encoding.UTF8.GetString(newContents[i]));
-                        sr.Flush();
-                    }
-                }
-                else
-                {
-                    File.WriteAllBytes(absolutePath + "\\" + newFiles[i], newContents[i]);
-                }
-                project = newFiles[i].Substring(newFiles[i].IndexOf('\\') + 1);
-                project = newFiles[i].Substring(0,newFiles[i].LastIndexOf('\\'));
+                File.WriteAllBytes(absolutePath + "\\" + n_files[i], n_contents[i]);
+                project = n_files[i].Substring(n_files[i].IndexOf('\\') + 1);
+                project = project.Substring(0, project.LastIndexOf('\\'));
+                File.WriteAllBytes(absolutePath + "\\" + n_files[i], n_contents[i]);
+                name = absolutePath + "\\" + n_files[i];
+                name = name.Substring(name.LastIndexOf('\\') + 1);
+                name = name.Substring(0, name.LastIndexOf('.'));
                 MultiEditFilterProvider.MySide = false;
-                DTE2.Solution.Projects.Item(project).ProjectItems.AddFromFile(absolutePath + "\\" + newFiles[i]);
-                MultiEditFilterProvider.MySide = true;
+                EnvDTE.Projects p = DTE2.Solution.Projects;
+                //p.ProjectItems.AddFromFile(name);
+                MultiEditFilterProvider.MySide = true; ;
+
             }
             File.WriteAllBytes(ProjPath + "\\CoProFiles\\timestamps.xml", contents[files.Length]);
             ExpectedSequence++;
@@ -346,7 +351,7 @@ namespace Company.VSPackage1
             File.WriteAllBytes(ProjPath + relPath.Substring(relPath.IndexOf('\\')), content);
         }
 
-        public void NewItemRemovedCallback(string name,string project)
+        public void NewItemRemovedCallback(string name, string project)
         {
             DTE2.Solution.Projects.Item(project).ProjectItems.Item(name).Remove();
         }

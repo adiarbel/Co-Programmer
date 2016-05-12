@@ -122,7 +122,7 @@ namespace Company.VSPackage1.ServiceReference1 {
         string[][] UpdateProjFilesCallback(string file);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICoProService/UpdateProjFilesContents", ReplyAction="http://tempuri.org/ICoProService/UpdateProjFilesContentsResponse")]
-        void UpdateProjFilesContents(string[] files, byte[][] contents, string[] newFiles, byte[][] newContents);
+        void UpdateProjFilesContents(string[] files, byte[][] contents, string[] n_files, byte[][] n_contents);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICoProService/UpdateSpecificFileCallback", ReplyAction="http://tempuri.org/ICoProService/UpdateSpecificFileCallbackResponse")]
         void UpdateSpecificFileCallback(byte[] content, string relPath);

@@ -57,7 +57,7 @@ namespace Company.VSPackage1
         public static Service service = null;
         int place = 0;
         List<object> events = new List<object>();
-
+        SolutionEvents se;
         public static MyCallBack cb = null;
         static Dictionary<string, MenuCommand> cmds = new Dictionary<string, MenuCommand>();
         private DTE2 DTE2
@@ -121,7 +121,8 @@ namespace Company.VSPackage1
         {
             Debug.WriteLine(string.Format(CultureInfo.CurrentCulture, "Entering Initialize() of: {0}", this.ToString()));
             base.Initialize();
-            
+            se = ((Events2)DTE2.Events).SolutionEvents;
+            se.AfterClosing += ShutDown;
             // Add our command handlers for menu (commands must exist in the .vsct file)
             OleMenuCommandService mcs = GetService(typeof(IMenuCommandService)) as OleMenuCommandService;
             if (null != mcs)

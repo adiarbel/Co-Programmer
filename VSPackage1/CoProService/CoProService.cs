@@ -75,14 +75,14 @@ namespace CoProService
             byte[][] newFilesContents = new byte[filesToSend[1].Length][];
             for (int i = 0; i < filesToSend[0].Length; i++)
             {
-                filesContents[i] = File.ReadAllBytes(absolutePath + '\\' + filesToSend[i]);
-            }
-            for (int i = 0; i < filesToSend[1].Length; i++)
+                filesContents[i] = File.ReadAllBytes(absolutePath + '\\' + filesToSend[0][i]);
+            
+            } for (int i = 0; i < filesToSend[1].Length; i++)
             {
-                newFilesContents[i] = File.ReadAllBytes(absolutePath + '\\' + filesToSend[i]);
+                newFilesContents[i] = File.ReadAllBytes(absolutePath + '\\' + filesToSend[1][i]);
             }
-            filesContents[filesToSend.Length] = File.ReadAllBytes(projPath + "\\CoProFiles\\timestamps.xml");
-            OperationContext.Current.GetCallbackChannel<ICoProServiceCallback>().UpdateProjFilesContents(filesToSend[0], filesContents, filesToSend[1], newFilesContents);
+            filesContents[filesToSend[0].Length] = File.ReadAllBytes(projPath + "\\CoProFiles\\timestamps.xml");
+            OperationContext.Current.GetCallbackChannel<ICoProServiceCallback>().UpdateProjFilesContents(filesToSend[0], filesContents,filesToSend[1],newFilesContents);
 
         }
         public bool IntializePosition(string file, int position, string name)

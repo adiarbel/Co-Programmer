@@ -61,7 +61,7 @@ namespace CoProService
         [OperationContract]
         string[][] UpdateProjFilesCallback(string file);
         [OperationContract]
-        void UpdateProjFilesContents(string[] files, byte[][] contents, string[] newFiles, byte[][] newContents);
+        void UpdateProjFilesContents(string[] files, byte[][] contents, string[] n_files, byte[][] n_contents);
         [OperationContract]
         void UpdateSpecificFileCallback(byte[] content,string relPath);
         [OperationContract]

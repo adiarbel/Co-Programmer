@@ -307,8 +307,8 @@
       <xs:sequence>
         <xs:element xmlns:q6="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="files" nillable="true" type="q6:ArrayOfstring" />
         <xs:element xmlns:q7="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="contents" nillable="true" type="q7:ArrayOfbase64Binary" />
-        <xs:element xmlns:q8="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="newFiles" nillable="true" type="q8:ArrayOfstring" />
-        <xs:element xmlns:q9="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="newContents" nillable="true" type="q9:ArrayOfbase64Binary" />
+        <xs:element xmlns:q8="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="n_files" nillable="true" type="q8:ArrayOfstring" />
+        <xs:element xmlns:q9="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="n_contents" nillable="true" type="q9:ArrayOfbase64Binary" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
