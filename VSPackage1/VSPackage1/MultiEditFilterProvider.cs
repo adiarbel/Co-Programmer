@@ -31,9 +31,9 @@ namespace Company.VSPackage1
         static bool mySide = true;
         ProjectItemsEvents pie;
         SolutionEvents se;
-        static MyCallBack cb = VSPackage1Package.cb;
+        static MyCallBack cb;
         Carets cs;
-        static bool isFirst = true;
+        public static bool isFirst = true;
         public static bool MySide
         {
             get { return mySide; }
@@ -41,6 +41,7 @@ namespace Company.VSPackage1
         }
         public void VsTextViewCreated(IVsTextView textViewAdapter)
         {
+            cb = VSPackage1Package.cb;
             if (cb == null)
             {
                 cb = new MyCallBack();
@@ -131,16 +132,26 @@ namespace Company.VSPackage1
         {
             if (mySide)
             {
-
-                string name = pi.FileNames[1];
-                byte[] content = File.ReadAllBytes(name);
-                string removeString = cb.ProjPath;
-                int index = name.IndexOf(removeString);
-                int length = removeString.Length;
-                String startOfString = name.Substring(0, index);
-                String endOfString = name.Substring(index + length);
-                String cleanPath = startOfString + endOfString;
-                cb.NewItemAdded(cleanPath, content, name, pi.ContainingProject.Name);
+                if (pi.Kind == "{6BB5F8EE-4483-11D3-8BCF-00C04F8EC28C}")
+                {
+                    string name = pi.FileNames[1];
+                    byte[] content = File.ReadAllBytes(name);
+                    string removeString = cb.ProjPath;
+                    int index = name.IndexOf(removeString);
+                    int length = removeString.Length;
+                    String startOfString = name.Substring(0, index);
+                    String endOfString = name.Substring(index + length);
+                    String cleanPath = startOfString + endOfString;
+                    if (cb.IsAdmin)
+                    {
+                        XElement xe = VSPackage1Package.CreateFileSystemXmlTree(cb.ProjPath, 1, cb.ProjPath.Substring(cb.ProjPath.LastIndexOf('\\') + 1));
+                        XmlTextWriter xwr = new XmlTextWriter(cb.ProjPath + "\\CoProFiles\\timestamps.xml", System.Text.Encoding.UTF8);
+                        xwr.Formatting = Formatting.Indented;
+                        xe.WriteTo(xwr);
+                        xwr.Close();
+                    }
+                    cb.NewItemAdded(cleanPath, content, name.Substring(name.LastIndexOf('\\')+1), pi.ContainingProject.Name);
+                }
             }
         }
         private void ItemRemoved(ProjectItem pi)
@@ -149,8 +160,8 @@ namespace Company.VSPackage1
             {
 
                 string name = pi.FileNames[1];
-                name = name.Substring(name.LastIndexOf('\\')+1);
-                
+                name = name.Substring(name.LastIndexOf('\\') + 1);
+
                 //cs.DTE2.Solution.Projects.Item(1).ProjectItems.Item("ASD").Remove();
                 //cb.NewItemAdded(cleanPath, content, name, pi.ContainingProject.Name);
             }

@@ -72,7 +72,7 @@ namespace Company.VSPackage1
         {
             get { return cmds; }
         }
-        
+
         /// <summary>
         /// Default constructor of the package.
         /// Inside this method you can place any initialization code that does not require 
@@ -142,8 +142,8 @@ namespace Company.VSPackage1
                 mcs.AddCommand(menuItem);
             }
         }
-        
-        
+
+
         private void ShowToolWindow(object sender, EventArgs e)
         {
             // Get the instance number 0 of this tool window. This window is single instance so this instance
@@ -158,15 +158,15 @@ namespace Company.VSPackage1
             Microsoft.VisualStudio.ErrorHandler.ThrowOnFailure(windowFrame.Show());
         }
         #endregion
-        
+
         /// <summary>
         /// This function is the callback used to execute a command when the a menu item is clicked.
         /// See the Initialize method to see how the menu item is associated to this function using
         /// the OleMenuCommandService service and the MenuCommand class.
         /// </summary>
         /// 
-       
-        
+
+
         private void ConnectCallback(object sender, EventArgs e)
         {
             cb = new MyCallBack();
@@ -191,16 +191,22 @@ namespace Company.VSPackage1
                 //StreamWriter sw = new StreamWriter(cb.ProjPath + "\\CoProFiles\\timestamps.txt");
                 //sw.Write(TimeStampDirectory(cb.ProjPath, 1, cb.ProjPath.Substring(cb.ProjPath.LastIndexOf('\\'))));
                 //sw.Close();
-                XElement xe = CreateFileSystemXmlTree(cb.ProjPath, 1, cb.ProjPath.Substring(cb.ProjPath.LastIndexOf('\\') + 1));
-                XmlTextWriter xwr = new XmlTextWriter(cb.ProjPath + "\\CoProFiles\\timestamps.xml", System.Text.Encoding.UTF8);
-                xwr.Formatting = Formatting.Indented;
-                xe.WriteTo(xwr);
-                xwr.Close();
+                if (cb.IsAdmin)
+                {
+                    XElement xe = CreateFileSystemXmlTree(cb.ProjPath, 1, cb.ProjPath.Substring(cb.ProjPath.LastIndexOf('\\') + 1));
+                    XmlTextWriter xwr = new XmlTextWriter(cb.ProjPath + "\\CoProFiles\\timestamps.xml", System.Text.Encoding.UTF8);
+                    xwr.Formatting = Formatting.Indented;
+                    xe.WriteTo(xwr);
+                    xwr.Close();
+                }
                 cb.Abort();
+                cb = null;
+                MultiEditFilterProvider.isFirst = true;
             }
             if (VSPackage1Package.service != null)
             {
                 VSPackage1Package.service.Close();
+                VSPackage1Package.service = null;
             }
         }
         public static XElement CreateFileSystemXmlTree(string source, int level, string relPath)

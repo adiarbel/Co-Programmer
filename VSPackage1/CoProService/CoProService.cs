@@ -76,13 +76,13 @@ namespace CoProService
             for (int i = 0; i < filesToSend[0].Length; i++)
             {
                 filesContents[i] = File.ReadAllBytes(absolutePath + '\\' + filesToSend[0][i]);
-            
+
             } for (int i = 0; i < filesToSend[1].Length; i++)
             {
                 newFilesContents[i] = File.ReadAllBytes(absolutePath + '\\' + filesToSend[1][i]);
             }
             filesContents[filesToSend[0].Length] = File.ReadAllBytes(projPath + "\\CoProFiles\\timestamps.xml");
-            OperationContext.Current.GetCallbackChannel<ICoProServiceCallback>().UpdateProjFilesContents(filesToSend[0], filesContents,filesToSend[1],newFilesContents);
+            OperationContext.Current.GetCallbackChannel<ICoProServiceCallback>().UpdateProjFilesContents(filesToSend[0], filesContents, filesToSend[1], newFilesContents);
 
         }
         public bool IntializePosition(string file, int position, string name)
@@ -107,12 +107,13 @@ namespace CoProService
                         }
                     }
                 }
-                OperationContext.Current.GetCallbackChannel<ICoProServiceCallback>().AddCurrentEditors(keys.ToArray<string>(), vals.ToArray<string>(), null);
                 if (!isAdmin)
                 {
                     ids[admin].GetCallbackChannel<ICoProServiceCallback>().AdminFileOpen(file);
 
                 }
+                OperationContext.Current.GetCallbackChannel<ICoProServiceCallback>().AddCurrentEditors(keys.ToArray<string>(), vals.ToArray<string>(), null);
+
                 SendCaretPosition(file, position, "click");
 
             }
@@ -310,7 +311,7 @@ namespace CoProService
             }
         }
 
-        public void NewItemRemoved(string name,string project)
+        public void NewItemRemoved(string name, string project)
         {
             ICoProServiceCallback callback;
             string[] idsKeys = ids.Keys.ToArray();
@@ -324,7 +325,7 @@ namespace CoProService
                         callback = idsArr[i].GetCallbackChannel<ICoProServiceCallback>();
                         lock (locker)
                         {
-                            callback.NewItemRemovedCallback(name,project);
+                            callback.NewItemRemovedCallback(name, project);
                         }
                     }
                     catch

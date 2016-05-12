@@ -285,7 +285,7 @@ namespace Company.VSPackage1
                     {
                         newFilesToRequest.Add(serverDictionary[tempKey][1] + "\\" + tempKey);
                     }
-                    else if (myDictionary[tempKey][1] != serverDictionary[tempKey][1])
+                    else if (myDictionary[tempKey][0] != serverDictionary[tempKey][0])
                     {
                         filesToRequest.Add(serverDictionary[tempKey][1] + "\\" + tempKey);
                     }
@@ -298,6 +298,7 @@ namespace Company.VSPackage1
 
                 //    }
                 //}
+                int dsa = 1;
             }
             string[][] arrs = { filesToRequest.ToArray(), newFilesToRequest.ToArray() };
             return arrs;
@@ -331,16 +332,21 @@ namespace Company.VSPackage1
             for (int i = 0; i < n_files.Length; i++)
             {
                 File.WriteAllBytes(absolutePath + "\\" + n_files[i], n_contents[i]);
-                project = n_files[i].Substring(n_files[i].IndexOf('\\') + 1);
-                project = project.Substring(0, project.LastIndexOf('\\'));
-                File.WriteAllBytes(absolutePath + "\\" + n_files[i], n_contents[i]);
-                name = absolutePath + "\\" + n_files[i];
-                name = name.Substring(name.LastIndexOf('\\') + 1);
-                name = name.Substring(0, name.LastIndexOf('.'));
-                MultiEditFilterProvider.MySide = false;
-                EnvDTE.Projects p = DTE2.Solution.Projects;
-                //p.ProjectItems.AddFromFile(name);
-                MultiEditFilterProvider.MySide = true; ;
+                //project = n_files[i].Substring(n_files[i].IndexOf('\\') + 1);
+                //project = project.Substring(0, project.LastIndexOf('\\'));
+                //File.WriteAllBytes(absolutePath + "\\" + n_files[i], n_contents[i]);
+                //name = absolutePath + "\\" + n_files[i];
+                //MultiEditFilterProvider.MySide = false;
+                //EnvDTE.Projects ps = DTE2.Solution.Projects;
+                //foreach(EnvDTE.Project p in ps)
+                //{
+                //    string pname = p.Name;
+                //    if(p.Name.Contains(project))
+                //    {
+                //        p.ProjectItems.AddFromTemplate(name, name.Substring(name.LastIndexOf('\\') + 1));
+                //    }
+                //}
+                //MultiEditFilterProvider.MySide = true; ;
 
             }
             File.WriteAllBytes(ProjPath + "\\CoProFiles\\timestamps.xml", contents[files.Length]);
@@ -360,7 +366,16 @@ namespace Company.VSPackage1
         {
             File.WriteAllBytes(ProjPath + relpath, content);
             MultiEditFilterProvider.MySide = false;
-            DTE2.Solution.Projects.Item(project).ProjectItems.AddFromFile(name);
+            EnvDTE.Projects ps = DTE2.Solution.Projects;
+            foreach (EnvDTE.Project p in ps)
+            {
+                string pname = p.Name;
+                if (p.Name.Contains(project))
+                {
+                    p.ProjectItems.AddFromTemplate(ProjPath + relpath, name);
+                    break;
+                }
+            }
             MultiEditFilterProvider.MySide = true;
         }
 
