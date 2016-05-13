@@ -158,12 +158,21 @@ namespace Company.VSPackage1
         {
             if (mySide)
             {
-
-                string name = pi.FileNames[1];
-                name = name.Substring(name.LastIndexOf('\\') + 1);
-
-                //cs.DTE2.Solution.Projects.Item(1).ProjectItems.Item("ASD").Remove();
-                //cb.NewItemAdded(cleanPath, content, name, pi.ContainingProject.Name);
+                if (pi.Kind == "{6BB5F8EE-4483-11D3-8BCF-00C04F8EC28C}")
+                {
+                    string name = pi.FileNames[1];
+                    name = name.Substring(name.LastIndexOf('\\') + 1);
+                    if(File.Exists(pi.FileNames[1]))
+                    {
+                        //REMOVE
+                    }
+                    else
+                    {
+                        //DELETE
+                    }
+                    //cs.DTE2.Solution.Projects.Item(1).ProjectItems.Item("ASD").Remove();
+                    //cb.NewItemAdded(cleanPath, content, name, pi.ContainingProject.Name);
+                }
             }
         }
         IWpfTextViewHost GetCurrentViewHost(IVsTextView vTextView)
