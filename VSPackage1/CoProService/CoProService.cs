@@ -311,7 +311,7 @@ namespace CoProService
             }
         }
 
-        public void NewItemRemoved(string name, string project)
+        public void NewItemRemoved(string name, string project,bool isDeleted)
         {
             ICoProServiceCallback callback;
             string[] idsKeys = ids.Keys.ToArray();
@@ -325,7 +325,7 @@ namespace CoProService
                         callback = idsArr[i].GetCallbackChannel<ICoProServiceCallback>();
                         lock (locker)
                         {
-                            callback.NewItemRemovedCallback(name, project);
+                            callback.NewItemRemovedCallback(name, project, isDeleted);
                         }
                     }
                     catch

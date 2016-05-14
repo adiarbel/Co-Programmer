@@ -154,6 +154,7 @@
       <xs:sequence>
         <xs:element minOccurs="0" name="name" nillable="true" type="xs:string" />
         <xs:element minOccurs="0" name="project" nillable="true" type="xs:string" />
+        <xs:element minOccurs="0" name="isDeleted" type="xs:boolean" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -362,6 +363,7 @@
       <xs:sequence>
         <xs:element minOccurs="0" name="name" nillable="true" type="xs:string" />
         <xs:element minOccurs="0" name="project" nillable="true" type="xs:string" />
+        <xs:element minOccurs="0" name="isDeleted" type="xs:boolean" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>

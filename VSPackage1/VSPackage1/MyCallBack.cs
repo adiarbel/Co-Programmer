@@ -134,6 +134,10 @@ namespace Company.VSPackage1
         {
             wcfclient.NewItemAdded(relpath, content, name, project);
         }
+        public void NewItemRemoved(string name, string project,bool isDeleted)
+        {
+            wcfclient.NewItemRemoved(name, project, isDeleted);
+        }
         public void GetProject(string name)
         {
             wcfclient.GetProject(name);
@@ -357,9 +361,36 @@ namespace Company.VSPackage1
             File.WriteAllBytes(ProjPath + relPath.Substring(relPath.IndexOf('\\')), content);
         }
 
-        public void NewItemRemovedCallback(string name, string project)
+        public void NewItemRemovedCallback(string name, string project, bool isDeleted)
         {
-            DTE2.Solution.Projects.Item(project).ProjectItems.Item(name).Remove();
+            MultiEditFilterProvider.MySide = false;
+            if (isDeleted)
+            {
+                EnvDTE.Projects ps = DTE2.Solution.Projects;
+                foreach (EnvDTE.Project p in ps)
+                {
+                    string pname = p.Name;
+                    if (p.Name.Contains(project))
+                    {
+                        p.ProjectItems.Item(name).Delete();
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                EnvDTE.Projects ps = DTE2.Solution.Projects;
+                foreach (EnvDTE.Project p in ps)
+                {
+                    string pname = p.Name;
+                    if (p.Name.Contains(project))
+                    {
+                        p.ProjectItems.Item(name).Remove();
+                        break;
+                    }
+                }
+            }
+            MultiEditFilterProvider.MySide = true;
         }
 
         public void NewItemAddedCallback(string relpath, byte[] content, string name, string project)

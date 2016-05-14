@@ -34,7 +34,7 @@ namespace CoProService
         [OperationContract]
         void NewItemAdded(string relpath, byte[] content, string name, string project);
         [OperationContract]
-        void NewItemRemoved(string name, string project);
+        void NewItemRemoved(string name, string project,bool isDeleted);
 
     }
 
@@ -69,6 +69,6 @@ namespace CoProService
         [OperationContract]
         void NewItemAddedCallback(string relpath, byte[] content, string name, string project);
         [OperationContract]
-        void NewItemRemovedCallback(string name,string project);
+        void NewItemRemovedCallback(string name, string project, bool isDeleted);
     }
 }

@@ -150,7 +150,7 @@ namespace Company.VSPackage1
                         xe.WriteTo(xwr);
                         xwr.Close();
                     }
-                    cb.NewItemAdded(cleanPath, content, name.Substring(name.LastIndexOf('\\')+1), pi.ContainingProject.Name);
+                    cb.NewItemAdded(cleanPath, content, name.Substring(name.LastIndexOf('\\') + 1), pi.ContainingProject.Name);
                 }
             }
         }
@@ -162,16 +162,12 @@ namespace Company.VSPackage1
                 {
                     string name = pi.FileNames[1];
                     name = name.Substring(name.LastIndexOf('\\') + 1);
+                    bool isDeleted = true;
                     if(File.Exists(pi.FileNames[1]))
                     {
-                        //REMOVE
+                        isDeleted = true;
                     }
-                    else
-                    {
-                        //DELETE
-                    }
-                    //cs.DTE2.Solution.Projects.Item(1).ProjectItems.Item("ASD").Remove();
-                    //cb.NewItemAdded(cleanPath, content, name, pi.ContainingProject.Name);
+                    cb.NewItemRemoved(name,  pi.ContainingProject.Name,isDeleted);
                 }
             }
         }

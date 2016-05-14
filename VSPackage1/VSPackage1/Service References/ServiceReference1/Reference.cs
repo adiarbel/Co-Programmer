@@ -82,10 +82,10 @@ namespace Company.VSPackage1.ServiceReference1 {
         System.Threading.Tasks.Task NewItemAddedAsync(string relpath, byte[] content, string name, string project);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICoProService/NewItemRemoved", ReplyAction="http://tempuri.org/ICoProService/NewItemRemovedResponse")]
-        void NewItemRemoved(string name, string project);
+        void NewItemRemoved(string name, string project, bool isDeleted);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICoProService/NewItemRemoved", ReplyAction="http://tempuri.org/ICoProService/NewItemRemovedResponse")]
-        System.Threading.Tasks.Task NewItemRemovedAsync(string name, string project);
+        System.Threading.Tasks.Task NewItemRemovedAsync(string name, string project, bool isDeleted);
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
@@ -134,7 +134,7 @@ namespace Company.VSPackage1.ServiceReference1 {
         void NewItemAddedCallback(string relpath, byte[] content, string name, string project);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICoProService/NewItemRemovedCallback", ReplyAction="http://tempuri.org/ICoProService/NewItemRemovedCallbackResponse")]
-        void NewItemRemovedCallback(string name, string project);
+        void NewItemRemovedCallback(string name, string project, bool isDeleted);
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
@@ -253,12 +253,12 @@ namespace Company.VSPackage1.ServiceReference1 {
             return base.Channel.NewItemAddedAsync(relpath, content, name, project);
         }
         
-        public void NewItemRemoved(string name, string project) {
-            base.Channel.NewItemRemoved(name, project);
+        public void NewItemRemoved(string name, string project, bool isDeleted) {
+            base.Channel.NewItemRemoved(name, project, isDeleted);
         }
         
-        public System.Threading.Tasks.Task NewItemRemovedAsync(string name, string project) {
-            return base.Channel.NewItemRemovedAsync(name, project);
+        public System.Threading.Tasks.Task NewItemRemovedAsync(string name, string project, bool isDeleted) {
+            return base.Channel.NewItemRemovedAsync(name, project, isDeleted);
         }
     }
 }
