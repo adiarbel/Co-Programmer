@@ -116,7 +116,7 @@ namespace Company.VSPackage1
                 ExpectedSequence = wcfclient.GetExpectedSeq() - 1; //insert function that gets the id
                 return wcfclient.IsConnected();
             }
-            catch
+            catch(Exception e)
             {
                 return false;
             }
