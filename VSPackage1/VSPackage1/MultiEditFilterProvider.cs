@@ -31,9 +31,11 @@ namespace Company.VSPackage1
         static bool mySide = true;
         ProjectItemsEvents pie;
         SolutionEvents se;
+        DebuggerEvents de;
         static MyCallBack cb;
         Carets cs;
         public static bool isFirst = true;
+        bool runFlag = false;
         public static bool MySide
         {
             get { return mySide; }
@@ -41,86 +43,93 @@ namespace Company.VSPackage1
         }
         public void VsTextViewCreated(IVsTextView textViewAdapter)
         {
-            cb = VSPackage1Package.cb;
-            if (cb == null)
+            if (!runFlag)
             {
-                cb = new MyCallBack();
-                VSPackage1Package.cb = cb;
-            }
-            cs = new Carets(GetCurrentViewHost(textViewAdapter), cb);
-            cb.DTE2 = cs.DTE2;
-            if (isFirst)
-            {
-                se = ((Events2)cs.DTE2.Events).SolutionEvents;
-                se.Opened += SubscribeGlobalEvents;
-                bool setAdminConfiguraions = false;
-                var slnName = cs.DTE2.Solution.FullName;
-                var adminFile = slnName.Substring(0, slnName.Substring(0, slnName.LastIndexOf('\\')).LastIndexOf('\\')) + "\\admin.txt";
-                if (File.Exists(adminFile))
+                cb = VSPackage1Package.cb;
+                if (cb == null)
                 {
-                    StreamReader sr = new StreamReader(adminFile);
-                    string dir = sr.ReadToEnd();
-                    if (dir.Split('\n')[0] == slnName.Substring(0, slnName.LastIndexOf('\\')))
-                    {
-                        VSPackage1Package.service = new Service();
-                        string filesDir = slnName.Substring(0, slnName.LastIndexOf('\\')) + "\\CoProFiles";
-                        if (!Directory.Exists(filesDir))
-                        {
-                            Directory.CreateDirectory(slnName.Substring(0, slnName.LastIndexOf('\\')) + "\\CoProFiles");
-                        }
-                        string path = slnName.Substring(0, slnName.LastIndexOf('\\'));
-                        XElement xe = VSPackage1Package.CreateFileSystemXmlTree(path, 1, path.Substring(path.LastIndexOf('\\') + 1));
-                        XmlTextWriter xwr = new XmlTextWriter(path + "\\CoProFiles\\timestamps.xml", System.Text.Encoding.UTF8);
-                        xwr.Formatting = Formatting.Indented;
-                        xe.WriteTo(xwr);
-                        xwr.Close();
-                        FileStream fs = File.Create(slnName.Substring(0, slnName.LastIndexOf('\\')) + "\\CoProFiles\\client.txt");
-                        string ipPort = "localhost:" + (VSPackage1Package.service.PortOfService() + 10).ToString() + ":" + dir.Split('\n')[1];
-                        fs.Write(Encoding.ASCII.GetBytes(ipPort), 0, ipPort.Length);
-                        fs.Close();
-                        setAdminConfiguraions = true;
-                    }
+                    cb = new MyCallBack();
+                    VSPackage1Package.cb = cb;
                 }
-                if (File.Exists(slnName.Substring(0, slnName.LastIndexOf('\\')) + "\\CoProFiles\\client.txt"))
+                cs = new Carets(GetCurrentViewHost(textViewAdapter), cb);
+                cb.DTE2 = cs.DTE2;
+                if (isFirst)
                 {
-                    StreamReader sr = new StreamReader(slnName.Substring(0, slnName.LastIndexOf('\\')) + "\\CoProFiles\\client.txt");
-                    string iportName = sr.ReadToEnd();
-                    cb.SetIpPort(iportName.Split(':')[0], iportName.Split(':')[1]);
-                    cb.Name = iportName.Split(':')[2];
-                    if (cb.Connect())
+                    se = ((Events2)cs.DTE2.Events).SolutionEvents;
+                    de = ((Events2)cs.DTE2.Events).DebuggerEvents;
+                    se.Opened += SubscribeGlobalEvents;
+                    de.OnEnterRunMode += new _dispDebuggerEvents_OnEnterRunModeEventHandler(OnRun);
+                    bool setAdminConfiguraions = false;
+                    var slnName = cs.DTE2.Solution.FullName;
+                    var adminFile = slnName.Substring(0, slnName.Substring(0, slnName.LastIndexOf('\\')).LastIndexOf('\\')) + "\\admin.txt";
+                    if (File.Exists(adminFile))
                     {
-                        cb.ProjPath = slnName.Substring(0, slnName.LastIndexOf('\\'));
-                        if (setAdminConfiguraions)
+                        StreamReader sr = new StreamReader(adminFile);
+                        string dir = sr.ReadToEnd();
+                        if (dir.Split('\n')[0] == slnName.Substring(0, slnName.LastIndexOf('\\')))
                         {
-                            if (cb.SetAdmin(true))
+                            VSPackage1Package.service = new Service();
+                            string filesDir = slnName.Substring(0, slnName.LastIndexOf('\\')) + "\\CoProFiles";
+                            if (!Directory.Exists(filesDir))
                             {
-                                cb.IsAdmin = true;
-                                cb.SetProjectDir(slnName.Substring(0, slnName.LastIndexOf('\\')));
+                                Directory.CreateDirectory(slnName.Substring(0, slnName.LastIndexOf('\\')) + "\\CoProFiles");
                             }
+                            string path = slnName.Substring(0, slnName.LastIndexOf('\\'));
+                            XElement xe = VSPackage1Package.CreateFileSystemXmlTree(path, 1, path.Substring(path.LastIndexOf('\\') + 1));
+                            XmlTextWriter xwr = new XmlTextWriter(path + "\\CoProFiles\\timestamps.xml", System.Text.Encoding.UTF8);
+                            xwr.Formatting = Formatting.Indented;
+                            xe.WriteTo(xwr);
+                            xwr.Close();
+                            FileStream fs = File.Create(slnName.Substring(0, slnName.LastIndexOf('\\')) + "\\CoProFiles\\client.txt");
+                            string ipPort = "localhost:" + (VSPackage1Package.service.PortOfService() + 10).ToString() + ":" + dir.Split('\n')[1];
+                            fs.Write(Encoding.ASCII.GetBytes(ipPort), 0, ipPort.Length);
+                            fs.Close();
+                            setAdminConfiguraions = true;
                         }
-                        else
-                        {
-                            cb.IsAdmin = false;
-                            cb.UpdateProject();
-                        }
-                        if (cb.IsAdmin)
-                        {
-                            cb.ExpectedSequence++;
-                        }
-
                     }
+                    if (File.Exists(slnName.Substring(0, slnName.LastIndexOf('\\')) + "\\CoProFiles\\client.txt"))
+                    {
+                        StreamReader sr = new StreamReader(slnName.Substring(0, slnName.LastIndexOf('\\')) + "\\CoProFiles\\client.txt");
+                        string iportName = sr.ReadToEnd();
+                        cb.SetIpPort(iportName.Split(':')[0], iportName.Split(':')[1]);
+                        cb.Name = iportName.Split(':')[2];
+                        if (cb.Connect())
+                        {
+                            cb.ProjPath = slnName.Substring(0, slnName.LastIndexOf('\\'));
+                            if (setAdminConfiguraions)
+                            {
+                                if (cb.SetAdmin(true))
+                                {
+                                    cb.IsAdmin = true;
+                                    cb.SetProjectDir(slnName.Substring(0, slnName.LastIndexOf('\\')));
+                                }
+                            }
+                            else
+                            {
+                                cb.IsAdmin = false;
+                                cb.UpdateProject();
+                            }
+                            if (cb.IsAdmin)
+                            {
+                                cb.ExpectedSequence++;
+                            }
+
+                        }
+                    }
+                    else
+                    {
+                        cb = null;
+                        cs = null;
+                    }
+                    isFirst = false;
                 }
-                else
-                {
-                    cb = null;
-                    cs = null;
-                }
-                isFirst = false;
+
+                IWpfTextView textView = editorFactory.GetWpfTextView(textViewAdapter);//gets the text view
+                if (textView == null)
+                    return;
+                AddCommandFilter(textViewAdapter, new MultiEditCommandFilter(textView, cb, cs));//adds an instance of our command filter to the text view
             }
-            IWpfTextView textView = editorFactory.GetWpfTextView(textViewAdapter);//gets the text view
-            if (textView == null)
-                return;
-            AddCommandFilter(textViewAdapter, new MultiEditCommandFilter(textView, cb, cs));//adds an instance of our command filter to the text view
+            runFlag = false;
         }
         private void SubscribeGlobalEvents()
         {
@@ -163,13 +172,17 @@ namespace Company.VSPackage1
                     string name = pi.FileNames[1];
                     name = name.Substring(name.LastIndexOf('\\') + 1);
                     bool isDeleted = true;
-                    if(File.Exists(pi.FileNames[1]))
+                    if (File.Exists(pi.FileNames[1]))
                     {
                         isDeleted = true;
                     }
-                    cb.NewItemRemoved(name,  pi.ContainingProject.Name,isDeleted);
+                    cb.NewItemRemoved(name, pi.ContainingProject.Name, isDeleted);
                 }
             }
+        }
+        private void OnRun(dbgEventReason d)
+        {
+            runFlag = true;
         }
         IWpfTextViewHost GetCurrentViewHost(IVsTextView vTextView)
         {

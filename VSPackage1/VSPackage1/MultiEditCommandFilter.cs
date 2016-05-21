@@ -126,12 +126,12 @@ namespace Company.VSPackage1
                 {
                     if (e.Changes[i].OldText != "")
                     {
-                        cb.SendCaretPosition(filename, e.Changes[i].OldPosition, "DELETE;" + e.Changes[i].OldSpan.Length + ";");
+                        cb.SendCaretPosition(filename, e.Changes[i].NewPosition, "DELETE;" + e.Changes[i].OldSpan.Length + ";");
                         cb.ExpectedSequence++;
                     }
                     if (e.Changes[i].NewText != "")
                     {
-                        cb.SendCaretPosition(filename, e.Changes[i].OldPosition, e.Changes[i].NewText);
+                        cb.SendCaretPosition(filename, e.Changes[i].NewPosition, e.Changes[i].NewText);
                         cb.ExpectedSequence++;
                     }
                 }
