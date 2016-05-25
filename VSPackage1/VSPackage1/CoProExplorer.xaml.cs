@@ -19,11 +19,15 @@ namespace Company.VSPackage1
     /// </summary>
     public partial class CoProExplorer : UserControl
     {
+        private MyCallBack cb = null;
         public CoProExplorer()
         {
             InitializeComponent();
         }
-
+        public void SetConnection(MyCallBack cb)
+        {
+            this.cb=cb;
+        }
         //[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Globalization", "CA1300:SpecifyMessageBoxOptions")]
         //private void button1_Click(object sender, RoutedEventArgs e)
         //{

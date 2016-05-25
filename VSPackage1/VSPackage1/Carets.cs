@@ -37,12 +37,18 @@ namespace Company.VSPackage1
         IWpfTextViewHost iwpf;
         WindowEvents we;
         MyCallBack cb;
+        CoProExplorer coproExplorer;
         public DTE2 DTE2
         {
             get { return dte ?? (dte = ServiceProvider.GlobalProvider.GetService(typeof(DTE)) as DTE2); }
         }
-        public Carets(IWpfTextViewHost h, MyCallBack cb)
+        public CoProExplorer CoProExplorer
         {
+            get { return (CoProExplorer)(coproExplorer.Content); }
+        }
+        public Carets(IWpfTextViewHost h, MyCallBack cb, CoProExplorer cpe)
+        {
+            coproExplorer = cpe;
             if (DTE2.ActiveWindow != null)
             {
                 iwpf = h;

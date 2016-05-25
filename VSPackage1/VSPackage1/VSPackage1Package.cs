@@ -59,6 +59,7 @@ namespace Company.VSPackage1
         List<object> events = new List<object>();
         SolutionEvents se;
         public static MyCallBack cb = null;
+        public static CoProExplorer coproExplorer;
         static Dictionary<string, MenuCommand> cmds = new Dictionary<string, MenuCommand>();
         private DTE2 DTE2
         {
@@ -156,6 +157,7 @@ namespace Company.VSPackage1
             }
             IVsWindowFrame windowFrame = (IVsWindowFrame)window.Frame;
             Microsoft.VisualStudio.ErrorHandler.ThrowOnFailure(windowFrame.Show());
+            coproExplorer = window.Content as CoProExplorer;
         }
         #endregion
 

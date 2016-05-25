@@ -51,7 +51,8 @@ namespace Company.VSPackage1
                     cb = new MyCallBack();
                     VSPackage1Package.cb = cb;
                 }
-                cs = new Carets(GetCurrentViewHost(textViewAdapter), cb);
+                cs = new Carets(GetCurrentViewHost(textViewAdapter), cb,VSPackage1Package.coproExplorer);
+                cs.CoProExplorer.SetConnection(cb);
                 cb.DTE2 = cs.DTE2;
                 if (isFirst)
                 {
