@@ -60,6 +60,7 @@ namespace Company.VSPackage1
         SolutionEvents se;
         public static MyCallBack cb = null;
         public static CoProExplorer coproExplorer;
+        public static VSPackage1Package currRunning;
         static Dictionary<string, MenuCommand> cmds = new Dictionary<string, MenuCommand>();
         private DTE2 DTE2
         {
@@ -120,6 +121,7 @@ namespace Company.VSPackage1
         /// </summary>
         protected override void Initialize()
         {
+            currRunning = this;
             Debug.WriteLine(string.Format(CultureInfo.CurrentCulture, "Entering Initialize() of: {0}", this.ToString()));
             base.Initialize();
             se = ((Events2)DTE2.Events).SolutionEvents;
@@ -157,10 +159,17 @@ namespace Company.VSPackage1
             }
             IVsWindowFrame windowFrame = (IVsWindowFrame)window.Frame;
             Microsoft.VisualStudio.ErrorHandler.ThrowOnFailure(windowFrame.Show());
-            coproExplorer = window.Content as CoProExplorer;
         }
         #endregion
-
+        public object GetWindowCotnent()
+        {
+            ToolWindowPane window = this.FindToolWindow(typeof(MyToolWindow), 0, true);
+            if ((null == window) || (null == window.Frame))
+            {
+                throw new NotSupportedException(Resources.CanNotCreateWindow);
+            }
+            return window.Content;
+        }
         /// <summary>
         /// This function is the callback used to execute a command when the a menu item is clicked.
         /// See the Initialize method to see how the menu item is associated to this function using

@@ -28,6 +28,10 @@ namespace Company.VSPackage1
         {
             this.cb=cb;
         }
+        public void UpdateInfo()
+        {
+            infoText.Text = cb.IPort[0] + " " + cb.IPort[1];
+        }
         //[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Globalization", "CA1300:SpecifyMessageBoxOptions")]
         //private void button1_Click(object sender, RoutedEventArgs e)
         //{

@@ -13,7 +13,7 @@
             <TextBlock Margin="10" HorizontalAlignment="Center">CoPro Explorer</TextBlock>
         </StackPanel>
         <StackPanel Orientation="Vertical">
-            <TextBlock Margin="50" HorizontalAlignment="Center" TextAlignment="Center">Here information about the service <LineBreak/> and the editors will be displayed. <LineBreak/> Please connect or create team project<LineBreak/> to see more  information</TextBlock>
+            <TextBlock Name="infoText" Margin="50" HorizontalAlignment="Center" TextAlignment="Center">Here information about the service <LineBreak/> and the editors will be displayed. <LineBreak/> Please connect or create team project<LineBreak/> to see more  information</TextBlock>
         </StackPanel>
     </Grid>
 </UserControl>

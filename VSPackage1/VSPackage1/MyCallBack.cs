@@ -74,6 +74,10 @@ namespace Company.VSPackage1
             get { return dte; }
             set { dte = value; }
         }
+        public string[] IPort
+        {
+            get { return iport; }
+        }
         public MyCallBack()
         {
             context = new InstanceContext(this);

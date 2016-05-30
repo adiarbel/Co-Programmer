@@ -44,7 +44,7 @@ namespace Company.VSPackage1
         }
         public CoProExplorer CoProExplorer
         {
-            get { return (CoProExplorer)(coproExplorer.Content); }
+            get { return (CoProExplorer)(coproExplorer); }
         }
         public Carets(IWpfTextViewHost h, MyCallBack cb, CoProExplorer cpe)
         {

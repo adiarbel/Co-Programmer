@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using Microsoft.VisualStudio;
+using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.OLE.Interop;
 using Microsoft.VisualStudio.Utilities;
 using Microsoft.VisualStudio.Editor;
@@ -51,7 +52,12 @@ namespace Company.VSPackage1
                     cb = new MyCallBack();
                     VSPackage1Package.cb = cb;
                 }
-                cs = new Carets(GetCurrentViewHost(textViewAdapter), cb,VSPackage1Package.coproExplorer);
+                ToolWindowPane window = VSPackage1Package.currRunning.FindToolWindow(typeof(MyToolWindow), 0, true);
+                if ((null == window) || (null == window.Frame))
+                {
+                    throw new NotSupportedException(Resources.CanNotCreateWindow);
+                }
+                cs = new Carets(GetCurrentViewHost(textViewAdapter), cb, (CoProExplorer)window.Content);
                 cs.CoProExplorer.SetConnection(cb);
                 cb.DTE2 = cs.DTE2;
                 if (isFirst)
@@ -114,7 +120,7 @@ namespace Company.VSPackage1
                             {
                                 cb.ExpectedSequence++;
                             }
-
+                            cs.CoProExplorer.UpdateInfo();
                         }
                     }
                     else
