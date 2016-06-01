@@ -26,21 +26,24 @@ namespace Company.VSPackage1
             InitializeComponent();
             this.dte = dte;
         }
-        private void ChooseDirectory_Click(object sender,RoutedEventArgs e)
+        private void ChooseDirectory_Click(object sender, RoutedEventArgs e)
         {
             var dialog = new System.Windows.Forms.FolderBrowserDialog();
             dialog.ShowDialog();
             dirBlock.Text = dialog.SelectedPath;
-            while (!(Directory.EnumerateFiles(dialog.SelectedPath).Any() && Directory.EnumerateDirectories(dialog.SelectedPath).Any())&& dialog.SelectedPath!="")
+            if (dialog.SelectedPath != "")
             {
-                System.Windows.MessageBox.Show("Please do not choose an empty folder for sharing");
-                dialog.ShowDialog();
-                dirBlock.Text = dialog.SelectedPath;
+                while (!(Directory.EnumerateFiles(dialog.SelectedPath).Any() && Directory.EnumerateDirectories(dialog.SelectedPath).Any()) && dialog.SelectedPath != "")
+                {
+                    System.Windows.MessageBox.Show("Please do not choose an empty folder for sharing");
+                    dialog.ShowDialog();
+                    dirBlock.Text = dialog.SelectedPath;
+                }
             }
         }
         private void Done_Click(object sender, RoutedEventArgs e)
         {
-            if(name.Text!="")
+            if (name.Text != "")
             {
 
                 FileStream fs = File.Create(dirBlock.Text.Substring(0, dirBlock.Text.LastIndexOf('\\')) + "\\admin.txt");
