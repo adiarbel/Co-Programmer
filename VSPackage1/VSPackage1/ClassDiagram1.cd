@@ -1,0 +1,244 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="Company.VSPackage1.Carets" Collapsed="true">
+    <Position X="9.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>EBAAAAAQAAAAAgAAAEAAAAAAAAAAAAABAAQAASAAAAA=</HashCode>
+      <FileName>Carets.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Company.VSPackage1.CloneWindow" Collapsed="true">
+    <Position X="11.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>EAAAAAAAAAAAAgAAAIAAAAAAAAAAgAAAAAAAAAAAAAA=</HashCode>
+      <FileName>CloneWindow.xaml.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Company.VSPackage1.CoProExplorer" Collapsed="true">
+    <Position X="13" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAEAAAgAAAAAAAAAAAAAAAAAAAAABAAAAAAA=</HashCode>
+      <FileName>CoProExplorer.xaml.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Company.VSPackage1.CoProWindow" Collapsed="true">
+    <Position X="7.75" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAgAAAAAAAAEAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>CoProWindow.xaml.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Company.VSPackage1.GuidList" Collapsed="true">
+    <Position X="13" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAAAIAAAAAAAgAAAAAFAAAUACAAAAAAAAA=</HashCode>
+      <FileName>Guids.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Company.VSPackage1.HostProjectWindow" Collapsed="true">
+    <Position X="6" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAIAAAAAAAAAAgAAAAAQAAAAAAAA=</HashCode>
+      <FileName>HostProjectWindow.xaml.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Company.VSPackage1.MultiEditCommandFilter" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="7.75" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BQQAAABAICCQAgZQABBAAgAAQIExABIAAIEQYQBAQAA=</HashCode>
+      <FileName>MultiEditCommandFilter.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Company.VSPackage1.MultiEditFilterProvider" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="9.5" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAIAAACAQgIAkAQAgAAAhAEkgAAAAhEAAAAAAAA=</HashCode>
+      <FileName>MultiEditFilterProvider.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Company.VSPackage1.MyCallBack" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="11.25" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ACADIITCAEEBICQgIBAC0IQA6AjUAHiBQgRpAQIBhCA=</HashCode>
+      <FileName>MyCallBack.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="Company.VSPackage1.ChangeCaretEventArgs" Collapsed="true">
+    <Position X="3.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAQAIIBACAAAEEAAAAAAAAAAAAACA=</HashCode>
+      <FileName>MyCallBack.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Company.VSPackage1.EditedTextEventArgs" Collapsed="true">
+    <Position X="3.5" Y="2" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAQBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>MyCallBack.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Company.VSPackage1.AddEditorsEventArgs" Collapsed="true">
+    <Position X="6" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAEAAAAAIAAAAACAEAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>MyCallBack.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Company.VSPackage1.EditorDisEventArgs" Collapsed="true">
+    <Position X="9.5" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAQAAAAAAAAAEAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>MyCallBack.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Company.VSPackage1.AdminEventArgs" Collapsed="true">
+    <Position X="7.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAACAAAAEAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>MyCallBack.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Company.VSPackage1.ExplorerInfoEventArgs" Collapsed="true">
+    <Position X="11.25" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>EAAAgAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAACAA=</HashCode>
+      <FileName>MyCallBack.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Company.VSPackage1.MyToolWindow" Collapsed="true">
+    <Position X="13" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>MyToolWindow.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Company.VSPackage1.PkgCmdIDList" Collapsed="true">
+    <Position X="6" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAEAAAAAAAAAAAAAAAACAAAAAAAAAAAAgAAAACA=</HashCode>
+      <FileName>PkgCmdID.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Company.VSPackage1.Resources" Collapsed="true">
+    <Position X="7.75" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAABEAAAAQAAAAAAAAABAAAIAIA=</HashCode>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Company.VSPackage1.Service" Collapsed="true">
+    <Position X="9.5" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAEAAAAAAAAAAAAAAAAAAAAAAAAAAwAAAwAAACAAAA=</HashCode>
+      <FileName>Service.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Company.VSPackage1.VSPackage1Package" Collapsed="true">
+    <Position X="13" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>EAAAAAkQIAAAAwAQAAQAABAAhAAAQAIBAEQBAwAAAAA=</HashCode>
+      <FileName>VSPackage1Package.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Company.VSPackage1.Properties.Settings" Collapsed="true">
+    <Position X="11.25" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAIAAAAAABAAAAAAAAAAAAAAA=</HashCode>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Company.VSPackage1.ServiceReference1.CoProServiceClient" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="6" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ACABAAIEAAABAQhAABACAAgAgAgwACgAggAICAABAAE=</HashCode>
+      <FileName>Service References\ServiceReference1\Reference.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Interface Name="Company.VSPackage1.ServiceReference1.ICoProService" Collapsed="true">
+    <Position X="0.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ACABAAIEAAABAQhAABACAAgAgAgwACgAggAICAABAAE=</HashCode>
+      <FileName>Service References\ServiceReference1\Reference.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Company.VSPackage1.ServiceReference1.ICoProServiceCallback" Collapsed="true">
+    <Position X="6" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAISAAAAAAAAAAAACUAAAIADAAACAAgAAAQAAgCA=</HashCode>
+      <FileName>Service References\ServiceReference1\Reference.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Company.VSPackage1.ServiceReference1.ICoProServiceChannel" Collapsed="true">
+    <Position X="0.5" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Service References\ServiceReference1\Reference.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Delegate Name="Company.VSPackage1.RemovedTextEventHandler" Collapsed="true">
+    <Position X="9.5" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAQAAAgAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>MyCallBack.cs</FileName>
+    </TypeIdentifier>
+  </Delegate>
+  <Delegate Name="Company.VSPackage1.NewTextEventHandler" Collapsed="true">
+    <Position X="7.75" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAQAAAgAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>MyCallBack.cs</FileName>
+    </TypeIdentifier>
+  </Delegate>
+  <Delegate Name="Company.VSPackage1.EditorDisconnectedEventHandler" Collapsed="true">
+    <Position X="11.25" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAQAQAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>MyCallBack.cs</FileName>
+    </TypeIdentifier>
+  </Delegate>
+  <Delegate Name="Company.VSPackage1.AddCurrentEditorsEventHandler" Collapsed="true">
+    <Position X="6" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAIAAAAAAAA=</HashCode>
+      <FileName>MyCallBack.cs</FileName>
+    </TypeIdentifier>
+  </Delegate>
+  <Delegate Name="Company.VSPackage1.NewCaretEventHandler" Collapsed="true">
+    <Position X="6" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAQAAAgAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>MyCallBack.cs</FileName>
+    </TypeIdentifier>
+  </Delegate>
+  <Delegate Name="Company.VSPackage1.ChangeCaretEventHandler" Collapsed="true">
+    <Position X="9.5" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAQAAAgAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>MyCallBack.cs</FileName>
+    </TypeIdentifier>
+  </Delegate>
+  <Delegate Name="Company.VSPackage1.SaveEventHandler" Collapsed="true">
+    <Position X="11.25" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAABAAAAAAAQAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>MyCallBack.cs</FileName>
+    </TypeIdentifier>
+  </Delegate>
+  <Delegate Name="Company.VSPackage1.AdminEventHandler" Collapsed="true">
+    <Position X="7.75" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAEAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>MyCallBack.cs</FileName>
+    </TypeIdentifier>
+  </Delegate>
+  <Delegate Name="Company.VSPackage1.ExplorerInfoEventHandler" Collapsed="true">
+    <Position X="13" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAIAAAA=</HashCode>
+      <FileName>MyCallBack.cs</FileName>
+    </TypeIdentifier>
+  </Delegate>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

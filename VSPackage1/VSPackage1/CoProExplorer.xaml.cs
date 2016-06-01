@@ -19,15 +19,18 @@ namespace Company.VSPackage1
     /// </summary>
     public partial class CoProExplorer : UserControl
     {
-        private MyCallBack cb = null;
+        private CoProNetwork cb = null;
         public CoProExplorer()
         {
             InitializeComponent();
         }
-        public void SetConnection(MyCallBack cb)
+        public void SetConnection(CoProNetwork cb)
         {
             this.cb=cb;
         }
+        /// <summary>
+        /// Updates info in the explorer
+        /// </summary>
         public void UpdateInfo()
         {
             infoText.Text = cb.IPort[0] + " " + cb.IPort[1];

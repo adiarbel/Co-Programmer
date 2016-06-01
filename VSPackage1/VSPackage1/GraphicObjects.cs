@@ -31,12 +31,12 @@ using Microsoft.Win32;
 
 namespace Company.VSPackage1
 {
-    class Carets
+    class GraphicObjects
     {
         DTE2 dte;
         IWpfTextViewHost iwpf;
         WindowEvents we;
-        MyCallBack cb;
+        CoProNetwork cb;
         CoProExplorer coproExplorer;
         public DTE2 DTE2
         {
@@ -46,19 +46,19 @@ namespace Company.VSPackage1
         {
             get { return (CoProExplorer)(coproExplorer); }
         }
-        public Carets(IWpfTextViewHost h, MyCallBack cb, CoProExplorer cpe)
+        /// <summary>
+        /// sets the objects that would be accessed later by other classes
+        /// </summary>
+        /// <param name="h">iwpftextviewhost of the textview</param>
+        /// <param name="cb">the client network object</param>
+        /// <param name="cpe">the explorer management object</param>
+        public GraphicObjects(IWpfTextViewHost h, CoProNetwork cb, CoProExplorer cpe)
         {
             coproExplorer = cpe;
             if (DTE2.ActiveWindow != null)
             {
-                iwpf = h;
-                //tde = ((Events2)DTE2.Events).TextDocumentKeyPressEvents;
-                //tde.BeforeKeyPress += new _dispTextDocumentKeyPressEvents_BeforeKeyPressEventHandler(KeyPress_EventHandler);
-                
+                iwpf = h;                
                 we = ((Events2)DTE2.Events).WindowEvents;
-                //te.LineChanged += new _dispTextEditorEvents_LineChangedEventHandler(EnterFix);
-                //DTE2.Events.CommandEvents.BeforeExecute+= new _dispCommandEvents_BeforeExecuteEventHandler()
-                //te.LineChanged += new _dispTextEditorEvents_LineChangedEventHandler(IntelisenseFix);
                 this.cb = cb;
                 //pie.ItemAdded += ItemAdded;
                 //((Events2)DTE2.Events).WindowEvents.WindowClosing += new _dispWindowEvents_WindowClosingEventHandler(ClosedWindow);
@@ -71,20 +71,20 @@ namespace Company.VSPackage1
 
                 //ts.NewLine();
                 //ts.Insert("a");
+                //tde = ((Events2)DTE2.Events).TextDocumentKeyPressEvents;
+                //tde.BeforeKeyPress += new _dispTextDocumentKeyPressEvents_BeforeKeyPressEventHandler(KeyPress_EventHandler);
 
+                //te.LineChanged += new _dispTextEditorEvents_LineChangedEventHandler(EnterFix);
+                //DTE2.Events.CommandEvents.BeforeExecute+= new _dispCommandEvents_BeforeExecuteEventHandler()
+                //te.LineChanged += new _dispTextEditorEvents_LineChangedEventHandler(IntelisenseFix);
 
             }
         }
-        private void ClosedWindow(Window target)
-        {
-
-        }
-       
         IWpfTextViewHost GetTextViewHost()
         {
             return iwpf;
         }
-        void GetTextViewHost(IWpfTextViewHost h)
+        void SetTextViewHost(IWpfTextViewHost h)
         {
             iwpf = h;
         }

@@ -9,12 +9,16 @@ using System.ServiceModel.Description;
 
 namespace Company.VSPackage1
 {
-    public class Service
+    public class CoProServer
     {
         ServiceHost host;
         INetFwPolicy2 fwPolicy2;
         int port;
-        public Service()
+
+        /// <summary>
+        /// Initialization of the service
+        /// </summary>
+        public CoProServer()
         {
             bool flag = true;
             port = 8080;
@@ -88,15 +92,26 @@ namespace Company.VSPackage1
 
             fwPolicy2.Rules.Add(inboundRule);
         }
+        /// <summary>
+        /// Closing the service
+        /// </summary>
         public void Close()
         {
             host.Close();
             fwPolicy2.Rules.Remove("PortCoProgrammer");
         }
+        /// <summary>
+        /// getter for addresses
+        /// </summary>
+        /// <returns>addresses that the server listens to</returns>
         public System.Collections.ObjectModel.ReadOnlyCollection<Uri> GetAddresses()
         {
             return host.BaseAddresses;
         }
+        /// <summary>
+        /// getter for the port
+        /// </summary>
+        /// <returns>the current port that the service runs on</returns>
         public int PortOfService()
         {
             return port;

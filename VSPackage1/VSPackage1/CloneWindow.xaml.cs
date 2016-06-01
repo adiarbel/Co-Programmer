@@ -20,15 +20,19 @@ namespace Company.VSPackage1
     /// </summary>
     public partial class CloneWindow : Window
     {
-        MyCallBack cb;
+        CoProNetwork cb;
         string m_name;
-        public CloneWindow(MyCallBack calb, string name)
+        public CloneWindow(CoProNetwork calb, string name)
         {
             InitializeComponent();
             cb = calb;
             m_name = name;
         }
-
+        /// <summary>
+        /// Choosing directory button handler
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void ChooseDirectory_Click(object sender, RoutedEventArgs e)
         {
             var dialog = new System.Windows.Forms.FolderBrowserDialog();
@@ -47,10 +51,21 @@ namespace Company.VSPackage1
             }
             
         }
-
+        /// <summary>
+        /// "When done chosing directory" handler
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Done_Click(object sender, RoutedEventArgs e)
         {
-            cb.GetProject(m_name);
+            if(cb.GetProject(m_name))
+            {
+                System.Windows.Forms.MessageBox.Show("Success you can now open your project!");
+            }
+            else
+            {
+                System.Windows.Forms.MessageBox.Show("Cloning failed :/ try again");
+            }
             this.Close();
         }
     }

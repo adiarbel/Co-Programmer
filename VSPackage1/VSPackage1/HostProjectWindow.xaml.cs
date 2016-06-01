@@ -26,6 +26,11 @@ namespace Company.VSPackage1
             InitializeComponent();
             this.dte = dte;
         }
+        /// <summary>
+        /// Choosing directory handler
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void ChooseDirectory_Click(object sender, RoutedEventArgs e)
         {
             var dialog = new System.Windows.Forms.FolderBrowserDialog();
@@ -41,6 +46,11 @@ namespace Company.VSPackage1
                 }
             }
         }
+        /// <summary>
+        /// Finishing the creation of project handler
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Done_Click(object sender, RoutedEventArgs e)
         {
             if (name.Text != "")

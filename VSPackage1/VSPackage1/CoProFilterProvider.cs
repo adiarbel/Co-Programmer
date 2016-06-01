@@ -18,10 +18,14 @@ using System.Xml.Linq;
 
 namespace Company.VSPackage1
 {
+    /// <summary>
+    /// The purpose of this class is to manage text view issues before and after use, manage connections between UI and network. 
+    /// COllaboration of the network and UI managment class
+    /// </summary>
     [Export(typeof(IVsTextViewCreationListener))]
     [ContentType("text")]
     [TextViewRole(PredefinedTextViewRoles.Editable)]
-    internal class MultiEditFilterProvider : IVsTextViewCreationListener//classifies as an extension
+    internal class CoProFilterProvider : IVsTextViewCreationListener//classifies as an extension
     {
         [Export(typeof(AdornmentLayerDefinition))]
         [Name("MultiEditLayer")]
@@ -29,71 +33,78 @@ namespace Company.VSPackage1
         internal AdornmentLayerDefinition m_multieditAdornmentLayer = null;
         [Import(typeof(IVsEditorAdaptersFactoryService))]
         internal IVsEditorAdaptersFactoryService editorFactory = null;
-        static bool mySide = true;
-        ProjectItemsEvents pie;
-        SolutionEvents se;
-        DebuggerEvents de;
-        static MyCallBack cb;
-        Carets cs;
-        public static bool isFirst = true;
-        bool runFlag = false;
+        static bool mySideCalling = true;// determines whether the invoke of an event is from our side or a network one 
+        ProjectItemsEvents pie;// ProjectItems events object
+        SolutionEvents se;// SolutionEvents events object
+        DebuggerEvents de;// DebuggerEvents events object
+        static CoProNetwork cb;// netowrk client object
+        GraphicObjects gobj;// GraphicObjects object used to give access to dte objects and explorer
+        public static bool isFirst = true; // flag for the load of the package for a specific project
+        bool runFlag = false;// flag to determine if code is running or not
+
         public static bool MySide
         {
-            get { return mySide; }
-            set { mySide = value; }
+            get { return mySideCalling; }
+            set { mySideCalling = value; }
         }
+
+        /// <summary>
+        /// This function is called whenever a new item to edit is opened
+        /// </summary>
+        /// <param name="textViewAdapter">adapter of the text view (given by the VS itself [MEF] )</param>
         public void VsTextViewCreated(IVsTextView textViewAdapter)
         {
             if (!runFlag)
             {
-                cb = VSPackage1Package.cb;
+                cb = CoProgrammerPackage.cb;
                 if (cb == null)
                 {
-                    cb = new MyCallBack();
-                    VSPackage1Package.cb = cb;
+                    cb = new CoProNetwork();
+                    CoProgrammerPackage.cb = cb;
                 }
-                ToolWindowPane window = VSPackage1Package.currRunning.FindToolWindow(typeof(MyToolWindow), 0, true);
+                ToolWindowPane window = CoProgrammerPackage.currRunning.FindToolWindow(typeof(CoProToolWindow), 0, true);
                 if ((null == window) || (null == window.Frame))
                 {
                     throw new NotSupportedException(Resources.CanNotCreateWindow);
                 }
-                cs = new Carets(GetCurrentViewHost(textViewAdapter), cb, (CoProExplorer)window.Content);
-                cs.CoProExplorer.SetConnection(cb);
-                cb.DTE2 = cs.DTE2;
+                gobj = new GraphicObjects(GetCurrentViewHost(textViewAdapter), cb, (CoProExplorer)window.Content);
+                gobj.CoProExplorer.SetConnection(cb);
                 if (isFirst)
                 {
-                    se = ((Events2)cs.DTE2.Events).SolutionEvents;
-                    de = ((Events2)cs.DTE2.Events).DebuggerEvents;
+                    se = ((Events2)gobj.DTE2.Events).SolutionEvents;
+                    de = ((Events2)gobj.DTE2.Events).DebuggerEvents;
                     se.Opened += SubscribeGlobalEvents;
                     de.OnEnterRunMode += new _dispDebuggerEvents_OnEnterRunModeEventHandler(OnRun);
                     bool setAdminConfiguraions = false;
-                    var slnName = cs.DTE2.Solution.FullName;
+                    var slnName = gobj.DTE2.Solution.FullName;
                     var adminFile = slnName.Substring(0, slnName.Substring(0, slnName.LastIndexOf('\\')).LastIndexOf('\\')) + "\\admin.txt";
+                    //IF THERE IS ADMIN INFO
                     if (File.Exists(adminFile))
                     {
                         StreamReader sr = new StreamReader(adminFile);
                         string dir = sr.ReadToEnd();
                         if (dir.Split('\n')[0] == slnName.Substring(0, slnName.LastIndexOf('\\')))
                         {
-                            VSPackage1Package.service = new Service();
+                            CoProgrammerPackage.service = new CoProServer();
                             string filesDir = slnName.Substring(0, slnName.LastIndexOf('\\')) + "\\CoProFiles";
                             if (!Directory.Exists(filesDir))
                             {
                                 Directory.CreateDirectory(slnName.Substring(0, slnName.LastIndexOf('\\')) + "\\CoProFiles");
                             }
                             string path = slnName.Substring(0, slnName.LastIndexOf('\\'));
-                            XElement xe = VSPackage1Package.CreateFileSystemXmlTree(path, 1, path.Substring(path.LastIndexOf('\\') + 1));
+                            XElement xe = CoProgrammerPackage.CreateFileSystemXmlTree(path, 1, path.Substring(path.LastIndexOf('\\') + 1));
                             XmlTextWriter xwr = new XmlTextWriter(path + "\\CoProFiles\\timestamps.xml", System.Text.Encoding.UTF8);
                             xwr.Formatting = Formatting.Indented;
                             xe.WriteTo(xwr);
                             xwr.Close();
                             FileStream fs = File.Create(slnName.Substring(0, slnName.LastIndexOf('\\')) + "\\CoProFiles\\client.txt");
-                            string ipPort = "localhost:" + (VSPackage1Package.service.PortOfService() + 10).ToString() + ":" + dir.Split('\n')[1];
+                            string ipPort = "localhost:" + (CoProgrammerPackage.service.PortOfService() + 10).ToString() + ":" + dir.Split('\n')[1];
                             fs.Write(Encoding.ASCII.GetBytes(ipPort), 0, ipPort.Length);
                             fs.Close();
                             setAdminConfiguraions = true;
                         }
                     }
+                    //IF THERE IS A CLIENT INFO
                     if (File.Exists(slnName.Substring(0, slnName.LastIndexOf('\\')) + "\\CoProFiles\\client.txt"))
                     {
                         StreamReader sr = new StreamReader(slnName.Substring(0, slnName.LastIndexOf('\\')) + "\\CoProFiles\\client.txt");
@@ -120,13 +131,13 @@ namespace Company.VSPackage1
                             {
                                 cb.ExpectedSequence++;
                             }
-                            cs.CoProExplorer.UpdateInfo();
+                            gobj.CoProExplorer.UpdateInfo();
                         }
                     }
                     else
                     {
                         cb = null;
-                        cs = null;
+                        gobj = null;
                     }
                     isFirst = false;
                 }
@@ -134,19 +145,28 @@ namespace Company.VSPackage1
                 IWpfTextView textView = editorFactory.GetWpfTextView(textViewAdapter);//gets the text view
                 if (textView == null)
                     return;
-                AddCommandFilter(textViewAdapter, new MultiEditCommandFilter(textView, cb, cs));//adds an instance of our command filter to the text view
+                AddCommandFilter(textViewAdapter, new CoProCommandFilter(textView, cb, gobj));//adds an instance of our command filter to the text view
             }
             runFlag = false;
         }
+
+        /// <summary>
+        /// Subscribes to golbal events of solutions
+        /// </summary>
         private void SubscribeGlobalEvents()
         {
-            pie = ((Events2)cs.DTE2.Events).ProjectItemsEvents;
+            pie = ((Events2)gobj.DTE2.Events).ProjectItemsEvents;
             pie.ItemAdded += ItemAdded;
             pie.ItemRemoved += ItemRemoved;
         }
+
+        /// <summary>
+        /// Handler of adding an item
+        /// </summary>
+        /// <param name="pi">the item that was added</param>
         private void ItemAdded(ProjectItem pi)
         {
-            if (mySide)
+            if (mySideCalling)
             {
                 if (pi.Kind == "{6BB5F8EE-4483-11D3-8BCF-00C04F8EC28C}")
                 {
@@ -160,7 +180,7 @@ namespace Company.VSPackage1
                     String cleanPath = startOfString + endOfString;
                     if (cb.IsAdmin)
                     {
-                        XElement xe = VSPackage1Package.CreateFileSystemXmlTree(cb.ProjPath, 1, cb.ProjPath.Substring(cb.ProjPath.LastIndexOf('\\') + 1));
+                        XElement xe = CoProgrammerPackage.CreateFileSystemXmlTree(cb.ProjPath, 1, cb.ProjPath.Substring(cb.ProjPath.LastIndexOf('\\') + 1));
                         XmlTextWriter xwr = new XmlTextWriter(cb.ProjPath + "\\CoProFiles\\timestamps.xml", System.Text.Encoding.UTF8);
                         xwr.Formatting = Formatting.Indented;
                         xe.WriteTo(xwr);
@@ -170,9 +190,14 @@ namespace Company.VSPackage1
                 }
             }
         }
+
+        /// <summary>
+        /// Hnadler of removing item
+        /// </summary>
+        /// <param name="pi">the item that was removed</param>
         private void ItemRemoved(ProjectItem pi)
         {
-            if (mySide)
+            if (mySideCalling)
             {
                 if (pi.Kind == "{6BB5F8EE-4483-11D3-8BCF-00C04F8EC28C}")
                 {
@@ -187,10 +212,21 @@ namespace Company.VSPackage1
                 }
             }
         }
+
+        /// <summary>
+        /// When the code is running
+        /// </summary>
+        /// <param name="d"></param>
         private void OnRun(dbgEventReason d)
         {
             runFlag = true;
         }
+
+        /// <summary>
+        /// gets the current text view for dte purposes
+        /// </summary>
+        /// <param name="vTextView"></param>
+        /// <returns></returns>
         IWpfTextViewHost GetCurrentViewHost(IVsTextView vTextView)
         {
             IVsUserData userData = vTextView as IVsUserData;
@@ -208,7 +244,13 @@ namespace Company.VSPackage1
                 return viewHost;
             }
         }
-        void AddCommandFilter(IVsTextView viewAdapter, MultiEditCommandFilter commandFilter)
+
+        /// <summary>
+        /// adds the packge adornment layer the the entire structure of vs textview 
+        /// </summary>
+        /// <param name="viewAdapter"></param>
+        /// <param name="commandFilter"></param>
+        void AddCommandFilter(IVsTextView viewAdapter, CoProCommandFilter commandFilter)
         {
             if (commandFilter.m_added == false)
             {

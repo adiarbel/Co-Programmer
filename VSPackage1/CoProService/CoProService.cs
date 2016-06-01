@@ -17,20 +17,20 @@ namespace CoProService
     [ServiceBehavior(InstanceContextMode = InstanceContextMode.PerSession, ConcurrencyMode = ConcurrencyMode.Reentrant)]
     public class CoProService : ICoProService, IDisposable
     {
-        string[] currChanges = new string[10];
-        static Dictionary<string, OperationContext> ids = new Dictionary<string, OperationContext>();
-        static Dictionary<string, string> carets = new Dictionary<string, string>();
-        static List<string> EditorsNames = new List<string>();
-        static List<string> ShareProjectIDs = new List<string>();
-        static List<string> ShareProjectNames = new List<string>();
-        static int seqId = 0;
-        static string projPath;
-        int place;
-        string name;
-        string id;
-        Object locker = new Object();
-        bool isAdmin;
-        static string admin = "";
+        
+        static Dictionary<string, OperationContext> ids = new Dictionary<string, OperationContext>(); //ids of editors
+        static Dictionary<string, string> carets = new Dictionary<string, string>();// locations of editors
+        static List<string> EditorsNames = new List<string>(); // editors names
+        static int seqId = 0;// current message sequence
+        static string projPath;// the path of the project on the computer
+        string name;// the name of the current editor
+        string id;// the id of the current editor
+        Object locker = new Object();// locker for mutex
+        bool isAdmin;// whether the editor is admin or not
+        static string admin = "";// the id of the admin for public use
+        /// <summary>
+        /// 
+        /// </summary>
         public CoProService()
         {
 
@@ -219,31 +219,21 @@ namespace CoProService
             }
             return true;
         }
-        public void GetProject(string name)
+        public bool GetProject(string name)
         {
-            lock (ShareProjectIDs)
-            {
-                ShareProjectIDs.Add(id);
-            }
-            lock (ShareProjectNames)
-            {
-                ShareProjectNames.Add(name);
-            }
-            ids[admin].GetCallbackChannel<ICoProServiceCallback>().ApproveCloning(ShareProjectNames.ToArray());
+            return ids[admin].GetCallbackChannel<ICoProServiceCallback>().ApproveCloning(name, id);
+
         }
-        public int ShareProject(string path, string projName)
+        public int ShareProject(string path, string projName, string id)
         {
             if (isAdmin)
             {
                 ZipProject(path);
                 byte[] zipfile = File.ReadAllBytes(path.Substring(0, path.LastIndexOf('\\') + 1) + "\\proj.zip");
-                for (int i = 0; i < ShareProjectIDs.Count; i++)
-                {
-                    ids[ShareProjectIDs[i]].GetCallbackChannel<ICoProServiceCallback>().CloneProject(projName, zipfile);
-                }
+
+                ids[id].GetCallbackChannel<ICoProServiceCallback>().CloneProject(projName, zipfile);
                 File.Delete(path.Substring(0, path.LastIndexOf('\\') + 1) + "\\proj.zip");
-                ShareProjectIDs.Clear();
-                ShareProjectNames.Clear();
+                
                 return 1;
             }
             return 0;
@@ -311,7 +301,7 @@ namespace CoProService
             }
         }
 
-        public void NewItemRemoved(string name, string project,bool isDeleted)
+        public void NewItemRemoved(string name, string project, bool isDeleted)
         {
             ICoProServiceCallback callback;
             string[] idsKeys = ids.Keys.ToArray();
@@ -336,6 +326,9 @@ namespace CoProService
 
             }
         }
+        /// <summary>
+        /// 
+        /// </summary>
         void IDisposable.Dispose()
         {
             ICoProServiceCallback callback;

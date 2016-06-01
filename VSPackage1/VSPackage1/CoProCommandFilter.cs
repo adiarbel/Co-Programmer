@@ -16,35 +16,41 @@ using EnvDTE80;
 using EnvDTE100;
 namespace Company.VSPackage1
 {
-    class MultiEditCommandFilter : IOleCommandTarget///helps to get IO of clicked buttons 
+    class CoProCommandFilter : IOleCommandTarget///helps to get IO of clicked buttons 
     {
         private IWpfTextView m_textView;//The text view we work on
         internal IOleCommandTarget m_nextTarget;//The next task to be called by the visual studio
         internal bool m_added;
-        private IAdornmentLayer m_adornmentLayer;//Our adornment layer to work on
-        private bool requiresHandling = false;
-        Dictionary<string, ITrackingPoint> trackDict = new Dictionary<string, ITrackingPoint>();
-        List<SolidColorBrush> brushes = new List<SolidColorBrush>();
-        internal MyCallBack cb;
-        internal Carets crts;
-        static Dispatcher uiDisp;
-        static bool isFirst = true;
-        bool mySide = true;
-        bool delayFixer = false;
-        int currSizeBuffer;
-        string filename;
-        Events events;
-        DocumentEvents saveEvent;
-        public MultiEditCommandFilter(IWpfTextView textView, MyCallBack mcb, Carets cs)
+        private IAdornmentLayer m_adornmentLayer;//adornment layer to work on
+        Dictionary<string, ITrackingPoint> trackDict = new Dictionary<string, ITrackingPoint>();//tracking point of current text view editors
+        List<SolidColorBrush> brushes = new List<SolidColorBrush>();//brushes of the editors' carets
+        internal CoProNetwork cb;// client's object
+        internal GraphicObjects gobj;//graphic objects item
+        static Dispatcher uiDisp;// dispatcher of main thread in order for other threads do ui manipulations
+        static bool isFirstTime = true;// flag for first load of a textview
+        bool mySideCalling = true;// flag to determine which side the event/function is called from
+        bool delayFixer = false;// delay fixer flag for sending caret positions
+        int currBufferSize;// current buffer size of the file
+        string filename;// the name of the file
+        Events events;// DTE events object 
+        DocumentEvents saveEvent;//DocumentEvents object used for saving events
+
+        /// <summary>
+        /// Initialization of UI and editing related events and members
+        /// </summary>
+        /// <param name="textView"></param>
+        /// <param name="mcb"></param>
+        /// <param name="cs"></param>
+        public CoProCommandFilter(IWpfTextView textView, CoProNetwork mcb, GraphicObjects cs)
         {
             m_textView = textView;
             m_adornmentLayer = m_textView.GetAdornmentLayer("MultiEditLayer");
             m_added = false;
             m_textView.LayoutChanged += m_textView_LayoutChanged;
             cb = mcb;
-            crts = cs;
+            gobj = cs;
             //crts.DTE2.Events.TextEditorEvents.LineChanged += new _dispTextEditorEvents_LineChangedEventHandler();
-            events = crts.DTE2.Events;
+            events = gobj.DTE2.Events;
             saveEvent = events.DocumentEvents;
             saveEvent.DocumentSaved += new _dispDocumentEvents_DocumentSavedEventHandler(my_DocWasSaved);
             cb.NewCaret += new NewCaretEventHandler(my_NewCaret);
@@ -54,6 +60,8 @@ namespace Company.VSPackage1
             cb.RemovedText += new RemovedTextEventHandler(my_RemovedText);
             cb.SaveEvent += new SaveEventHandler(my_Save);
             cb.AddAllEditors += new AddCurrentEditorsEventHandler(my_AddEditors);
+            cb.ItemRemoved += new ItemRemovedEventHandler(my_RemovedItem);
+            cb.ItemAdded += new NewItemAddedEventHandler(my_ItemAdded);
             textView.Caret.PositionChanged += new EventHandler<CaretPositionChangedEventArgs>(my_PositionChanged);
             textView.TextBuffer.Changed += TextBuffer_Changed;
             InitBrushes();
@@ -61,7 +69,7 @@ namespace Company.VSPackage1
             ITextDocument textDoc;
             var rc = m_textView.TextBuffer.Properties.TryGetProperty<ITextDocument>(
               typeof(ITextDocument), out textDoc);
-            filename = crts.DTE2.Solution.FullName;
+            filename = gobj.DTE2.Solution.FullName;
             filename = filename.Substring(filename.LastIndexOf('\\') + 1);
             filename = filename.Split('.')[0];
             filename = textDoc.FilePath.Substring(textDoc.FilePath.IndexOf(filename));
@@ -69,15 +77,12 @@ namespace Company.VSPackage1
             {
                 cb.AdminEvent += my_AdminCallback;
             }
-            if (isFirst)
+            if (isFirstTime)
             {
-                isFirst = false;
-
+                isFirstTime = false;
             }
             else
             {
-                //TODO: ask for specific file from the server;
-                //TODO: what about admin?
                 if (!cb.IsAdmin)
                 {
                     cb.UpdateSpecificFile(filename);
@@ -86,8 +91,14 @@ namespace Company.VSPackage1
             filename = filename.Substring(filename.LastIndexOf('\\') + 1);
             cb.IntializePosition(filename, m_textView.Caret.Position.BufferPosition.Position, cb.Name);
 
-            currSizeBuffer = m_textView.TextSnapshot.Length;
+            currBufferSize = m_textView.TextSnapshot.Length;
         }
+
+        /// <summary>
+        /// Handler for changing position in the text file
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         void my_PositionChanged(object sender, CaretPositionChangedEventArgs e)
         {
             RedrawScreen();
@@ -95,31 +106,48 @@ namespace Company.VSPackage1
             cb.SendCaretPosition(filename, e.NewPosition.BufferPosition.Position, "click");
             cb.ExpectedSequence++;
         }
+
+        /// <summary>
+        /// Handler for saving the text file
+        /// </summary>
+        /// <param name="target"></param>
         void my_DocWasSaved(Document target)
         {
-            if (mySide)
+            if (mySideCalling)
             {
                 cb.SendCaretPosition(filename, 0, "save");
             }
-            mySide = true;
+            mySideCalling = true;
         }
+
+        /// <summary>
+        /// Handler for admin open file action - in order for the project items to be synced the admin should always open the file when even one user uses them 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         void my_AdminCallback(object sender, AdminEventArgs e)
         {
-            if (!crts.DTE2.Solution.Projects.Item(crts.DTE2.ActiveDocument.ProjectItem.ContainingProject.UniqueName).ProjectItems.Item(e.File).IsOpen)
+            if (!gobj.DTE2.Solution.Projects.Item(gobj.DTE2.ActiveDocument.ProjectItem.ContainingProject.UniqueName).ProjectItems.Item(e.File).IsOpen)
             {
                 Window w = null;
                 uiDisp.Invoke(new Action(() =>
                         {
-                            w = crts.DTE2.Solution.Projects.Item(crts.DTE2.ActiveDocument.ProjectItem.ContainingProject.UniqueName).ProjectItems.Item(e.File).Open(EnvDTE.Constants.vsViewKindTextView);
+                            w = gobj.DTE2.Solution.Projects.Item(gobj.DTE2.ActiveDocument.ProjectItem.ContainingProject.UniqueName).ProjectItems.Item(e.File).Open(EnvDTE.Constants.vsViewKindTextView);
 
                         }));
                 w.Activate();
                 w.Visible = false;
             }
         }
+
+        /// <summary>
+        /// Handler for changes on the buffer deletion/insertion of text 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         void TextBuffer_Changed(object sender, TextContentChangedEventArgs e)
         {
-            if (mySide)
+            if (mySideCalling)
             {
 
                 for (int i = 0; i < e.Changes.Count; i++)
@@ -136,49 +164,55 @@ namespace Company.VSPackage1
                     }
                 }
             }
-            mySide = true;
+            mySideCalling = true;
         }
+
+        /// <summary>
+        /// Handler for net side saving
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         void my_Save(object sender, ChangeCaretEventArgs e)
         {
             if (e.File == filename)
             {
                 if (e.File == "all")
                 {
-                    crts.DTE2.ActiveWindow.Project.Save();
+                    gobj.DTE2.ActiveWindow.Project.Save();
                 }
                 else
                 {
-                    var b = crts.DTE2.ActiveWindow.Project.ProjectItems.Item(e.File).IsOpen;
+                    var b = gobj.DTE2.ActiveWindow.Project.ProjectItems.Item(e.File).IsOpen;
                     if (b)
                     {
-                        crts.DTE2.ActiveWindow.Project.ProjectItems.Item(e.File).Save();
+                        gobj.DTE2.ActiveWindow.Project.ProjectItems.Item(e.File).Save();
                     }
                 }
-                mySide = false;
+                mySideCalling = false;
             }
         }
+
+        /// <summary>
+        /// Handler for new editor on the file 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         void my_NewCaret(object sender, EditedTextEventArgs e)
         {
-            //ITextDocument textDoc;
-            //var rc = m_textView.TextBuffer.Properties.TryGetProperty<ITextDocument>(
-            //  typeof(ITextDocument), out textDoc);
-            //string s = textDoc.FilePath.Substring(textDoc.FilePath.LastIndexOf('\\'));//gets the file only
-            //if (rc == true)
-            //    if (e.File == textDoc.FilePath.Substring(textDoc.FilePath.LastIndexOf('\\') + 1))
-            //        crts.my_CaretChange(sender, e);//helps me to find which file the caret is in
+
             if (e.File == filename)
             {
-                lock (MyCallBack.locker)
+                lock (CoProNetwork.locker)
                 {
                     while (e.Seq != cb.ExpectedSequence)//if excpected id is the id i got
                     {
-                        System.Threading.Monitor.Wait(MyCallBack.locker);
+                        System.Threading.Monitor.Wait(CoProNetwork.locker);
                         Debug.WriteLine("Recieved seq : " + e.Seq + " Expected seq : " + cb.ExpectedSequence);
                     }
                     var curTrackPoint = m_textView.TextSnapshot.CreateTrackingPoint(e.Location,
                     PointTrackingMode.Positive);
                     trackDict[e.Editor] = curTrackPoint;
-                    System.Threading.Monitor.PulseAll(MyCallBack.locker);
+                    System.Threading.Monitor.PulseAll(CoProNetwork.locker);
                 }
             }
             else
@@ -186,22 +220,22 @@ namespace Company.VSPackage1
                 trackDict[e.Editor] = null;
             }
         }
+
+        /// <summary>
+        /// Handler for changing caret of an editor
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         void my_ChangedCaret(object sender, EditedTextEventArgs e)
         {
-            //ITextDocument textDoc;
-            //var rc = m_textView.TextBuffer.Properties.TryGetProperty<ITextDocument>(
-            //  typeof(ITextDocument), out textDoc);
-            //string s = textDoc.FilePath.Substring(textDoc.FilePath.LastIndexOf('\\'));//gets the file only
-            //if (rc == true)
-            //    if (e.File == textDoc.FilePath.Substring(textDoc.FilePath.LastIndexOf('\\') + 1))
-            //        crts.my_CaretChange(sender, e);//helps me to find which file the caret is in
-            if (e.File == filename)//TODO : change location of statement
+
+            if (e.File == filename)
             {
-                lock (MyCallBack.locker)
+                lock (CoProNetwork.locker)
                 {
                     while (e.Seq != cb.ExpectedSequence)//if excpected id is the id i got
                     {
-                        System.Threading.Monitor.Wait(MyCallBack.locker);
+                        System.Threading.Monitor.Wait(CoProNetwork.locker);
                         Debug.WriteLine("Recieved seq : " + e.Seq + " Expected seq : " + cb.ExpectedSequence);
                     }
 
@@ -216,7 +250,7 @@ namespace Company.VSPackage1
                         PointTrackingMode.Positive);
                     }
 
-                    System.Threading.Monitor.PulseAll(MyCallBack.locker);
+                    System.Threading.Monitor.PulseAll(CoProNetwork.locker);
                 }
             }
             else
@@ -225,12 +259,18 @@ namespace Company.VSPackage1
             }
 
         }
+
+        /// <summary>
+        /// Handler for adding current editors of file
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         void my_AddEditors(object sender, AddEditorsEventArgs e)
         {
             string s;
             for (int i = 0; i < e.Editors.Length; i++)
             {
-                s = crts.DTE2.ActiveDocument.FullName;
+                s = gobj.DTE2.ActiveDocument.FullName;
                 s = e.Locations[i].Split(' ')[1];
                 if (e.Locations[i].Split(' ')[0] == filename)
                 {
@@ -239,20 +279,32 @@ namespace Company.VSPackage1
                 }
             }
         }
+
+        /// <summary>
+        /// Handler for an editor disconnection
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         void my_EditorDisc(object sender, EditorDisEventArgs e)
         {
             trackDict.Remove(e.Editor);
             RedrawScreen();
         }
+
+        /// <summary>
+        /// Handler for added text of other editor
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         void my_AddedText(object sender, EditedTextEventArgs e)
         {
             if (e.File == filename)
             {
-                lock (MyCallBack.locker)
+                lock (CoProNetwork.locker)
                 {
                     while (e.Seq != cb.ExpectedSequence)//if excpected id is the id i got
                     {
-                        System.Threading.Monitor.Wait(MyCallBack.locker);
+                        System.Threading.Monitor.Wait(CoProNetwork.locker);
                         Debug.WriteLine("Recieved seq : " + e.Seq + " Expected seq : " + cb.ExpectedSequence);
                     }
 
@@ -267,25 +319,31 @@ namespace Company.VSPackage1
 
                             edit.Insert(curTrackPoint.GetPosition(m_textView.TextSnapshot), e.Command);
 
-                            mySide = false;
+                            mySideCalling = false;
                             edit.Apply();
                             edit.Dispose();
 
 
                         }));
-                    System.Threading.Monitor.PulseAll(MyCallBack.locker);
+                    System.Threading.Monitor.PulseAll(CoProNetwork.locker);
                 }
             }
         }
+
+        /// <summary>
+        ///  Handler for removed text by other editor
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         void my_RemovedText(object sender, EditedTextEventArgs e)
         {
             if (e.File == filename)
             {
-                lock (MyCallBack.locker)
+                lock (CoProNetwork.locker)
                 {
                     while (e.Seq != cb.ExpectedSequence)//if excpected id is the id i got
                     {
-                        System.Threading.Monitor.Wait(MyCallBack.locker);
+                        System.Threading.Monitor.Wait(CoProNetwork.locker);
                         Debug.WriteLine("Recieved seq : " + e.Seq + " Expected seq : " + cb.ExpectedSequence);
                     }
 
@@ -300,153 +358,107 @@ namespace Company.VSPackage1
 
                         edit.Delete(e.Location, int.Parse(e.Command.Split(';')[1]));
 
-                        mySide = false;
+                        mySideCalling = false;
                         edit.Apply();
                         edit.Dispose();
                     }));
-                    System.Threading.Monitor.PulseAll(MyCallBack.locker);
+                    System.Threading.Monitor.PulseAll(CoProNetwork.locker);
                 }
             }
         }
+
+        /// <summary>
+        /// Handler for a removed item by other editor
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        void my_RemovedItem(object sender, ItemRemovedEventArgs e)
+        {
+
+            CoProFilterProvider.MySide = false;
+            if (e.IsDeleted)
+            {
+                EnvDTE.Projects ps = gobj.DTE2.Solution.Projects;
+                foreach (EnvDTE.Project p in ps)
+                {
+                    string pname = p.Name;
+                    if (p.Name.Contains(e.Project))
+                    {
+                        p.ProjectItems.Item(e.Name).Delete();
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                EnvDTE.Projects ps = gobj.DTE2.Solution.Projects;
+                foreach (EnvDTE.Project p in ps)
+                {
+                    string pname = p.Name;
+                    if (p.Name.Contains(e.Project))
+                    {
+                        p.ProjectItems.Item(e.Name).Remove();
+                        break;
+                    }
+                }
+            }
+            CoProFilterProvider.MySide = true;
+        }
+
+        /// <summary>
+        /// Handler for item added by other editor
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        void my_ItemAdded(object sender, NewItemAddedEventArgs e)
+        {
+
+            File.WriteAllBytes(cb.ProjPath + e.RelPath, e.Content);
+            CoProFilterProvider.MySide = false;
+            EnvDTE.Projects ps = gobj.DTE2.Solution.Projects;
+            foreach (EnvDTE.Project p in ps)
+            {
+                string pname = p.Name;
+                if (p.Name.Contains(e.Project))
+                {
+                    p.ProjectItems.AddFromTemplate(cb.ProjPath + e.RelPath, e.Name);
+                    break;
+                }
+            }
+            CoProFilterProvider.MySide = true;
+        }
+
+        /// <summary>
+        /// Exec fucntion - called every time as scheduled by VS system to do reapted checks and actions
+        /// </summary>
+        /// <param name="pguidCmdGroup"></param>
+        /// <param name="nCmdID"></param>
+        /// <param name="nCmdexecopt"></param>
+        /// <param name="pvaIn"></param>
+        /// <param name="pvaOut"></param>
+        /// <returns></returns>
         public int Exec(ref Guid pguidCmdGroup, uint nCmdID, uint nCmdexecopt, IntPtr pvaIn, IntPtr pvaOut)
         {
             RedrawScreen();
-            requiresHandling = false;
-            // When Alt Clicking, we need to add Edit points.
-            Debug.WriteLine("=====" + nCmdID + " " + pguidCmdGroup.ToString() + nCmdexecopt + " " + pvaIn.ToString() + " " + pvaOut.ToString(), "adi");
-            Debug.WriteLine((uint)VSConstants.VSStd97CmdID.SaveProjectItem);
-            //if (delayFixer)
-            //{
-            //    cb.SendCaretPosition(filename, m_textView.Caret.Position.BufferPosition.Position, "click");
-            //    cb.ExpectedSequence++;
-            //    delayFixer = false;
-            //}
-            //if (pguidCmdGroup == VSConstants.VSStd2K && nCmdID == (uint)VSConstants.VSStd2KCmdID.ECMD_LEFTCLICK)
-            //{
-            //    requiresHandling = true;
-            //    RedrawScreen();
-            //    //https://msdn.microsoft.com/en-us/library/microsoft.visualstudio.text.editor.itextcaret.positionchanged.aspx
-            //    cb.SendCaretPosition(filename, m_textView.Caret.Position.BufferPosition.Position, "click");
-            //    cb.ExpectedSequence++;
-
-            //}
-            //else if (pguidCmdGroup == VSConstants.VSStd2K &&
-            //        nCmdID == (uint)VSConstants.VSStd2KCmdID.UP ||
-            //        nCmdID == (uint)VSConstants.VSStd2KCmdID.DOWN ||
-            //        nCmdID == (uint)VSConstants.VSStd2KCmdID.LEFT ||
-            //        nCmdID == (uint)VSConstants.VSStd2KCmdID.RIGHT)
-            //{
-            //    delayFixer = true;
-            //}
-            //if (nCmdID == (uint)VSConstants.VSStd97CmdID.SaveProjectItem)
-            //{
-            //    if (mySide)
-            //    {
-            //        cb.SendCaretPosition(filename, 0, "save");//http://stackoverflow.com/questions/9844900/visual-studio-sdk-handle-file-save-event
-            //    }
-            //    mySide = true;
-
-            //}
-            //else if (nCmdID == (uint)VSConstants.VSStd97CmdID.SaveSolution)
-            //{
-            //    if (mySide)
-            //    {
-            //        cb.SendCaretPosition(filename, 0, "saveS");
-            //    }
-            //    mySide = true;
-
-            //}
-            //else if (pguidCmdGroup == VSConstants.VSStd2K && trackDict.Count > 0 && (nCmdID == (uint)VSConstants.VSStd2KCmdID.TYPECHAR ||
-            //        nCmdID == (uint)VSConstants.VSStd2KCmdID.BACKSPACE ||
-            //        nCmdID == (uint)VSConstants.VSStd2KCmdID.TAB ||
-            //        nCmdID == (uint)VSConstants.VSStd2KCmdID.RETURN
-            //))
-            //{
-            //    //keyPressed = true;
-            //}
-            //else if (nCmdID == 17)//DELETE pressed
-            //{
-            //   // keyPressed = true;
-            //}
-            //else if (Keyboard.Modifiers == ModifierKeys.Alt || Keyboard.Modifiers == ModifierKeys.Control || Keyboard.Modifiers == ModifierKeys.Shift)
-            //{
-            //    //keyPressed = true;
-            //}
-            //if (requiresHandling == true)
-            //{
-
-            //    if (pguidCmdGroup == VSConstants.VSStd2K && nCmdID == (uint)VSConstants.VSStd2KCmdID.TYPECHAR)
-            //    {
-            //        var typedChar = ((char)(ushort)Marshal.GetObjectForNativeVariant(pvaIn)).ToString();
-            //        if (Math.Abs(m_textView.Selection.End.Position - m_textView.Selection.Start.Position) > 0)
-            //        {
-            //            typedChar = typedChar + ";del;" + Math.Abs(m_textView.Selection.End.Position - m_textView.Selection.Start.Position) + ";";
-            //            cb.SendCaretPosition(filename, m_textView.Selection.Start.Position, typedChar);
-            //        }
-            //        else
-            //        {
-            //            cb.SendCaretPosition(filename, m_textView.Caret.Position.BufferPosition.Position, typedChar);
-            //        }
-            //        //cb.SendCaretPosition(filename, m_textView.Caret.Position.BufferPosition.Position, typedChar);
-            //        //InsertSyncedChar(typedChar.ToString());
-            //        RedrawScreen();
-            //    }
-            //    else if (pguidCmdGroup == VSConstants.VSStd2K && nCmdID == (uint)VSConstants.VSStd2KCmdID.BACKSPACE)
-            //    {
-            //        if (Math.Abs(m_textView.Selection.End.Position - m_textView.Selection.Start.Position) > 0)
-            //        {
-
-            //            cb.SendCaretPosition(filename, m_textView.Selection.Start.Position, "BACKSPACE;sel;" + Math.Abs(m_textView.Selection.End.Position - m_textView.Selection.Start.Position) + ";");
-            //        }
-            //        else
-            //        {
-            //            if((crts.DTE2.ActiveDocument.Selection as TextSelection).ActivePoint.LineCharOffset==1)
-            //            {
-            //                cb.SendCaretPosition(filename, m_textView.Caret.Position.BufferPosition.Position, "BACKSPACE;2;");
-            //            }
-            //            else
-            //            {
-            //                cb.SendCaretPosition(filename, m_textView.Caret.Position.BufferPosition.Position, "BACKSPACE;1;");
-            //            }
-            //        }
-            //        // SyncedBackSpace();
-            //        RedrawScreen();
-            //    }
-            //    else if (nCmdID == 17)
-            //    {
-            //        if (Math.Abs(m_textView.Selection.End.Position - m_textView.Selection.Start.Position) > 0)
-            //        {
-
-            //            cb.SendCaretPosition(filename, m_textView.Selection.Start.Position, "DELETE;sel" +Math.Abs(m_textView.Selection.End.Position - m_textView.Selection.Start.Position)+ ";");
-            //        }
-            //        else
-            //        {
-            //            cb.SendCaretPosition(filename, m_textView.Caret.Position.BufferPosition.Position, "DELETE;1;");
-            //        }
-            //        // SyncedDelete();
-            //        RedrawScreen();
-            //    }
-            //    else if (pguidCmdGroup == VSConstants.VSStd2K && nCmdID == (uint)VSConstants.VSStd2KCmdID.RETURN)
-            //    {
-            //        //var typedChar = (char)(ushort)Marshal.GetObjectForNativeVariant(pvaIn);
-            //        cb.SendCaretPosition(filename, m_textView.Caret.Position.BufferPosition.Position, "\r\n");
-            //        //InsertSyncedChar(typedChar.ToString());
-
-            //        RedrawScreen();
-            //    }
-            //} 
-            //if (currSizeBuffer != m_textView.TextSnapshot.Length)
-            //{
-            //    currSizeBuffer = m_textView.TextSnapshot.Length;
-            //}
             return m_nextTarget.Exec(ref pguidCmdGroup, nCmdID, nCmdexecopt, pvaIn, pvaOut);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="pguidCmdGroup"></param>
+        /// <param name="cCmds"></param>
+        /// <param name="prgCmds"></param>
+        /// <param name="pCmdText"></param>
+        /// <returns></returns>
         public int QueryStatus(ref Guid pguidCmdGroup, uint cCmds, OLECMD[] prgCmds, IntPtr pCmdText)
         {
             return m_nextTarget.QueryStatus(ref pguidCmdGroup, cCmds, prgCmds, pCmdText);
         }
 
+        /// <summary>
+        /// Redraw screens and carets
+        /// </summary>
         private void RedrawScreen()
         {
             try
@@ -472,6 +484,11 @@ namespace Company.VSPackage1
             }
         }
 
+        /// <summary>
+        /// Draw a caret in its position
+        /// </summary>
+        /// <param name="curTrackPoint"></param>
+        /// <param name="brush"></param>
         private void DrawSingleSyncPoint(ITrackingPoint curTrackPoint, SolidColorBrush brush)
         {
             SnapshotSpan span;
@@ -497,13 +514,21 @@ namespace Company.VSPackage1
                 m_adornmentLayer.AddAdornment(AdornmentPositioningBehavior.TextRelative, span, "MultiEditLayer", r, null);
             }
 
-
-
         }
+
+        /// <summary>
+        /// Handler for layout changed
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void m_textView_LayoutChanged(object sender, TextViewLayoutChangedEventArgs e)
         {
             RedrawScreen();
         }
+
+        /// <summary>
+        /// Initializes brush list with colors
+        /// </summary>
         private void InitBrushes()
         {
             brushes.Add(new SolidColorBrush(Colors.Aqua));

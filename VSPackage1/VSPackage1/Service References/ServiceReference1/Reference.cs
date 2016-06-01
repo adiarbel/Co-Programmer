@@ -28,16 +28,16 @@ namespace Company.VSPackage1.ServiceReference1 {
         System.Threading.Tasks.Task<bool> SendCaretPositionAsync(string file, int position, string content);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICoProService/ShareProject", ReplyAction="http://tempuri.org/ICoProService/ShareProjectResponse")]
-        int ShareProject(string path, string projName);
+        int ShareProject(string path, string projName, string id);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICoProService/ShareProject", ReplyAction="http://tempuri.org/ICoProService/ShareProjectResponse")]
-        System.Threading.Tasks.Task<int> ShareProjectAsync(string path, string projName);
+        System.Threading.Tasks.Task<int> ShareProjectAsync(string path, string projName, string id);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICoProService/GetProject", ReplyAction="http://tempuri.org/ICoProService/GetProjectResponse")]
-        void GetProject(string name);
+        bool GetProject(string name);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICoProService/GetProject", ReplyAction="http://tempuri.org/ICoProService/GetProjectResponse")]
-        System.Threading.Tasks.Task GetProjectAsync(string name);
+        System.Threading.Tasks.Task<bool> GetProjectAsync(string name);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICoProService/SetAdmin", ReplyAction="http://tempuri.org/ICoProService/SetAdminResponse")]
         bool SetAdmin(bool adm);
@@ -116,7 +116,7 @@ namespace Company.VSPackage1.ServiceReference1 {
         void CloneProject(string fileName, byte[] zipFile);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICoProService/ApproveCloning", ReplyAction="http://tempuri.org/ICoProService/ApproveCloningResponse")]
-        void ApproveCloning(string[] idsToApprove);
+        bool ApproveCloning(string nameToApprove, string idToApprove);
         
         [System.ServiceModel.OperationContractAttribute(Action="http://tempuri.org/ICoProService/UpdateProjFilesCallback", ReplyAction="http://tempuri.org/ICoProService/UpdateProjFilesCallbackResponse")]
         string[][] UpdateProjFilesCallback(string file);
@@ -181,19 +181,19 @@ namespace Company.VSPackage1.ServiceReference1 {
             return base.Channel.SendCaretPositionAsync(file, position, content);
         }
         
-        public int ShareProject(string path, string projName) {
-            return base.Channel.ShareProject(path, projName);
+        public int ShareProject(string path, string projName, string id) {
+            return base.Channel.ShareProject(path, projName, id);
         }
         
-        public System.Threading.Tasks.Task<int> ShareProjectAsync(string path, string projName) {
-            return base.Channel.ShareProjectAsync(path, projName);
+        public System.Threading.Tasks.Task<int> ShareProjectAsync(string path, string projName, string id) {
+            return base.Channel.ShareProjectAsync(path, projName, id);
         }
         
-        public void GetProject(string name) {
-            base.Channel.GetProject(name);
+        public bool GetProject(string name) {
+            return base.Channel.GetProject(name);
         }
         
-        public System.Threading.Tasks.Task GetProjectAsync(string name) {
+        public System.Threading.Tasks.Task<bool> GetProjectAsync(string name) {
             return base.Channel.GetProjectAsync(name);
         }
         

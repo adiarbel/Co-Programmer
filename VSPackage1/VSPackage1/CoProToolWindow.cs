@@ -20,12 +20,12 @@ namespace Company.VSPackage1
     /// implementation of the IVsUIElementPane interface.
     /// </summary>
     [Guid("a8bdab84-3037-435a-94b5-8220df7e9a01")]
-    public class MyToolWindow : ToolWindowPane
+    public class CoProToolWindow : ToolWindowPane
     {
         /// <summary>
         /// Standard constructor for the tool window.
         /// </summary>
-        public MyToolWindow() :
+        public CoProToolWindow() :
             base(null)
         {
             // Set the window title reading it from the resources.

@@ -19,12 +19,17 @@ namespace Company.VSPackage1
     /// </summary>
     public partial class CoProWindow : Window
     {
-        MyCallBack cb;
-        public CoProWindow(MyCallBack calb)
+        CoProNetwork cb;
+        public CoProWindow(CoProNetwork calb)
         {
             InitializeComponent();
             cb = calb;
         }
+        /// <summary>
+        /// Registration finish handler
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             if (name.Text != "" && ip.Text != "" && port.Text != "")

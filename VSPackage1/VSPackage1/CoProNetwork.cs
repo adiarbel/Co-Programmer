@@ -16,7 +16,6 @@ using System.Xml.Linq;
 
 namespace Company.VSPackage1
 {
-    /*TODO: define delegate*/
     public delegate void RemovedTextEventHandler(object sender, EditedTextEventArgs e);
     public delegate void NewTextEventHandler(object sender, EditedTextEventArgs e);
     public delegate void EditorDisconnectedEventHandler(object sender, EditorDisEventArgs e);
@@ -26,34 +25,51 @@ namespace Company.VSPackage1
     public delegate void SaveEventHandler(object sender, ChangeCaretEventArgs e);
     public delegate void AdminEventHandler(object sender, AdminEventArgs e);
     public delegate void ExplorerInfoEventHandler(object sender, ExplorerInfoEventArgs e);
-    /*TODO: define event for that delegate*/
+    public delegate void NewItemAddedEventHandler(object sender, NewItemAddedEventArgs e);
+    public delegate void ItemRemovedEventHandler(object sender, ItemRemovedEventArgs e);
 
-    /*TODO: define the above for each event that might come from the server's callbacks*/
+
     [CallbackBehavior(UseSynchronizationContext = false, ConcurrencyMode = ConcurrencyMode.Multiple)]
-    public class MyCallBack : ICoProServiceCallback, IDisposable
+    public class CoProNetwork : ICoProServiceCallback, IDisposable
     {
-        public event NewCaretEventHandler NewCaret;
-        public event RemovedTextEventHandler RemovedText;
-        public event ChangeCaretEventHandler ChangeCaret;
-        public event AddCurrentEditorsEventHandler AddAllEditors;
-        public event EditorDisconnectedEventHandler EditorDisc;
-        public event NewTextEventHandler NewText;
-        public event SaveEventHandler SaveEvent;
-        public event AdminEventHandler AdminEvent;
-        public event ExplorerInfoEventHandler ExplorerInfoEvent;
+        public event NewCaretEventHandler NewCaret; //Event for new editors
+        public event RemovedTextEventHandler RemovedText; //Event for removed text while editing
+        public event ChangeCaretEventHandler ChangeCaret; // Event for changing the position of an editor
+        public event AddCurrentEditorsEventHandler AddAllEditors; //Event for adding the current editors
+        public event EditorDisconnectedEventHandler EditorDisc; //Event for new disconnected editor
+        public event NewTextEventHandler NewText; //Event for new added text
+        public event SaveEventHandler SaveEvent;//Event for saving action
+        public event AdminEventHandler AdminEvent; //Event for adming calling actions
+        public event ExplorerInfoEventHandler ExplorerInfoEvent;// Event for changing explorer info due to network changes 
+        public event NewItemAddedEventHandler ItemAdded;// Event for adding new items
+        public event ItemRemovedEventHandler ItemRemoved;//  Event for removing items
 
 
-        public static Object locker = new Object();
-        InstanceContext context;
-        EndpointAddress myEndPoint;
-        NetTcpBinding mybinding;
-        CoProServiceClient wcfclient;
-        int expecSeq;
-        bool isAdmin;
-        string name;
-        string proj;
-        EnvDTE80.DTE2 dte;
-        string[] iport = new string[2];
+        public static Object locker = new Object();//Locker for public resources
+        InstanceContext context;//Service client infrastructure objects
+        EndpointAddress myEndPoint;//
+        NetTcpBinding mybinding;//
+        CoProServiceClient wcfclient;//service client object
+        int expecSeq;// expected message sequence number
+        bool isAdmin;// determines access level of user
+        string name;// editor name
+        string proj;// project path on the current endpoint
+        string[] iport = new string[2];// ip and port of the server
+
+        /// <summary>
+        /// Properties of members
+        /// </summary>
+        public string ProjPath
+        {
+            get { return proj; }
+            set { proj = value; }
+
+        }
+        public string GetId()
+        {
+            string st = wcfclient.InnerDuplexChannel.SessionId;
+            return st;
+        }
         public int ExpectedSequence
         {
             get { return expecSeq; }
@@ -69,16 +85,15 @@ namespace Company.VSPackage1
             get { return name; }
             set { name = value; }
         }
-        public EnvDTE80.DTE2 DTE2
-        {
-            get { return dte; }
-            set { dte = value; }
-        }
         public string[] IPort
         {
             get { return iport; }
         }
-        public MyCallBack()
+
+        /// <summary>
+        /// Initialize the main members of the client 
+        /// </summary>
+        public CoProNetwork()
         {
             context = new InstanceContext(this);
             mybinding = new NetTcpBinding();
@@ -87,30 +102,40 @@ namespace Company.VSPackage1
             //mybinding.SendTimeout = new TimeSpan(0, 10, 0);
             mybinding.Security.Mode = SecurityMode.None;
         }
-        public string ProjPath
-        {
-            get { return proj; }
-            set { proj = value; }
-
-        }
-        public string GetId()
-        {
-            string st = wcfclient.InnerDuplexChannel.SessionId;
-            return st;
-        }
+        /// <summary>
+        /// Mediator funciton for service SetAdmin function
+        /// </summary>
+        /// <param name="adm">is admin or not </param>
+        /// <returns>if setting was successful</returns>
         public bool SetAdmin(bool adm)
         {
             return wcfclient.SetAdmin(adm);
         }
+
+        /// <summary>
+        /// Mediator funciton for service SetProjectDir function
+        /// </summary>
+        /// <param name="dir">the project directory</param>
         public void SetProjectDir(string dir)
         {
             wcfclient.SetProjectDir(dir);
         }
+
+        /// <summary>
+        /// Setter for ip and port
+        /// </summary>
+        /// <param name="ip"></param>
+        /// <param name="port"></param>
         public void SetIpPort(string ip, string port)
         {
             iport[0] = ip;
             iport[1] = port;
         }
+
+        /// <summary>
+        /// Connection to the service and checking for response
+        /// </summary>
+        /// <returns>true if suceeds, otherwise false</returns>
         public bool Connect()
         {
             myEndPoint = new EndpointAddress("net.tcp://" + iport[0] + ":" + iport[1] + "/CoProService");
@@ -120,33 +145,71 @@ namespace Company.VSPackage1
                 ExpectedSequence = wcfclient.GetExpectedSeq() - 1; //insert function that gets the id
                 return wcfclient.IsConnected();
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 return false;
             }
 
         }
+
+        /// <summary>
+        /// Mediator function for service InitializePosition function
+        /// </summary>
+        /// <param name="file">current file of editor</param>
+        /// <param name="position">position within the file</param>
+        /// <param name="name">the name of the editor</param>
         public void IntializePosition(string file, int position, string name)
         {
             wcfclient.IntializePosition(file, position, name);
         }
+
+        /// <summary>
+        /// Mediator function for service SendCaretPosition function
+        /// </summary>
+        /// <param name="file">current file of editor</param>
+        /// <param name="position">position within the file</param>
+        /// <param name="command">command that was done</param>
         public void SendCaretPosition(string file, int position, string command)
         {
             wcfclient.SendCaretPosition(file, position, command);
         }
+
+        /// <summary>
+        /// Mediator function for service NewItemAdded function
+        /// </summary>
+        /// <param name="relpath"></param>
+        /// <param name="content"></param>
+        /// <param name="name"></param>
+        /// <param name="project"></param>
         public void NewItemAdded(string relpath, byte[] content, string name, string project)
         {
             wcfclient.NewItemAdded(relpath, content, name, project);
         }
-        public void NewItemRemoved(string name, string project,bool isDeleted)
+
+        /// <summary>
+        /// Mediator function for service NewItemRemoved function
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="project"></param>
+        /// <param name="isDeleted"></param>
+        public void NewItemRemoved(string name, string project, bool isDeleted)
         {
             wcfclient.NewItemRemoved(name, project, isDeleted);
         }
-        public void GetProject(string name)
+
+        /// <summary>
+        /// Mediator function for service GetProject function
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns>result of attempt to get the project</returns>
+        public bool GetProject(string name)
         {
-            wcfclient.GetProject(name);
+            bool ret = wcfclient.GetProject(name);
             wcfclient.Abort();
+            return ret;
         }
+
+        
         public void AddCurrentEditors(string[] editors, string[] locations, string[] names)
         {
             if (AddAllEditors != null)
@@ -212,6 +275,10 @@ namespace Company.VSPackage1
                 SaveEvent(this, new ChangeCaretEventArgs(" ", 0, file, " "));
             }
         }
+
+        /// <summary>
+        /// disposes the client object
+        /// </summary>
         void IDisposable.Dispose()
         {
             wcfclient.Close();
@@ -230,28 +297,34 @@ namespace Company.VSPackage1
             fs.Write(Encoding.ASCII.GetBytes(iport[0] + ':' + iport[1] + ':' + name), 0, (iport[0] + ':' + iport[1] + ':' + name).Length);
             fs.Close();
         }
-        public void ApproveCloning(string[] idsToApprove)
+        public bool ApproveCloning(string nameToApprove, string idToApprove)
         {
-            string st = "";
-            for (int i = 0; i < idsToApprove.Length; i++)
-            {
-                st += idsToApprove[i] + '\n';
-            }
-            System.Windows.Forms.DialogResult result = System.Windows.Forms.MessageBox.Show("Do you want to approve cloning for the following?:\n" + st, "Confirmation", System.Windows.Forms.MessageBoxButtons.YesNoCancel);
+            System.Windows.Forms.DialogResult result = System.Windows.Forms.MessageBox.Show("Do you want to approve cloning for the following?:\n" + nameToApprove, "Confirmation", System.Windows.Forms.MessageBoxButtons.YesNoCancel);
             if (result == System.Windows.Forms.DialogResult.Yes)
             {
-                wcfclient.ShareProject(proj, proj.Substring(proj.LastIndexOf('\\') + 1));
+                wcfclient.ShareProject(proj, proj.Substring(proj.LastIndexOf('\\') + 1), idToApprove);
+                return true;
             }
+            return false;
 
         }
+        /// <summary>
+        /// aborts client object when needed
+        /// </summary>
         public void Abort()
         {
             wcfclient.Abort();
         }
+
+        /// <summary>
+        /// Mediator function for service funciton UpdateProject
+        /// </summary>
         public void UpdateProject()
         {
             wcfclient.UpdateProject();
         }
+
+        
         public string[][] UpdateProjFilesCallback(string file)
         {
             List<string> filesToRequest = new List<string>();
@@ -298,19 +371,16 @@ namespace Company.VSPackage1
                         filesToRequest.Add(serverDictionary[tempKey][1] + "\\" + tempKey);
                     }
                 }
-                //for (int i = 0; i < myDictionary.Keys.Count; i++)
-                //{
-                //    string tempKey = myDictionary.Keys.ElementAt(i);
-                //    if (!serverDictionary.ContainsKey(tempKey))
-                //    {
 
-                //    }
-                //}
-                int dsa = 1;
             }
             string[][] arrs = { filesToRequest.ToArray(), newFilesToRequest.ToArray() };
             return arrs;
         }
+
+        /// <summary>
+        /// Mediator function to service UpdateSpecificFile function
+        /// </summary>
+        /// <param name="relPath">relative path of the file to update</param>
         public void UpdateSpecificFile(string relPath)
         {
             wcfclient.UpdateSpecificFile(relPath);
@@ -340,26 +410,11 @@ namespace Company.VSPackage1
             for (int i = 0; i < n_files.Length; i++)
             {
                 File.WriteAllBytes(absolutePath + "\\" + n_files[i], n_contents[i]);
-                //project = n_files[i].Substring(n_files[i].IndexOf('\\') + 1);
-                //project = project.Substring(0, project.LastIndexOf('\\'));
-                //File.WriteAllBytes(absolutePath + "\\" + n_files[i], n_contents[i]);
-                //name = absolutePath + "\\" + n_files[i];
-                //MultiEditFilterProvider.MySide = false;
-                //EnvDTE.Projects ps = DTE2.Solution.Projects;
-                //foreach(EnvDTE.Project p in ps)
-                //{
-                //    string pname = p.Name;
-                //    if(p.Name.Contains(project))
-                //    {
-                //        p.ProjectItems.AddFromTemplate(name, name.Substring(name.LastIndexOf('\\') + 1));
-                //    }
-                //}
-                //MultiEditFilterProvider.MySide = true; ;
-
             }
             File.WriteAllBytes(ProjPath + "\\CoProFiles\\timestamps.xml", contents[files.Length]);
             ExpectedSequence++;
         }
+
         public void UpdateSpecificFileCallback(byte[] content, string relPath)
         {
             File.WriteAllBytes(ProjPath + relPath.Substring(relPath.IndexOf('\\')), content);
@@ -367,51 +422,18 @@ namespace Company.VSPackage1
 
         public void NewItemRemovedCallback(string name, string project, bool isDeleted)
         {
-            MultiEditFilterProvider.MySide = false;
-            if (isDeleted)
+            if(ItemRemoved!=null)
             {
-                EnvDTE.Projects ps = DTE2.Solution.Projects;
-                foreach (EnvDTE.Project p in ps)
-                {
-                    string pname = p.Name;
-                    if (p.Name.Contains(project))
-                    {
-                        p.ProjectItems.Item(name).Delete();
-                        break;
-                    }
-                }
+                ItemRemoved(this, new ItemRemovedEventArgs(name, project, isDeleted));
             }
-            else
-            {
-                EnvDTE.Projects ps = DTE2.Solution.Projects;
-                foreach (EnvDTE.Project p in ps)
-                {
-                    string pname = p.Name;
-                    if (p.Name.Contains(project))
-                    {
-                        p.ProjectItems.Item(name).Remove();
-                        break;
-                    }
-                }
-            }
-            MultiEditFilterProvider.MySide = true;
         }
 
         public void NewItemAddedCallback(string relpath, byte[] content, string name, string project)
         {
-            File.WriteAllBytes(ProjPath + relpath, content);
-            MultiEditFilterProvider.MySide = false;
-            EnvDTE.Projects ps = DTE2.Solution.Projects;
-            foreach (EnvDTE.Project p in ps)
+            if(ItemAdded!=null)
             {
-                string pname = p.Name;
-                if (p.Name.Contains(project))
-                {
-                    p.ProjectItems.AddFromTemplate(ProjPath + relpath, name);
-                    break;
-                }
+                ItemAdded(this, new NewItemAddedEventArgs(relpath, content, name, project));
             }
-            MultiEditFilterProvider.MySide = true;
         }
 
         public void AdminFileOpen(string file)
@@ -424,6 +446,10 @@ namespace Company.VSPackage1
 
 
     }
+
+    /// <summary>
+    /// Events arguments classes
+    /// </summary>
     public class ChangeCaretEventArgs : EventArgs
     {
         // Fields
@@ -539,5 +565,62 @@ namespace Company.VSPackage1
             get { return m_names; }
         }
     }
+    public class NewItemAddedEventArgs : EventArgs
+    {
+        string m_relpath;
+        byte[] m_content;
+        string m_name;
+        string m_project;
 
+        public NewItemAddedEventArgs(string relpath, byte[] content, string name, string project)
+        {
+            m_relpath = relpath;
+            m_content = content;
+            m_name = name;
+            m_project = project;
+        }
+        public string RelPath
+        {
+            get { return m_relpath; }
+        }
+        public byte[] Content
+        {
+            get { return m_content; }
+        }
+        public string Name
+        {
+            get { return m_name; }
+        }
+        public string Project
+        {
+            get { return m_project; }
+        }
+
+    }
+    public class ItemRemovedEventArgs : EventArgs
+    {
+        string m_name;
+        string m_project;
+        bool m_isDeleted;
+
+        public ItemRemovedEventArgs(string name, string project,bool isDeleted)
+        {
+            m_isDeleted = isDeleted;
+            m_name = name;
+            m_project = project;
+        }
+        public bool IsDeleted
+        {
+            get { return m_isDeleted; }
+        }
+        public string Name
+        {
+            get { return m_name; }
+        }
+        public string Project
+        {
+            get { return m_project; }
+        }
+
+    }
 }

@@ -38,6 +38,7 @@
       <xs:sequence>
         <xs:element minOccurs="0" name="path" nillable="true" type="xs:string" />
         <xs:element minOccurs="0" name="projName" nillable="true" type="xs:string" />
+        <xs:element minOccurs="0" name="id" nillable="true" type="xs:string" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -57,7 +58,9 @@
   </xs:element>
   <xs:element name="GetProjectResponse">
     <xs:complexType>
-      <xs:sequence />
+      <xs:sequence>
+        <xs:element minOccurs="0" name="GetProjectResult" type="xs:boolean" />
+      </xs:sequence>
     </xs:complexType>
   </xs:element>
   <xs:element name="SetAdmin">
@@ -280,13 +283,16 @@
   <xs:element name="ApproveCloning">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q4="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="idsToApprove" nillable="true" type="q4:ArrayOfstring" />
+        <xs:element minOccurs="0" name="nameToApprove" nillable="true" type="xs:string" />
+        <xs:element minOccurs="0" name="idToApprove" nillable="true" type="xs:string" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
   <xs:element name="ApproveCloningResponse">
     <xs:complexType>
-      <xs:sequence />
+      <xs:sequence>
+        <xs:element minOccurs="0" name="ApproveCloningResult" type="xs:boolean" />
+      </xs:sequence>
     </xs:complexType>
   </xs:element>
   <xs:element name="UpdateProjFilesCallback">
@@ -299,17 +305,17 @@
   <xs:element name="UpdateProjFilesCallbackResponse">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q5="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="UpdateProjFilesCallbackResult" nillable="true" type="q5:ArrayOfArrayOfstring" />
+        <xs:element xmlns:q4="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="UpdateProjFilesCallbackResult" nillable="true" type="q4:ArrayOfArrayOfstring" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
   <xs:element name="UpdateProjFilesContents">
     <xs:complexType>
       <xs:sequence>
-        <xs:element xmlns:q6="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="files" nillable="true" type="q6:ArrayOfstring" />
-        <xs:element xmlns:q7="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="contents" nillable="true" type="q7:ArrayOfbase64Binary" />
-        <xs:element xmlns:q8="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="n_files" nillable="true" type="q8:ArrayOfstring" />
-        <xs:element xmlns:q9="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="n_contents" nillable="true" type="q9:ArrayOfbase64Binary" />
+        <xs:element xmlns:q5="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="files" nillable="true" type="q5:ArrayOfstring" />
+        <xs:element xmlns:q6="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="contents" nillable="true" type="q6:ArrayOfbase64Binary" />
+        <xs:element xmlns:q7="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="n_files" nillable="true" type="q7:ArrayOfstring" />
+        <xs:element xmlns:q8="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="n_contents" nillable="true" type="q8:ArrayOfbase64Binary" />
       </xs:sequence>
     </xs:complexType>
   </xs:element>
