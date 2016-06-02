@@ -98,8 +98,8 @@ namespace Company.VSPackage1
             context = new InstanceContext(this);
             mybinding = new NetTcpBinding();
             mybinding.PortSharingEnabled = true;
-            //mybinding.ReceiveTimeout = new TimeSpan(0, 10, 0);
-            //mybinding.SendTimeout = new TimeSpan(0, 10, 0);
+            mybinding.ReceiveTimeout = new TimeSpan(0, 10, 0);
+            mybinding.SendTimeout = new TimeSpan(0, 10, 0);
             mybinding.Security.Mode = SecurityMode.None;
         }
         /// <summary>
@@ -450,6 +450,10 @@ namespace Company.VSPackage1
     /// <summary>
     /// Events arguments classes
     /// </summary>
+
+    /// <summary>
+    /// ChangeCaretEventArgs arguments connected to changing position of a caret
+    /// </summary>
     public class ChangeCaretEventArgs : EventArgs
     {
         // Fields
@@ -485,6 +489,9 @@ namespace Company.VSPackage1
         }
 
     }
+    /// <summary>
+    /// Changed carets events + text editing
+    /// </summary>
     public class EditedTextEventArgs : ChangeCaretEventArgs
     {
         // Fields
@@ -502,6 +509,9 @@ namespace Company.VSPackage1
             get { return m_seq; }
         }
     }
+    /// <summary>
+    /// Adding editors event arguments
+    /// </summary>
     public class AddEditorsEventArgs : EventArgs
     {
         private string[] m_editors = null;
@@ -521,6 +531,9 @@ namespace Company.VSPackage1
             get { return m_locations; }
         }
     }
+    /// <summary>
+    /// Editor disconnection arguements
+    /// </summary>
     public class EditorDisEventArgs : EventArgs
     {
 
@@ -534,6 +547,9 @@ namespace Company.VSPackage1
             get { return m_editor; }
         }
     }
+    /// <summary>
+    /// Admin event arguments
+    /// </summary>
     public class AdminEventArgs : EventArgs
     {
         private string m_file = string.Empty;
@@ -546,6 +562,9 @@ namespace Company.VSPackage1
             get { return m_file; }
         }
     }
+    /// <summary>
+    /// Explorer of the extension event arguments
+    /// </summary>
     public class ExplorerInfoEventArgs : EventArgs
     {
         private string m_name = null;
@@ -565,6 +584,9 @@ namespace Company.VSPackage1
             get { return m_names; }
         }
     }
+    /// <summary>
+    /// New item added event arguemnts
+    /// </summary>
     public class NewItemAddedEventArgs : EventArgs
     {
         string m_relpath;
@@ -597,6 +619,9 @@ namespace Company.VSPackage1
         }
 
     }
+    /// <summary>
+    ///  Item removed event arguemnts
+    /// </summary>
     public class ItemRemovedEventArgs : EventArgs
     {
         string m_name;

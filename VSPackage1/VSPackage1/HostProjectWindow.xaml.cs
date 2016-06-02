@@ -26,6 +26,7 @@ namespace Company.VSPackage1
             InitializeComponent();
             this.dte = dte;
         }
+
         /// <summary>
         /// Choosing directory handler
         /// </summary>

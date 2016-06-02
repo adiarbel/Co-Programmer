@@ -145,24 +145,26 @@
     </COMReference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Carets.cs" />
     <Compile Include="CloneWindow.xaml.cs">
       <DependentUpon>CloneWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="CoProCommandFilter.cs" />
+    <Compile Include="CoProFilterProvider.cs" />
+    <Compile Include="CoProgrammerPackage.cs" />
+    <Compile Include="CoProNetwork.cs" />
+    <Compile Include="CoProServer.cs" />
+    <Compile Include="CoProToolWindow.cs" />
     <Compile Include="CoProWindow.xaml.cs">
       <DependentUpon>CoProWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="GraphicObjects.cs" />
     <Compile Include="Guids.cs" />
     <Compile Include="HostProjectWindow.xaml.cs">
       <DependentUpon>HostProjectWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="MultiEditCommandFilter.cs" />
-    <Compile Include="MultiEditFilterProvider.cs" />
-    <Compile Include="MyCallBack.cs" />
     <Compile Include="CoProExplorer.xaml.cs">
       <DependentUpon>CoProExplorer.xaml</DependentUpon>
     </Compile>
-    <Compile Include="MyToolWindow.cs" />
     <Compile Include="Properties\Settings.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
@@ -179,8 +181,6 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Reference.svcmap</DependentUpon>
     </Compile>
-    <Compile Include="Service.cs" />
-    <Compile Include="VSPackage1Package.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="PkgCmdID.cs" />
   </ItemGroup>
