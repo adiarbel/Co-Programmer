@@ -47,6 +47,7 @@ namespace Company.VSPackage1
                 }
             }
         }
+
         /// <summary>
         /// Finishing the creation of project handler
         /// </summary>

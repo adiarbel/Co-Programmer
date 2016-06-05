@@ -127,7 +127,6 @@ namespace CoProService
         [OperationContract]
         void AddCurrentEditors(string[] editors, string[] locations, string[] names);
 
-
         /// <summary>
         /// An event of new editor that was added
         /// </summary>

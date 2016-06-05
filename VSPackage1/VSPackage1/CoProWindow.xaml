@@ -11,14 +11,17 @@
             <ColumnDefinition Width="83*"/>
             <ColumnDefinition Width="209*"/>
         </Grid.ColumnDefinitions>
-        <TextBox Name="ip" FontSize="16"  Margin="80,97,26,132" Background="#FF4D4848" Grid.ColumnSpan="2" Foreground="#FFFBFBFB" BorderBrush="#FF393A3C" BorderThickness="1" TextAlignment="Center" Padding="5,5,5,5" />
+        <TextBox Name="ip" FontSize="16"  Margin="80,97,26,132" Background="#FF4D4848"
+                 Grid.ColumnSpan="2" Foreground="#FFFBFBFB" BorderBrush="#FF393A3C" BorderThickness="1" TextAlignment="Center" Padding="5,5,5,5" />
         <Button Name="button1"  FontSize="16" BorderBrush="#FF404040" Click="Button_Click" Margin="19,211,109,10" Grid.Column="1" Background="#FF302D2D" Foreground="White">
             Connect
         </Button>
-        <TextBox Name="port" FontSize="16"  Margin="80,156,26,73" Background="#FF4D4848" Grid.ColumnSpan="2" Foreground="#FFFBFBFB" BorderBrush="#FF393A3C" BorderThickness="1" TextAlignment="Center" Padding="5,5,5,5"/>
+        <TextBox Name="port" FontSize="16"  Margin="80,156,26,73" Background="#FF4D4848"
+                 Grid.ColumnSpan="2" Foreground="#FFFBFBFB" BorderBrush="#FF393A3C" BorderThickness="1" TextAlignment="Center" Padding="5,5,5,5"/>
         <Label Content="ip :" HorizontalAlignment="Left" Margin="16,97,0,0" VerticalAlignment="Top" Foreground="White" RenderTransformOrigin="0.553,1.346"/>
         <Label Content="port :" HorizontalAlignment="Left" Margin="16,156,0,0" VerticalAlignment="Top" Foreground="White" RenderTransformOrigin="0.553,1.346"/>
-        <TextBox x:Name="name" FontSize="16"  Margin="80,36,26,193" Background="#FF4D4848" Grid.ColumnSpan="2" Foreground="#FFFBFBFB" BorderBrush="#FF393A3C" BorderThickness="1" TextAlignment="Center" Padding="5,5,5,5" />
+        <TextBox x:Name="name" FontSize="16"  Margin="80,36,26,193" Background="#FF4D4848" 
+                 Grid.ColumnSpan="2" Foreground="#FFFBFBFB" BorderBrush="#FF393A3C" BorderThickness="1" TextAlignment="Center" Padding="5,5,5,5" />
         <Label Content="name :" HorizontalAlignment="Left" Margin="16,36,0,0" VerticalAlignment="Top" Foreground="White" RenderTransformOrigin="0.553,1.346"/>
 
     </Grid>

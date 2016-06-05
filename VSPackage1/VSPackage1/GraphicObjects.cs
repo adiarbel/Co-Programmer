@@ -38,6 +38,10 @@ namespace Company.VSPackage1
         WindowEvents we;
         CoProNetwork cb;
         CoProExplorer coproExplorer;
+
+        /// <summary>
+        /// Properties of members
+        /// </summary>
         public DTE2 DTE2
         {
             get { return dte ?? (dte = ServiceProvider.GlobalProvider.GetService(typeof(DTE)) as DTE2); }
@@ -46,6 +50,7 @@ namespace Company.VSPackage1
         {
             get { return (CoProExplorer)(coproExplorer); }
         }
+
         /// <summary>
         /// sets the objects that would be accessed later by other classes
         /// </summary>
@@ -80,10 +85,20 @@ namespace Company.VSPackage1
 
             }
         }
+
+        /// <summary>
+        /// Getter for TextViewHost - helps for current document dte objects
+        /// </summary>
+        /// <returns></returns>
         IWpfTextViewHost GetTextViewHost()
         {
             return iwpf;
         }
+
+        /// <summary>
+        /// Setter for current document text view host for dte object
+        /// </summary>
+        /// <param name="h"></param>
         void SetTextViewHost(IWpfTextViewHost h)
         {
             iwpf = h;

@@ -51,6 +51,7 @@ namespace Company.VSPackage1
             }
             
         }
+
         /// <summary>
         /// "When done chosing directory" handler
         /// </summary>

@@ -138,7 +138,7 @@ namespace Company.VSPackage1
             OleMenuCommandService mcs = GetService(typeof(IMenuCommandService)) as OleMenuCommandService;
             if (null != mcs)
             {
-                // Create the command for the menu item.
+                // Create the command for the menu items.
                 CommandID toolwndCommandID = new CommandID(GuidList.guidVSPackage1CmdSet, (int)PkgCmdIDList.cmdidMyTool);
                 MenuCommand menuToolWin = new MenuCommand(ShowToolWindow, toolwndCommandID);
                 mcs.AddCommand(menuToolWin);
@@ -182,6 +182,7 @@ namespace Company.VSPackage1
             }
             return window.Content;
         }
+
         /// <summary>
         /// These functions are the callbacks used to execute commands when the a menu items are clicked.
         /// See the Initialize method to see how the menu item is associated to this function using
@@ -189,7 +190,11 @@ namespace Company.VSPackage1
         /// </summary>
         /// 
 
-        
+        /// <summary>
+        /// Callback function for connection option on the menu to open the window
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void ConnectCallback(object sender, EventArgs e)
         {
             cb = new CoProNetwork();
@@ -199,6 +204,12 @@ namespace Company.VSPackage1
 
 
         }
+
+        /// <summary>
+        /// Callback function for hosting project option on the menu to open the window
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void HostCallback(object sender, EventArgs e)
         {
             HostProjectWindow hpw = new HostProjectWindow(DTE2);
@@ -236,8 +247,9 @@ namespace Company.VSPackage1
                 CoProgrammerPackage.service = null;
             }
         }
+
         /// <summary>
-        /// Helper function to create xml file for the directories
+        /// Helper function to create xml file for the fiel tree in a directory
         /// </summary>
         /// <param name="source">path of the original directory</param>
         /// <param name="level">level of the directory relatively to the first </param>

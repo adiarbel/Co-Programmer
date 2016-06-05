@@ -7,12 +7,15 @@
         <Grid.Background>
             <ImageBrush ImageSource="Resources/Back.png"/>
         </Grid.Background>
-        <Button Content="Browse..." HorizontalAlignment="Left" BorderBrush="#FF404040" Margin="195,87,0,0" VerticalAlignment="Top" Width="63" Height="25" Click="ChooseDirectory_Click" Background="#FF302D2D" Foreground="White"/>
+        <Button Content="Browse..." HorizontalAlignment="Left" BorderBrush="#FF404040"
+                Margin="195,87,0,0" VerticalAlignment="Top" Width="63" Height="25" Click="ChooseDirectory_Click" Background="#FF302D2D" Foreground="White"/>
         <Label Content="Chosen Dir:" HorizontalAlignment="Left" Margin="23,137,0,0" VerticalAlignment="Top" Foreground="#FF9C8C8C"/>
         <Label Name="projDirLabel" Content="" HorizontalAlignment="center" Margin="0,33,0,0" VerticalAlignment="Top" Foreground="#FF9C8C8C"/>
         <Border BorderThickness="1" Padding="1,1,1,1" BorderBrush="Gray" Width="235" Height="55" Margin="23,144,34,22">
-            <TextBlock Name="dirBlock" HorizontalAlignment="Left" Margin="-1,-1,-1,0" TextWrapping="Wrap" VerticalAlignment="Top" Background="#FF302D2D" Foreground="White" Height="55" Width="235" />
+            <TextBlock Name="dirBlock" HorizontalAlignment="Left" Margin="-1,-1,-1,0" TextWrapping="Wrap" VerticalAlignment="Top" Background="#FF302D2D" 
+                       Foreground="White" Height="55" Width="235" />
         </Border>
-        <Button Content="OK" HorizontalAlignment="Left" BorderBrush="#FF404040" Margin="116,234,0,0" VerticalAlignment="Top" Width="63" Height="25" Click="Done_Click" Background="#FF302D2D" Foreground="White"/>
+        <Button Content="OK" HorizontalAlignment="Left" BorderBrush="#FF404040"
+                Margin="116,234,0,0" VerticalAlignment="Top" Width="63" Height="25" Click="Done_Click" Background="#FF302D2D" Foreground="White"/>
     </Grid>
 </Window>

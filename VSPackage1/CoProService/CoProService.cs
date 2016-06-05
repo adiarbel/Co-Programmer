@@ -20,12 +20,20 @@ namespace CoProService
         
         static Dictionary<string, OperationContext> ids = new Dictionary<string, OperationContext>(); //ids of editors
         static Dictionary<string, string> carets = new Dictionary<string, string>();// locations of editors
+
+
         static List<string> EditorsNames = new List<string>(); // editors names
         static int seqId = 0;// current message sequence
+
+
         static string projPath;// the path of the project on the computer
         string name;// the name of the current editor
+
+
         string id;// the id of the current editor
         Object locker = new Object();// locker for mutex
+
+
         bool isAdmin;// whether the editor is admin or not
         static string admin = "";// the id of the admin for public use
         /// <summary>
@@ -167,6 +175,7 @@ namespace CoProService
             }
             OperationContext[] idsArr = ids.Values.ToArray();
             string[] idsKeys = ids.Keys.ToArray();
+            bool sent = false;
             for (int i = 0; i < idsArr.Length; i++)
             {
                 if (idsKeys[i] != id)
@@ -179,7 +188,7 @@ namespace CoProService
                             lock (locker)
                             {
                                 callback.ChangedCaret(file, position, id, seqId);
-                                seqId++;
+                                sent = true;
                             }
                         }
                         else if (content.Contains("DELETE"))
@@ -187,7 +196,7 @@ namespace CoProService
                             lock (locker)
                             {
                                 callback.NewRemovedText(file, position, id, content, seqId);
-                                seqId++;
+                                sent = true;
                             }
                         }
                         else if (content.Contains("save"))
@@ -206,7 +215,7 @@ namespace CoProService
                             lock (locker)
                             {
                                 callback.NewAddedText(file, position, id, content, seqId);
-                                seqId++;
+                                sent = true;
                             }
                         }
                     }
@@ -216,6 +225,11 @@ namespace CoProService
                     }
                 }
 
+            }
+            if(sent)
+            {
+                seqId++;
+                sent = false;
             }
             return true;
         }
@@ -327,7 +341,7 @@ namespace CoProService
             }
         }
         /// <summary>
-        /// 
+        /// The function disposes the object of a user session
         /// </summary>
         void IDisposable.Dispose()
         {

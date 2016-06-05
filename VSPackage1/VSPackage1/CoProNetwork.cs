@@ -275,6 +275,60 @@ namespace Company.VSPackage1
                 SaveEvent(this, new ChangeCaretEventArgs(" ", 0, file, " "));
             }
         }
+        public void UpdateProjFilesContents(string[] files, byte[][] contents, string[] n_files, byte[][] n_contents)
+        {
+            string absolutePath = ProjPath.Substring(0, ProjPath.LastIndexOf('\\'));
+            string project;
+            string name;
+            for (int i = 0; i < files.Length; i++)
+            {
+                if (File.Exists(absolutePath + "\\" + files[i]))
+                {
+                    using (StreamWriter sr = new StreamWriter(absolutePath + "\\" + files[i], false))
+                    {
+                        sr.Write(System.Text.Encoding.UTF8.GetString(contents[i]));
+                        sr.Flush();
+                    }
+                }
+                else
+                {
+                    File.WriteAllBytes(absolutePath + "\\" + files[i], contents[i]);
+                }
+
+            }
+            for (int i = 0; i < n_files.Length; i++)
+            {
+                File.WriteAllBytes(absolutePath + "\\" + n_files[i], n_contents[i]);
+            }
+            File.WriteAllBytes(ProjPath + "\\CoProFiles\\timestamps.xml", contents[files.Length]);
+            ExpectedSequence++;
+        }
+        public void UpdateSpecificFileCallback(byte[] content, string relPath)
+        {
+            File.WriteAllBytes(ProjPath + relPath.Substring(relPath.IndexOf('\\')), content);
+        }
+        public void NewItemRemovedCallback(string name, string project, bool isDeleted)
+        {
+            if (ItemRemoved != null)
+            {
+                ItemRemoved(this, new ItemRemovedEventArgs(name, project, isDeleted));
+            }
+        }
+        public void NewItemAddedCallback(string relpath, byte[] content, string name, string project)
+        {
+            if (ItemAdded != null)
+            {
+                ItemAdded(this, new NewItemAddedEventArgs(relpath, content, name, project));
+            }
+        }
+        public void AdminFileOpen(string file)
+        {
+            if (AdminEvent != null)
+            {
+                AdminEvent(this, new AdminEventArgs(file));
+            }
+        }
+
 
         /// <summary>
         /// disposes the client object
@@ -385,65 +439,6 @@ namespace Company.VSPackage1
         {
             wcfclient.UpdateSpecificFile(relPath);
         }
-
-        public void UpdateProjFilesContents(string[] files, byte[][] contents, string[] n_files, byte[][] n_contents)
-        {
-            string absolutePath = ProjPath.Substring(0, ProjPath.LastIndexOf('\\'));
-            string project;
-            string name;
-            for (int i = 0; i < files.Length; i++)
-            {
-                if (File.Exists(absolutePath + "\\" + files[i]))
-                {
-                    using (StreamWriter sr = new StreamWriter(absolutePath + "\\" + files[i], false))
-                    {
-                        sr.Write(System.Text.Encoding.UTF8.GetString(contents[i]));
-                        sr.Flush();
-                    }
-                }
-                else
-                {
-                    File.WriteAllBytes(absolutePath + "\\" + files[i], contents[i]);
-                }
-
-            }
-            for (int i = 0; i < n_files.Length; i++)
-            {
-                File.WriteAllBytes(absolutePath + "\\" + n_files[i], n_contents[i]);
-            }
-            File.WriteAllBytes(ProjPath + "\\CoProFiles\\timestamps.xml", contents[files.Length]);
-            ExpectedSequence++;
-        }
-
-        public void UpdateSpecificFileCallback(byte[] content, string relPath)
-        {
-            File.WriteAllBytes(ProjPath + relPath.Substring(relPath.IndexOf('\\')), content);
-        }
-
-        public void NewItemRemovedCallback(string name, string project, bool isDeleted)
-        {
-            if(ItemRemoved!=null)
-            {
-                ItemRemoved(this, new ItemRemovedEventArgs(name, project, isDeleted));
-            }
-        }
-
-        public void NewItemAddedCallback(string relpath, byte[] content, string name, string project)
-        {
-            if(ItemAdded!=null)
-            {
-                ItemAdded(this, new NewItemAddedEventArgs(relpath, content, name, project));
-            }
-        }
-
-        public void AdminFileOpen(string file)
-        {
-            if (AdminEvent != null)
-            {
-                AdminEvent(this, new AdminEventArgs(file));
-            }
-        }
-
 
     }
 

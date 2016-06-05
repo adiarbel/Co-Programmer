@@ -42,6 +42,9 @@ namespace Company.VSPackage1
         public static bool isFirst = true; // flag for the load of the package for a specific project
         bool runFlag = false;// flag to determine if code is running or not
 
+        /// <summary>
+        /// Properties for members
+        /// </summary>
         public static bool MySide
         {
             get { return mySideCalling; }
@@ -56,10 +59,10 @@ namespace Company.VSPackage1
         {
             if (!runFlag)
             {
-                cb = CoProgrammerPackage.cb;
+                cb = CoProgrammerPackage.cb;// gets current network object
                 if (cb == null)
                 {
-                    cb = new CoProNetwork();
+                    cb = new CoProNetwork();//if null create new
                     CoProgrammerPackage.cb = cb;
                 }
                 ToolWindowPane window = CoProgrammerPackage.currRunning.FindToolWindow(typeof(CoProToolWindow), 0, true);
@@ -68,24 +71,24 @@ namespace Company.VSPackage1
                     throw new NotSupportedException(Resources.CanNotCreateWindow);
                 }
                 gobj = new GraphicObjects(GetCurrentViewHost(textViewAdapter), cb, (CoProExplorer)window.Content);
-                gobj.CoProExplorer.SetConnection(cb);
-                if (isFirst)
+                gobj.CoProExplorer.SetConnection(cb);//updates co pro explorer window 
+                if (isFirst)// on opening the solution
                 {
                     se = ((Events2)gobj.DTE2.Events).SolutionEvents;
                     de = ((Events2)gobj.DTE2.Events).DebuggerEvents;
-                    se.Opened += SubscribeGlobalEvents;
-                    de.OnEnterRunMode += new _dispDebuggerEvents_OnEnterRunModeEventHandler(OnRun);
+                    se.Opened += SubscribeGlobalEvents;//solution opened event
+                    de.OnEnterRunMode += new _dispDebuggerEvents_OnEnterRunModeEventHandler(OnRun);//when running the code event
                     bool setAdminConfiguraions = false;
                     var slnName = gobj.DTE2.Solution.FullName;
                     var adminFile = slnName.Substring(0, slnName.Substring(0, slnName.LastIndexOf('\\')).LastIndexOf('\\')) + "\\admin.txt";
                     //IF THERE IS ADMIN INFO
-                    if (File.Exists(adminFile))
+                    if (File.Exists(adminFile))//internal file that was created
                     {
                         StreamReader sr = new StreamReader(adminFile);
                         string dir = sr.ReadToEnd();
                         if (dir.Split('\n')[0] == slnName.Substring(0, slnName.LastIndexOf('\\')))
                         {
-                            CoProgrammerPackage.service = new CoProServer();
+                            CoProgrammerPackage.service = new CoProServer();// runs the server
                             string filesDir = slnName.Substring(0, slnName.LastIndexOf('\\')) + "\\CoProFiles";
                             if (!Directory.Exists(filesDir))
                             {
@@ -93,45 +96,45 @@ namespace Company.VSPackage1
                             }
                             string path = slnName.Substring(0, slnName.LastIndexOf('\\'));
                             XElement xe = CoProgrammerPackage.CreateFileSystemXmlTree(path, 1, path.Substring(path.LastIndexOf('\\') + 1));
-                            XmlTextWriter xwr = new XmlTextWriter(path + "\\CoProFiles\\timestamps.xml", System.Text.Encoding.UTF8);
+                            XmlTextWriter xwr = new XmlTextWriter(path + "\\CoProFiles\\timestamps.xml", System.Text.Encoding.UTF8);// timestamps file creation
                             xwr.Formatting = Formatting.Indented;
                             xe.WriteTo(xwr);
                             xwr.Close();
                             FileStream fs = File.Create(slnName.Substring(0, slnName.LastIndexOf('\\')) + "\\CoProFiles\\client.txt");
                             string ipPort = "localhost:" + (CoProgrammerPackage.service.PortOfService() + 10).ToString() + ":" + dir.Split('\n')[1];
-                            fs.Write(Encoding.ASCII.GetBytes(ipPort), 0, ipPort.Length);
+                            fs.Write(Encoding.ASCII.GetBytes(ipPort), 0, ipPort.Length);// creating client file if there is no one exsisting
                             fs.Close();
                             setAdminConfiguraions = true;
                         }
                     }
                     //IF THERE IS A CLIENT INFO
-                    if (File.Exists(slnName.Substring(0, slnName.LastIndexOf('\\')) + "\\CoProFiles\\client.txt"))
+                    if (File.Exists(slnName.Substring(0, slnName.LastIndexOf('\\')) + "\\CoProFiles\\client.txt"))// internal client info file
                     {
                         StreamReader sr = new StreamReader(slnName.Substring(0, slnName.LastIndexOf('\\')) + "\\CoProFiles\\client.txt");
                         string iportName = sr.ReadToEnd();
                         cb.SetIpPort(iportName.Split(':')[0], iportName.Split(':')[1]);
-                        cb.Name = iportName.Split(':')[2];
-                        if (cb.Connect())
+                        cb.Name = iportName.Split(':')[2];// configurates the class accoridng to info in file
+                        if (cb.Connect())// attempt to connect
                         {
                             cb.ProjPath = slnName.Substring(0, slnName.LastIndexOf('\\'));
                             if (setAdminConfiguraions)
                             {
                                 if (cb.SetAdmin(true))
                                 {
-                                    cb.IsAdmin = true;
+                                    cb.IsAdmin = true;// if is admin, he gets the access to some funcitons 
                                     cb.SetProjectDir(slnName.Substring(0, slnName.LastIndexOf('\\')));
                                 }
                             }
                             else
                             {
                                 cb.IsAdmin = false;
-                                cb.UpdateProject();
+                                cb.UpdateProject();// updates project for regular clients
                             }
                             if (cb.IsAdmin)
                             {
-                                cb.ExpectedSequence++;
+                                cb.ExpectedSequence++;// +1 to current count toget next messages
                             }
-                            gobj.CoProExplorer.UpdateInfo();
+                            gobj.CoProExplorer.UpdateInfo();// updates window info
                         }
                     }
                     else

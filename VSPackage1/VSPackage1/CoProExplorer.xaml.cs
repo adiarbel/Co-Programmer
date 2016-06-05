@@ -24,6 +24,11 @@ namespace Company.VSPackage1
         {
             InitializeComponent();
         }
+        /// <summary>
+        /// Sets the client network object
+        /// </summary>
+        /// <param name="cb"></param>
+        /// 
         public void SetConnection(CoProNetwork cb)
         {
             this.cb=cb;
@@ -35,12 +40,5 @@ namespace Company.VSPackage1
         {
             infoText.Text = cb.IPort[0] + " " + cb.IPort[1];
         }
-        //[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Globalization", "CA1300:SpecifyMessageBoxOptions")]
-        //private void button1_Click(object sender, RoutedEventArgs e)
-        //{
-        //    MessageBox.Show(string.Format(System.Globalization.CultureInfo.CurrentUICulture, "We are inside {0}.button1_Click()", this.ToString()),
-        //                    "My Tool Window");
-
-        //}
     }
 }

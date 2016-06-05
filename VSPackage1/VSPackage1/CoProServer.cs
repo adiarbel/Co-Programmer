@@ -12,7 +12,6 @@ namespace Company.VSPackage1
     public class CoProServer
     {
         ServiceHost host;
-        INetFwPolicy2 fwPolicy2;
         int port;
 
         /// <summary>
@@ -27,27 +26,25 @@ namespace Company.VSPackage1
             host = new ServiceHost(typeof(CoProService.CoProService), new Uri[] { new Uri("http://localhost:" + port), new Uri("net.tcp://localhost:" + (port + 10)) });
             try
             {
-                mybinding = new NetTcpBinding();
+                mybinding = new NetTcpBinding();// BINDING CONFIGURATION
                 mybinding.PortSharingEnabled = true;
                 mybinding.Security.Mode = SecurityMode.None;
-                TimeSpan minutes10 = new TimeSpan(0, 10, 0);
+                TimeSpan minutes10 = new TimeSpan(0, 10, 0);//TIMEOUTS CONFIGURATION
                 mybinding.ReliableSession.InactivityTimeout = minutes10;
                 mybinding.SendTimeout = minutes10;
                 mybinding.ReceiveTimeout = minutes10;
                 mybinding.CloseTimeout = minutes10;
                 mybinding.OpenTimeout = minutes10;
-
                 // Step 3 Add a service endpoint.
-                host.AddServiceEndpoint(typeof(CoProService.ICoProService), mybinding, "CoProService");
-
+                host.AddServiceEndpoint(typeof(CoProService.ICoProService), mybinding, "CoProService");// ADD ENDPOINTS TO THE LIST
                 // Step 4 Enable metadata exchange. 
-                smb = new ServiceMetadataBehavior();
+                smb = new ServiceMetadataBehavior();//SERVICE BEHAVIORS
                 smb.HttpGetEnabled = true;
                 host.Description.Behaviors.Add(smb);
             }
             catch (Exception e)
             {
-
+                //Future exception handler
             }
             while (flag)
             {
@@ -55,13 +52,13 @@ namespace Company.VSPackage1
                 {
                     Task.Factory.StartNew(() =>
                         {
-                            host.Open();
+                            host.Open();//OPEN THE SERVER
                         });
                     flag = false;
                 }
                 catch (Exception e)
                 {
-                    port++;
+                    port++;//IF FAILS CHANGES THE PORT AND RE-CONFIGURES
                     host = new ServiceHost(typeof(CoProService.CoProService), new Uri[] { new Uri("http://localhost:" + port), new Uri("net.tcp://localhost:" + (port + 10)) });
                     mybinding = new NetTcpBinding();
                     mybinding.PortSharingEnabled = true;
@@ -74,32 +71,16 @@ namespace Company.VSPackage1
                     host.Description.Behaviors.Add(smb);
                 }
             }
-            Type tNetFwPolicy2 = Type.GetTypeFromProgID("HNetCfg.FwPolicy2");
-            fwPolicy2 = (INetFwPolicy2)Activator.CreateInstance(tNetFwPolicy2);
-            var currentProfiles = fwPolicy2.CurrentProfileTypes;
-
-            // Let's create a new rule
-
-            INetFwRule2 inboundRule = (INetFwRule2)Activator.CreateInstance(Type.GetTypeFromProgID("HNetCfg.FWRule"));
-            inboundRule.Enabled = true;
-            inboundRule.Protocol = 6; // TCP
-            inboundRule.LocalPorts = (port + 10).ToString();
-            inboundRule.Profiles = currentProfiles;
-            inboundRule.Name = "PortCoProgrammer";
-            inboundRule.Description = "opens it";
-            inboundRule.Action = NET_FW_ACTION_.NET_FW_ACTION_ALLOW;
-            inboundRule.Direction = NET_FW_RULE_DIRECTION_.NET_FW_RULE_DIR_IN;
-
-            fwPolicy2.Rules.Add(inboundRule);
         }
+
         /// <summary>
         /// Closing the service
         /// </summary>
         public void Close()
         {
             host.Close();
-            fwPolicy2.Rules.Remove("PortCoProgrammer");
         }
+
         /// <summary>
         /// getter for addresses
         /// </summary>
@@ -108,6 +89,7 @@ namespace Company.VSPackage1
         {
             return host.BaseAddresses;
         }
+
         /// <summary>
         /// getter for the port
         /// </summary>
